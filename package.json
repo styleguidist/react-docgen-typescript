@@ -1,0 +1,20 @@
+{
+  "name": "react-docgen-typescript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc & node ./temp/parser.js",
+    "test": "tsc & mocha ./temp/**/__tests__/**.js"
+  },
+  "author": "pvasek",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^1.8.10"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5",
+    "typings": "^0.8.1"
+  }
+}
