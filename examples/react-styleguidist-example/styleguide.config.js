@@ -11,7 +11,7 @@ module.exports = {
 	},
 	resolver: require('react-docgen').resolver.findAllComponentDefinitions,
 	
-	propsParser: require('../../temp/propTypesParser').parse,
+	propsParser: require('../../lib/propTypesParser').parse,
 	
 	updateWebpackConfig: function(webpackConfig, env) {
 		var dir = path.resolve(__dirname, 'lib');

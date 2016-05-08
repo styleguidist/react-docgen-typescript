@@ -5,25 +5,25 @@ import { Component } from 'react';
  * Column properties.
  */
 export interface IColumnProps {
-	/** simple class name */
-    className?: string;
-	/** super simple property */
-    prop1: number;
-	/** callback property */
-    prop2: () => void;
-	/** Enum props */
-    prop3: 'option1' | 'option2' | "option3";
+	/** prop1 description */
+    prop1?: string;
+	/** prop2 description */
+    prop2: number;
+	/** 
+     * prop3 description 
+     */
+    prop3: () => void;
+	/** prop4 description */
+    prop4: 'option1' | 'option2' | 'option3';
 }
 
 /**
  * Form column.
  */
 export class Column extends Component<IColumnProps, {}> {
-
+    
     render() {
-        return (
-            <div>test</div>
-        );
+        return <div>Test</div>;
     }            
 }
 

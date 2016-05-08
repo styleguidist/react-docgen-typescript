@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Component, PropTypes, Children, EventHandler, KeyboardEvent } from 'react';
-import * as classNames from 'classnames';
+import { Component } from 'react';
 
 /**
  * Column properties.
@@ -22,20 +21,9 @@ export interface IColumnProps {
  * Form column.
  */
 export class Column extends Component<IColumnProps, {}> {
-
-    static propTypes: any = {
-        /** Additional class name that will be included on the element. */
-        className: PropTypes.string,
-    }
     
     render() {
-        
-        const { className } = this.props;
-        return (
-            <div className={classNames('st-col', className)}>
-                {this.props.children}
-            </div>
-        );
+        return <div>Test</div>;
     }            
 }
 
