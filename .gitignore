@@ -43,3 +43,5 @@ jspm_packages
 ### VisualStudioCode ###
 .vscode
 
+# App
+lib

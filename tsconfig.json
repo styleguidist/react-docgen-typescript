@@ -3,13 +3,16 @@
         "module": "commonjs",
         "target": "es5",
         "noImplicitAny": false,
-        "sourceMap": false,
-        "outDir": "./temp"
+        "sourceMap": true,
+        "outDir": "lib",
+        "jsx": "react"
     },
     "exclude": [
         "node_modules",
         "typings/browser",
         "typings/browser.d.ts",
-        "__tests__/data"
+        "examples",
+        "lib",
+        "src/__tests__/data"
     ]
 }

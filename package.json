@@ -2,10 +2,12 @@
   "name": "react-docgen-typescript",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "scripts": {
-    "start": "tsc & node ./temp/parser.js",
-    "test": "tsc & mocha ./temp/**/__tests__/**.js"
+    "prepublish": "tsc -d",
+    "test": "tsc && mocha ./lib/**/__tests__/**.js",
+    "example": "tsc && styleguidist server --config ./examples/react-styleguidist-example/styleguide.config.js"
   },
   "author": "pvasek",
   "license": "MIT",
@@ -13,8 +15,19 @@
     "typescript": "^1.8.10"
   },
   "devDependencies": {
+    "babel-core": "^6.8.0",
+    "babel-loader": "^6.2.4",
     "chai": "^3.5.0",
+    "file-loader": "^0.8.5",
     "mocha": "^2.4.5",
+    "react": "^15.0.2",
+    "react-dom": "^15.0.2",
+    "react-styleguidist": "^2.2.1",
+    "ts-loader": "^0.8.2",
     "typings": "^0.8.1"
-  }
+  },
+  "files": [
+    "lib",
+    "README.md"
+  ]
 }

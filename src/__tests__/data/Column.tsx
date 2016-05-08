@@ -6,14 +6,16 @@ import * as classNames from 'classnames';
  * Column properties.
  */
 export interface IColumnProps {
-	/** simple class name */
-    className?: string;
-	/** super simple prop */
-    prop1: number;
-	/** callbackx prop */
-    prop2: () => void;
-	/** Enum props */
-    prop3: 'option1' | 'option2' | 'option3';
+	/** prop1 description */
+    prop1?: string;
+	/** prop2 description */
+    prop2: number;
+	/** 
+     * prop3 description 
+     */
+    prop3: () => void;
+	/** prop4 description */
+    prop4: 'option1' | 'option2' | "option3";
 }
 
 /**

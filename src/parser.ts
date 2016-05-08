@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as ts from 'typescript';
+import { dumpNode, navigate, getFlatChildren } from './nodeUtils';
 
 
 const defaultOptions: ts.CompilerOptions = {
@@ -9,7 +10,9 @@ const defaultOptions: ts.CompilerOptions = {
 
 export interface ClassDoc {
     name: string;
-    comment: string;
+    extends: string;
+    propInterface: string;
+    comment: string;    
 }
 
 export interface InterfaceDoc {
@@ -22,6 +25,7 @@ export interface MemberDoc {
     name: string;
     text: string;
     type: string;
+    values?: string[];
     isRequired: boolean;
     comment: string;
 }
@@ -41,7 +45,7 @@ export function getDocumentation(fileName: string, options: ts.CompilerOptions =
     
     const sourceFile = program.getSourceFile(fileName);
     ts.forEachChild(sourceFile, visit);
-
+    
     /** visit nodes finding exported classes */    
     function visit(node: ts.Node) {
         // Only consider exported nodes
@@ -50,34 +54,49 @@ export function getDocumentation(fileName: string, options: ts.CompilerOptions =
         }
 
         if (node.kind === ts.SyntaxKind.ClassDeclaration) {
-            let symbol = checker.getSymbolAtLocation((<ts.ClassDeclaration>node).name);
+            const classNode = node as ts.ClassDeclaration;
+            const symbol = checker.getSymbolAtLocation(classNode.name);                                   
+            
+            const typeArguments = navigate(classNode, 
+                ts.SyntaxKind.HeritageClause, 
+                ts.SyntaxKind.ExpressionWithTypeArguments);
+                
+            const list = getFlatChildren(typeArguments)
+                .filter(i => i.kind === ts.SyntaxKind.Identifier)
+                .map((i: ts.Identifier) => i.text);
+
             classes.push({
                 name: symbol.name,
-                comment: ts.displayPartsToString(symbol.getDocumentationComment()) 
+                comment: ts.displayPartsToString(symbol.getDocumentationComment()),
+                extends: list.length > 0 ? list[0] : null,
+                propInterface: list.length > 1 ? list[1] : null,
             });            
         }
 
         if (node.kind === ts.SyntaxKind.InterfaceDeclaration) {
-             if ((<ts.InterfaceDeclaration>node).parent === sourceFile) {
-                 
-                const symbol = checker.getSymbolAtLocation((<ts.InterfaceDeclaration>node).name);
-                const type = checker.getTypeAtLocation((<ts.InterfaceDeclaration>node).name);
+            const interfaceDeclaration = node as ts.InterfaceDeclaration;
+             if (interfaceDeclaration.parent === sourceFile) {
+                                  
+                const symbol = checker.getSymbolAtLocation(interfaceDeclaration.name);
+                const type = checker.getTypeAtLocation(interfaceDeclaration.name);
                 
                 const members = type.getProperties().map(i => {
                     const symbol = checker.getSymbolAtLocation(i.valueDeclaration.name);
                     const prop = i.valueDeclaration as ts.PropertySignature;
+                    const typeInfo = getType(prop);
                     return {
                         name: i.getName(),                                        
                         text: i.valueDeclaration.getText(),
-                        type: prop.type.getText(),
+                        type: typeInfo.type,
+                        values: typeInfo.values,
                         isRequired: prop.questionToken === null,
-                        comment: ts.displayPartsToString(symbol.getDocumentationComment()),
+                        comment: ts.displayPartsToString(symbol.getDocumentationComment()).trim(),
                     };                    
                 });
                 
                 const interfaceDoc: InterfaceDoc = {
                     name: symbol.getName(),
-                    comment: ts.displayPartsToString(symbol.getDocumentationComment()),
+                    comment: ts.displayPartsToString(symbol.getDocumentationComment()).trim(),
                     members: members,
                 };
                 interfaces.push(interfaceDoc);
@@ -100,7 +119,18 @@ export function getDocumentation(fileName: string, options: ts.CompilerOptions =
     }
 }
 
-
+function getType(prop: ts.PropertySignature): { type: string, values?: string[]}  {
+    const unionType = prop.type as ts.UnionTypeNode;
+    if (unionType && unionType.types) {
+        return {
+            type: 'string',
+            values: unionType.types.map(i => i.getText()),
+        }        
+    }
+    return {
+        type: prop.type.getText(),
+    }
+}
 // /** Serialize a symbol into a json object */    
 //     function serializeSymbol(symbol: ts.Symbol): DocEntry {
 //         return {
