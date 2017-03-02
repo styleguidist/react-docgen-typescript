@@ -110,7 +110,7 @@ export function getDocumentation(fileName: string, options: ts.CompilerOptions =
 
     /** True if this is visible outside this file, false otherwise */
     function isNodeExported(node: ts.Node): boolean {
-        return (node.flags & ts.NodeFlags.Export) !== 0 || (node.parent && node.parent.kind === ts.SyntaxKind.SourceFile);
+        return (node.flags & ts.ModifierFlags.Export) !== 0 || (node.parent && node.parent.kind === ts.SyntaxKind.SourceFile);
     }
     
     return {
@@ -124,7 +124,7 @@ function getType(prop: ts.PropertySignature): { type: string, values?: string[]}
     if (unionType && unionType.types) {
         return {
             type: 'string',
-            values: unionType.types.map(i => i.getText()),
+            values: (unionType.types as Array<any>).map(i => i.getText()),
         }        
     }
     return {

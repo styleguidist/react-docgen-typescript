@@ -1,10 +1,10 @@
 import * as React from 'react';
-import {Component} from 'react';
+import { Component } from 'react';
 
 /**
- * Column properties.
+ * Grid properties.
  */
-export interface IColumnProps {
+export interface IGridProps {
     /** prop1 description */
     prop1?: string;
     /** prop2 description */
@@ -18,13 +18,13 @@ export interface IColumnProps {
 }
 
 /**
- * Form column.
+ * Form Grid.
  */
-export class Column extends Component<IColumnProps, {}> {
+export class Grid extends Component<IGridProps, {}> {
 
     render() {
-        return <div>Column</div>;
+        return <div>Grid</div>;
     }
 }
 
-export default Column;
+export default Grid;

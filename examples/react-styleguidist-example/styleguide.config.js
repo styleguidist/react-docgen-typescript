@@ -1,5 +1,5 @@
-var path = require('path');
-var glob = require('glob');
+const path = require('path');
+const glob = require('glob');
 
 module.exports = {
 	title: 'React Style Guide Example',
@@ -14,7 +14,7 @@ module.exports = {
 	propsParser: require('../../lib/propTypesParser').parse,
 	
 	updateWebpackConfig: function(webpackConfig, env) {
-		var dir = path.resolve(__dirname, 'lib');
+		const dir = path.resolve(__dirname, 'lib');
         webpackConfig.resolve.extensions.push('.ts');
         webpackConfig.resolve.extensions.push('.tsx');
         
@@ -22,7 +22,7 @@ module.exports = {
             { 
                 test: /\.tsx?$/,
                 include: __dirname,
-                loader: 'ts-loader'
+                loader: 'awesome-typescript-loader'
             }
         );
 		return webpackConfig;

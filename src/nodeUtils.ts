@@ -368,8 +368,8 @@ function kindToString(kind: ts.SyntaxKind) {
             return 'ParenthesizedType';
         case ts.SyntaxKind.ThisType:
             return 'ThisType';
-        case ts.SyntaxKind.StringLiteralType:
-            return 'StringLiteralType';
+        case ts.SyntaxKind.StringLiteral:
+            return 'StringLiteral';
         case ts.SyntaxKind.ObjectBindingPattern:
             return 'ObjectBindingPattern';
         case ts.SyntaxKind.ArrayBindingPattern:
@@ -418,8 +418,8 @@ function kindToString(kind: ts.SyntaxKind) {
             return 'TemplateExpression';
         case ts.SyntaxKind.YieldExpression:
             return 'YieldExpression';
-        case ts.SyntaxKind.SpreadElementExpression:
-            return 'SpreadElementExpression';
+        case ts.SyntaxKind.SpreadElement:
+            return 'SpreadElement';
         case ts.SyntaxKind.ClassExpression:
             return 'ClassExpression';
         case ts.SyntaxKind.OmittedExpression:

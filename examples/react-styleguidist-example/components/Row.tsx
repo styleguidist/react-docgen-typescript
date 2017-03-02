@@ -1,10 +1,10 @@
 import * as React from 'react';
-import {Component} from 'react';
+import { Component } from 'react';
 
 /**
- * Column properties.
+ * Row properties.
  */
-export interface IColumnProps {
+export interface IRowProps {
     /** prop1 description */
     prop1?: string;
     /** prop2 description */
@@ -18,13 +18,13 @@ export interface IColumnProps {
 }
 
 /**
- * Form column.
+ * Form Row.
  */
-export class Column extends Component<IColumnProps, {}> {
+export class Row extends Component<IRowProps, {}> {
 
     render() {
-        return <div>Column</div>;
+        return <div>Row</div>;
     }
 }
 
-export default Column;
+export default Row;
