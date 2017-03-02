@@ -24,8 +24,4 @@ export const Grid = (props: IGridProps) => {
     return <div>Grid</div>;
 };
 
-const notExported = (props: IGridProps) => {
-    return <div>not exported grid</div>
-};
-
 export default Grid;
