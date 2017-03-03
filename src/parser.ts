@@ -79,7 +79,7 @@ export function getDocumentation(fileName: string, options: ts.CompilerOptions =
             classes.push({
                 name: symbol.name,
                 comment: ts.displayPartsToString(symbol.getDocumentationComment()),
-                extends: list.length > 0 ? list[0] : null,
+                extends: list.length > 0 && list.indexOf('Component') > -1 ? 'Component' : null,
                 propInterface: list.length > 1 ? list[1] : null,
             });
         }

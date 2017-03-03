@@ -14,6 +14,7 @@ describe('parser', () => {
         const c = result.classes[0];
         assert.equal('Column', c.name);
         assert.equal('Form column.', c.comment);
+        assert.equal('Component', c.extends);
 
         const i = result.interfaces[0];
         assert.equal('IColumnProps', i.name);
@@ -40,6 +41,7 @@ describe('parser', () => {
         const c = result.classes[0];
         assert.equal('Row', c.name);
         assert.equal('Form row.', c.comment);
+        assert.equal('StatelessComponent', c.extends);
 
         const i = result.interfaces[0];
         assert.equal('IRowProps', i.name);

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Component } from 'react';
 
 /**
  * Column properties.
@@ -20,7 +19,7 @@ export interface IColumnProps {
 /**
  * Form column.
  */
-export class Column extends Component<IColumnProps, {}> {
+export class Column extends React.Component<IColumnProps, {}> {
     
     render() {
         return <div>Test</div>;
