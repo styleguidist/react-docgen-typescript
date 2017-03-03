@@ -100,7 +100,7 @@ export function getDocumentation(fileName: string, options: ts.CompilerOptions =
                         text: i.valueDeclaration.getText(),
                         type: typeInfo.type,
                         values: typeInfo.values,
-                        isRequired: prop.questionToken === null,
+                        isRequired: !prop.questionToken,
                         comment: ts.displayPartsToString(symbol.getDocumentationComment()).trim(),
                     };
                 });

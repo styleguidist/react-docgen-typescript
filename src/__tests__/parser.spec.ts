@@ -22,12 +22,19 @@ describe('parser', () => {
         assert.equal(4, i.members.length);
         assert.equal('prop1', i.members[0].name);
         assert.equal('prop1 description', i.members[0].comment);
+        assert.equal(false, i.members[0].isRequired);
+
         assert.equal('prop2', i.members[1].name);
         assert.equal('prop2 description', i.members[1].comment);
+        assert.equal(true, i.members[1].isRequired);
+
         assert.equal('prop3', i.members[2].name);
         assert.equal('prop3 description', i.members[2].comment);
+        assert.equal(true, i.members[2].isRequired);
+
         assert.equal('prop4', i.members[3].name);
         assert.equal('prop4 description', i.members[3].comment);
+        assert.equal(true, i.members[3].isRequired);
     });
 
     it('Should parse functional components', () => {
@@ -49,12 +56,19 @@ describe('parser', () => {
         assert.equal(4, i.members.length);
         assert.equal('prop1', i.members[0].name);
         assert.equal('prop1 description', i.members[0].comment);
+        assert.equal(false, i.members[0].isRequired);
+
         assert.equal('prop2', i.members[1].name);
         assert.equal('prop2 description', i.members[1].comment);
+        assert.equal(true, i.members[1].isRequired);
+
         assert.equal('prop3', i.members[2].name);
         assert.equal('prop3 description', i.members[2].comment);
+        assert.equal(true, i.members[2].isRequired);
+
         assert.equal('prop4', i.members[3].name);
         assert.equal('prop4 description', i.members[3].comment);
+        assert.equal(true, i.members[3].isRequired);
     });
 
 });
