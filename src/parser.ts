@@ -121,7 +121,18 @@ export function getDocumentation(fileName: string, options: ts.CompilerOptions =
 
     /** True if this is visible outside this file, false otherwise */
     function isNodeExported(node: ts.Node): boolean {
-        return (node.flags & ts.ModifierFlags.Export) !== 0 || (node.parent && node.parent.kind === ts.SyntaxKind.SourceFile);
+        // Parse the modifier array for the export keyword. If it is found
+        // and the node.parent is a sourcefile, return true
+        // This only returns top level exports
+        const {modifiers} = node;
+        if (modifiers) {
+            for (let i = 0; i < (modifiers as Array<any>).length; i++) {
+                if (modifiers[i].kind === ts.SyntaxKind.ExportKeyword) {
+                    return node.parent.kind === ts.SyntaxKind.SourceFile
+                }
+            }
+        }
+        return false;
     }
 
     return {

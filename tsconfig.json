@@ -5,12 +5,12 @@
     "noImplicitAny": false,
     "sourceMap": true,
     "outDir": "lib",
-    "jsx": "react"
+    "jsx": "react",
+    "typeRoots": [
+      "node_modules/@types"
+    ]
   },
   "include": [
     "src/**/*.ts"
-  ],
-  "exclude": [
-    "src/__tests__/**/*"
   ]
 }
