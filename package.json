@@ -31,7 +31,8 @@
     "react-bluekit": "^0.4.1",
     "react-dom": "^15.4.2",
     "react-styleguidist": "^2.2.1",
-    "ts-node": "^2.1.0"
+    "ts-node": "^2.1.0",
+    "typescript": "^2.2.1"
   },
   "files": [
     "lib",

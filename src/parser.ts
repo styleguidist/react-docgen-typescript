@@ -37,11 +37,13 @@ export interface FileDoc {
 export function getDocumentation(fileName: string, options: ts.CompilerOptions = defaultOptions): FileDoc {
 
     let program = ts.createProgram([fileName], options);
+    //noinspection TypeScriptUnresolvedFunction
     let checker = program.getTypeChecker();
 
     const classes: ClassDoc[] = [];
     const interfaces: InterfaceDoc[] = [];
 
+    //noinspection TypeScriptUnresolvedFunction
     const sourceFile = program.getSourceFile(fileName);
     ts.forEachChild(sourceFile, visit);
 
@@ -91,19 +93,24 @@ export function getDocumentation(fileName: string, options: ts.CompilerOptions =
                 const symbol = checker.getSymbolAtLocation(interfaceDeclaration.name);
                 const type = checker.getTypeAtLocation(interfaceDeclaration.name);
 
-                const members = type.getProperties().map(i => {
-                    const symbol = checker.getSymbolAtLocation(i.valueDeclaration.name);
-                    const prop = i.valueDeclaration as ts.PropertySignature;
-                    const typeInfo = getType(prop);
-                    return {
-                        name: i.getName(),
-                        text: i.valueDeclaration.getText(),
-                        type: typeInfo.type,
-                        values: typeInfo.values,
-                        isRequired: !prop.questionToken,
-                        comment: ts.displayPartsToString(symbol.getDocumentationComment()).trim(),
-                    };
-                });
+                const members = type.getProperties()
+                    .filter(i => {
+                        const s = i as any;
+                        return s.parent && s.parent.name && symbol.name === s.parent.name;
+                    })
+                    .map(i => {
+                        const symbol = checker.getSymbolAtLocation(i.valueDeclaration.name);
+                        const prop = i.valueDeclaration as ts.PropertySignature;
+                        const typeInfo = getType(prop);
+                        return {
+                            name: i.getName(),
+                            text: i.valueDeclaration.getText(),
+                            type: typeInfo.type,
+                            values: typeInfo.values,
+                            isRequired: !prop.questionToken,
+                            comment: ts.displayPartsToString(symbol.getDocumentationComment()).trim(),
+                        };
+                    });
 
                 const interfaceDoc: InterfaceDoc = {
                     name: symbol.getName(),
@@ -149,6 +156,7 @@ function getType(prop: ts.PropertySignature): {type: string, values?: string[]} 
             values: (unionType.types as Array<any>).map(i => i.getText()),
         }
     }
+    //noinspection TypeScriptUnresolvedFunction
     return {
         type: prop.type.getText(),
     }

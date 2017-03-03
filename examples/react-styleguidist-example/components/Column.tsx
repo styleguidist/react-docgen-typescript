@@ -4,7 +4,7 @@ import {Component} from 'react';
 /**
  * Column properties.
  */
-export interface IColumnProps {
+export interface IColumnProps extends React.HTMLAttributes<any> {
     /** prop1 description */
     prop1?: string;
     /** prop2 description */
