@@ -1,5 +1,5 @@
 {
-  "name": "react-docgen-typescript",
+  "name": "@specless/react-docgen-typescript",
   "version": "0.0.2",
   "description": "",
   "main": "lib/index.js",
