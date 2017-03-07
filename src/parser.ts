@@ -161,32 +161,4 @@ function getType(prop: ts.PropertySignature): {type: string, values?: string[]} 
         type: prop.type.getText(),
     }
 }
-// /** Serialize a symbol into a json object */    
-//     function serializeSymbol(symbol: ts.Symbol): DocEntry {
-//         return {
-//             name: symbol.getName(),
-//             documentation: ts.displayPartsToString(symbol.getDocumentationComment()),
-//             type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration))
-//         };
-//     }
-
-//     /** Serialize a class symbol infomration */
-//     function serializeClass(symbol: ts.Symbol) {
-//         //console.log('flags: ', symbol.getFlags(), ' declarations:', symbol.getDeclarations());
-//         let details = serializeSymbol(symbol);
-
-//         // Get the construct signatures
-//         let constructorType = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
-//         details.constructors = constructorType.getConstructSignatures().map(serializeSignature);
-//         return details;
-//     }
-
-//     /** Serialize a signature (call or construct) */
-//     function serializeSignature(signature: ts.Signature) {
-//         return {
-//             parameters: signature.parameters.map(serializeSymbol),
-//             returnType: checker.typeToString(signature.getReturnType()),
-//             documentation: ts.displayPartsToString(signature.getDocumentationComment())
-//         };
-//     }
     
