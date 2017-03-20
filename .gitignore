@@ -43,5 +43,8 @@ jspm_packages
 ### VisualStudioCode ###
 .vscode
 
+### Webstorm ###
+.idea
+
 # App
 lib

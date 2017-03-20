@@ -1,13 +1,12 @@
 {
-  "name": "@specless/react-docgen-typescript",
+  "name": "react-docgen-typescript",
   "version": "0.0.2",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
     "prepublish": "tsc -d",
     "test": "tsc && mocha ./lib/**/__tests__/**.js",
-    "example": "tsc && node ./node_modules/react-styleguidist/bin/styleguidist server --config ./examples/react-styleguidist-example/styleguide.config.js",
-    "example:ws": "tsc && node %NODE_DEBUG_OPTION% ./node_modules/react-styleguidist/bin/styleguidist server --config ./examples/react-styleguidist-example/styleguide.config.js"
+    "example": "tsc && node ./node_modules/react-styleguidist/bin/styleguidist server --config ./examples/react-styleguidist-example/styleguide.config.js"
   },
   "author": "pvasek",
   "license": "MIT",
