@@ -52,13 +52,46 @@ export class Column extends Component<IColumnProps, {}> {
         return <div>Test</div>;
     }            
 }
+```
+Will generate the following stylesheet:
+![Stylesheet example](./stylesheet-example-column.png "Stylesheet example")
 
-export default Column;
+The functional component [`Grid.tsx`](./example/react-styleguidist-example/components/Grid.tsx)
+
+```javascript
+import * as React from 'react';
+
+/**
+ * Grid properties.
+ */
+export interface IGridProps {
+    /** prop1 description */
+    prop1?: string;
+    /** prop2 description */
+    prop2: number;
+    /**
+     * prop3 description
+     */
+    prop3: () => void;
+    /** Working grid description */
+    prop4: 'option1' | 'option2' | 'option3';
+}
+
+/**
+ * Form Grid.
+ */
+export const Grid = (props: IGridProps) => {
+    const smaller = () => {return;};
+    return <div>Grid</div>;
+};
 ```
 
 Will generate the following stylesheet:
-![Stylesheet example](./stylesheet-example.png "Stylesheet example")
+![Stylesheet example](./stylesheet-example-grid.png "Stylesheet example")
 
+## Thanks to contributors
 
-## Thanks
+@JocD Jacques Dukes - complete support for functional components and much more
+
+## Thanks to others
 The integration with reac-styleguidist wouldn't be possible without [Vyacheslav Slinko](https://github.com/vslinko) pull request [#118](https://github.com/sapegin/react-styleguidist/pull/118) react-styleguidist.
