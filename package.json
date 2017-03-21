@@ -1,30 +1,37 @@
 {
   "name": "react-docgen-typescript",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
   "scripts": {
     "prepublish": "tsc -d",
     "test": "tsc && mocha ./lib/**/__tests__/**.js",
-    "example": "tsc && styleguidist server --config ./examples/react-styleguidist-example/styleguide.config.js"
+    "example": "tsc && node ./node_modules/react-styleguidist/bin/styleguidist server --config ./examples/react-styleguidist-example/styleguide.config.js"
   },
   "author": "pvasek",
   "license": "MIT",
   "dependencies": {
-    "typescript": "^1.8.10"
+    "awesome-typescript-loader": "^3.0.8",
+    "typescript": "^2.2.1"
   },
   "devDependencies": {
+    "@types/chai": "^3.4.35",
+    "@types/mocha": "^2.2.39",
+    "@types/node": "^7.0.5",
+    "@types/react": "^15.0.14",
+    "@types/react-dom": "^0.14.23",
+    "@types/react-redux": "^4.4.36",
     "babel-core": "^6.8.0",
     "babel-loader": "^6.2.4",
     "chai": "^3.5.0",
     "file-loader": "^0.8.5",
-    "mocha": "^2.4.5",
-    "react": "^15.0.2",
-    "react-dom": "^15.0.2",
+    "mocha": "^2.5.3",
+    "react": "^15.4.2",
+    "react-bluekit": "^0.4.1",
+    "react-dom": "^15.4.2",
     "react-styleguidist": "^2.2.1",
-    "ts-loader": "^0.8.2",
-    "typings": "^0.8.1"
+    "ts-node": "^2.1.0",
+    "typescript": "^2.2.1"
   },
   "files": [
     "lib",

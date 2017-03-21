@@ -1,18 +1,16 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "target": "es5",
-        "noImplicitAny": false,
-        "sourceMap": true,
-        "outDir": "lib",
-        "jsx": "react"
-    },
-    "exclude": [
-        "node_modules",
-        "typings/browser",
-        "typings/browser.d.ts",
-        "examples",
-        "lib",
-        "src/__tests__/data"
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "outDir": "lib",
+    "jsx": "react",
+    "typeRoots": [
+      "node_modules/@types"
     ]
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
 }
