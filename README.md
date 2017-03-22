@@ -21,7 +21,7 @@ propsParser: require('react-docgen-typescript').parse
 
 In the example folder you can see react-styleguidist integration.
 
-The component [`Column.tsx`](./example/react-styleguidist-example/components/Column.tsx)
+The component [`Column.tsx`](./examples/react-styleguidist-example/components/Column.tsx)
 
 ```javascript
 import * as React from 'react';
@@ -56,7 +56,7 @@ export class Column extends Component<IColumnProps, {}> {
 Will generate the following stylesheet:
 ![Stylesheet example](./stylesheet-example-column.png "Stylesheet example")
 
-The functional component [`Grid.tsx`](./example/react-styleguidist-example/components/Grid.tsx)
+The functional component [`Grid.tsx`](./examples/react-styleguidist-example/components/Grid.tsx)
 
 ```javascript
 import * as React from 'react';
