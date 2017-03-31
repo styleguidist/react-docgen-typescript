@@ -14,6 +14,7 @@ export function convertToDocgen(doc: FileDoc) {
     const props = reactInterfaces[0];
 
     return {
+		displayName: comp.name,
         description: comp.comment,
         props: props.members.reduce((acc, i) => {
             const item: PropItem = {
