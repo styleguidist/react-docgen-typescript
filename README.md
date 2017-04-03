@@ -93,5 +93,7 @@ Will generate the following stylesheet:
 
 @JocD Jacques Dukes - complete support for functional components and much more
 
+@sapegin Artem Sapegin - fix for compatibility with react-styleguidist v5
+
 ## Thanks to others
 The integration with reac-styleguidist wouldn't be possible without [Vyacheslav Slinko](https://github.com/vslinko) pull request [#118](https://github.com/sapegin/react-styleguidist/pull/118) react-styleguidist.
