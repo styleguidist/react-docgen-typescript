@@ -1,5 +1,9 @@
 # react-docgen-typescript
 
+<img src="https://travis-ci.org/pvasek/react-docgen-typescript.svg?branch=master"/>
+
+<img src="https://nodei.co/npm/react-docgen-typescript.png?downloadRank=true&downloads=true"/>
+
 A simple parser for react properties defined in typescript instead of propTypes. 
 
 It can be used with [react-styleguidist](https://github.com/sapegin/react-styleguidist).
