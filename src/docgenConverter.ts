@@ -1,6 +1,16 @@
-import { FileDoc } from './parser';
+import { FileDoc, InterfaceDoc, MemberDoc } from './parser';
 
-export function convertToDocgen(doc: FileDoc) {
+export interface StyleguidistProps {
+    [key: string]: PropItem;
+}
+
+export interface StyleguidistComponent {
+    displayName: string;
+    description: string;
+    props: StyleguidistProps;
+}
+
+export function convertToDocgen(doc: FileDoc): StyleguidistComponent {
     const reactClasses = doc.classes.filter(i => i.extends === 'Component' || i.extends === 'StatelessComponent');
 
     if (reactClasses.length === 0) {
@@ -8,28 +18,18 @@ export function convertToDocgen(doc: FileDoc) {
     }
     const comp = reactClasses[0];
     const reactInterfaces = doc.interfaces.filter(i => i.name === comp.propInterface);
-    if (reactInterfaces.length === 0) {
-        return null;
+    
+    let props: any = {};
+    if (reactInterfaces.length !== 0) {
+        props = getProps(reactInterfaces[0]);
+    } else {
+        console.warn('REACT-DOCGEN-TYPESCRIPT It seems that your props type is not exported. Add \'export\' keyword to your props definition.');
     }
-    const props = reactInterfaces[0];
 
     return {
 		displayName: comp.name,
         description: comp.comment,
-        props: props.members.reduce((acc, i) => {
-            const item: PropItem = {
-                description: i.comment,
-                type: {name: i.type},
-                defaultValue: null,
-                required: i.isRequired
-            };
-            if (i.values) {
-                item.description = item.description + ' (one of the following:' + i.values.join(',') + ')';
-            }
-
-            acc[i.name] = item;
-            return acc;
-        }, {})
+        props: props
     }
 }
 
@@ -54,6 +54,22 @@ export interface Docgen {
     props: PropsObject;
 }
 
+function getProps(props: InterfaceDoc): StyleguidistProps {
+    return props.members.reduce((acc, i) => {
+        const item: PropItem = {
+            description: i.comment,
+            type: {name: i.type},
+            defaultValue: null,
+            required: i.isRequired
+        };
+        if (i.values) {
+            item.description = item.description + ' (one of the following:' + i.values.join(',') + ')';
+        }
+
+        acc[i.name] = item;
+        return acc;
+    }, {});
+}
 /*
  {
  "props": {

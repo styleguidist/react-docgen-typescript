@@ -1,11 +1,12 @@
 {
   "name": "react-docgen-typescript",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
     "prepublish": "tsc -d",
     "test": "tsc && mocha ./lib/**/__tests__/**.js",
+    "test:debug": "tsc && mocha --debug ./lib/**/__tests__/**.js",
     "example": "tsc && node ./node_modules/react-styleguidist/bin/styleguidist server --config ./examples/react-styleguidist-example/styleguide.config.js"
   },
   "author": "pvasek",

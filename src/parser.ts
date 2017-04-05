@@ -66,7 +66,7 @@ export function getDocumentation(fileName: string, options: ts.CompilerOptions =
             };
             classes.push(classObj);
         }
-        if (node.kind === ts.SyntaxKind.ClassDeclaration) {
+        if (node.kind === ts.SyntaxKind.ClassDeclaration) {   
             const classNode = node as ts.ClassDeclaration;
             const symbol = checker.getSymbolAtLocation(classNode.name);
 
@@ -78,11 +78,14 @@ export function getDocumentation(fileName: string, options: ts.CompilerOptions =
                 .filter(i => i.kind === ts.SyntaxKind.Identifier)
                 .map((i: ts.Identifier) => i.text);
 
+            const componentIndex = list.indexOf('Component');
+            const propsIndex = componentIndex === -1 ? -1 : (componentIndex + 1);
+
             classes.push({
                 name: symbol.name,
                 comment: ts.displayPartsToString(symbol.getDocumentationComment()),
-                extends: list.length > 0 && list.indexOf('Component') > -1 ? 'Component' : null,
-                propInterface: list.length > 1 ? list[1] : null,
+                extends: list.length > 0 && componentIndex > -1 ? 'Component' : null,
+                propInterface: list.length > propsIndex ? list[propsIndex] : null,
             });
         }
 
