@@ -37,6 +37,20 @@ describe('parser', () => {
         assert.equal(true, i.members[3].isRequired);
     });
 
+    it('Should parse class-based components with unexported props interface', () => {
+        const fileName = path.join(__dirname, '../../src/__tests__/data/ColumnWithoutExportedProps.tsx'); // it's running in ./temp    
+        const result = getDocumentation(fileName);
+        assert.ok(result.classes);
+        assert.ok(result.interfaces);
+        assert.equal(1, result.classes.length);
+        assert.equal(0, result.interfaces.length);
+
+        const c = result.classes[0];
+        assert.equal('Column', c.name);
+        assert.equal('Form column.', c.comment);
+        assert.equal('Component', c.extends);
+    });
+
     it('Should parse functional components', () => {
         const fileName = path.join(__dirname, '../../src/__tests__/data/Row.tsx'); // it's running in ./temp
         const result = getDocumentation(fileName);
