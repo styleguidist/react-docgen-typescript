@@ -79,12 +79,23 @@ export function getDocumentation(fileName: string, options: ts.CompilerOptions =
                 .map((i: ts.Identifier) => i.text);
 
             const componentIndex = list.indexOf('Component');
-            const propsIndex = componentIndex === -1 ? -1 : (componentIndex + 1);
+            let propsIndex = -1;
+            let extendsClass;
+
+            if (componentIndex > -1) {
+                propsIndex = componentIndex + 1;
+                extendsClass = 'Component';
+            } else {
+                const pureIndex = list.indexOf('PureComponent');
+
+                propsIndex = pureIndex === -1 ? -1 : (pureIndex + 1);
+                extendsClass = pureIndex === -1 ? null : 'PureComponent';
+            }
 
             classes.push({
                 name: symbol.name,
                 comment: ts.displayPartsToString(symbol.getDocumentationComment()),
-                extends: list.length > 0 && componentIndex > -1 ? 'Component' : null,
+                extends: list.length > 0 ? extendsClass : null,
                 propInterface: list.length > propsIndex ? list[propsIndex] : null,
             });
         }
