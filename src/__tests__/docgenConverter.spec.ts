@@ -1,34 +1,27 @@
 import { assert } from 'chai';
 import * as path from 'path';
-import { getDocumentation } from '../parser';
-import { convertToDocgen, StyleguidistComponent } from "../docgenConverter";
+import { getFileDocumentation } from '../getFileDocumentation';
+import { convertToDocgen } from '../docgenConverter';
+import { StyleguidistComponent } from '../propTypesParser';
 
 describe('docgenConverter', () => {
     it('Should work with class Component', () => {
         const result = convertToDocgen({
-            classes: [
+            components: [
                 { 
                     name: 'name1',
                     comment: 'comment1',
                     extends: 'Component',
-                    propInterface: 'PropsInterface',
-                }
-            ],
-            interfaces: [
-                {
-                    name: 'PropsInterface',
-                    comment: 'props comment',
-                    members: [
-                        {
-                            name: 'prop1',
-                            comment: 'prop1 comment',
-                            isRequired: true,
-                            text: 'prop1 text',
-                            type: 'prop1 type'
-                        }
-                    ]
-                }
-            ]
+                    propInterface: {
+                        name: 'PropsInterface',
+                        comment: 'props comment',
+                        members: [{
+                                name: 'prop1',
+                                comment: 'prop1 comment',
+                                isRequired: true,
+                                type: 'prop1 type'
+                            }]},
+                }]
         });
 
         assert.equal('name1', result.displayName);
@@ -41,29 +34,21 @@ describe('docgenConverter', () => {
 
     it('Should work with functional StatelessComponent', () => {
         const result = convertToDocgen({
-            classes: [
+            components: [
                 { 
                     name: 'name1',
                     comment: 'comment1',
                     extends: 'StatelessComponent',
-                    propInterface: 'PropsInterface',
-                }
-            ],
-            interfaces: [
-                {
-                    name: 'PropsInterface',
-                    comment: 'props comment',
-                    members: [
-                        {
-                            name: 'prop1',
-                            comment: 'prop1 comment',
-                            isRequired: true,
-                            text: 'prop1 text',
-                            type: 'prop1 type'
-                        }
-                    ]
-                }
-            ]
+                    propInterface: {
+                        name: 'PropsInterface',
+                        comment: 'props comment',
+                        members: [{
+                                name: 'prop1',
+                                comment: 'prop1 comment',
+                                isRequired: true,
+                                type: 'prop1 type'
+                            }]}
+                }]
         });
 
         assert.equal('name1', result.displayName);
@@ -81,15 +66,14 @@ describe('docgenConverter', () => {
         console.warn = () => warnCallCount++;
         try {
             result = convertToDocgen({
-                classes: [
+                components: [
                     { 
                         name: 'name1',
                         comment: 'comment1',
                         extends: 'Component',
                         propInterface: null,
                     }
-                ],
-                interfaces: []
+                ]
             });
         } finally {
             console.warn = originalWarn;
@@ -107,15 +91,14 @@ describe('docgenConverter', () => {
         console.warn = () => warnCallCount++;
         try {
             result = convertToDocgen({
-                classes: [
+                components: [
                     { 
                         name: 'name1',
                         comment: 'comment1',
                         extends: 'PureComponent',
                         propInterface: null,
                     }
-                ],
-                interfaces: []
+                ]
             });
         } finally {
             console.warn = originalWarn;
