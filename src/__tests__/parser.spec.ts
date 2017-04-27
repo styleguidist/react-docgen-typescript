@@ -88,6 +88,7 @@ describe('parser', () => {
     it('Should parse class-based pure components', () => {
         const fileName = path.join(__dirname, '../../src/__tests__/data/PureRow.tsx'); // it's running in ./temp
         const result = getDocumentation(fileName);
+
         assert.ok(result.classes);
         assert.ok(result.interfaces);
         assert.equal(1, result.classes.length);
