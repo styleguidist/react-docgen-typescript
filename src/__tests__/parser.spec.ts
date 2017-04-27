@@ -120,7 +120,7 @@ describe('parser', () => {
         assert.equal(true, i.members[3].isRequired);
     });
 
-    it('Should should avoid exported objects', () => {
+    it('Should avoid parsing exported objects as components', () => {
         const fileName = path.join(__dirname, '../../src/__tests__/data/ConstExport.tsx'); // it's running in ./temp
         const result = getDocumentation(fileName);
         assert.ok(result.classes);
