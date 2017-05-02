@@ -99,5 +99,7 @@ Will generate the following stylesheet:
 
 @sapegin Artem Sapegin - fix for compatibility with react-styleguidist v5
 
+@diegolanda Diego - support for different kinds of components
+
 ## Thanks to others
 The integration with reac-styleguidist wouldn't be possible without [Vyacheslav Slinko](https://github.com/vslinko) pull request [#118](https://github.com/sapegin/react-styleguidist/pull/118) react-styleguidist.
