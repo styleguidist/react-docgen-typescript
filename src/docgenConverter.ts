@@ -11,7 +11,7 @@ export interface StyleguidistComponent {
 }
 
 export function convertToDocgen(doc: FileDoc): StyleguidistComponent {
-    const reactClasses = doc.classes.filter(i => i.extends === 'Component' || i.extends === 'StatelessComponent');
+    const reactClasses = doc.classes.filter(i => i.extends === 'Component' || i.extends === 'StatelessComponent' || i.extends === 'PureComponent');
 
     if (reactClasses.length === 0) {
         return null;

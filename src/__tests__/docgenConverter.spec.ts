@@ -99,4 +99,30 @@ describe('docgenConverter', () => {
         assert.equal('name1', result.displayName);
         assert.equal('comment1', result.description);
     });
+
+    it('Should work with class PureComponent', () => {
+        let result: StyleguidistComponent = null;
+        const originalWarn = console.warn;
+        let warnCallCount = 0;
+        console.warn = () => warnCallCount++;
+        try {
+            result = convertToDocgen({
+                classes: [
+                    { 
+                        name: 'name1',
+                        comment: 'comment1',
+                        extends: 'PureComponent',
+                        propInterface: null,
+                    }
+                ],
+                interfaces: []
+            });
+        } finally {
+            console.warn = originalWarn;
+        }
+
+        assert.equal(1, warnCallCount);
+        assert.equal('name1', result.displayName);
+        assert.equal('comment1', result.description);
+    });
 });
