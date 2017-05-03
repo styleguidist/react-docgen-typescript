@@ -56,7 +56,7 @@ function getProperties(checker: ts.TypeChecker, type: ts.Type, interfaceDeclarat
             const typeInfo = getType(prop);
             return {
                 name: i.getName(),
-                text: i.valueDeclaration.getText(),
+                // text: i.valueDeclaration.getText(),
                 type: typeInfo.type,
                 values: typeInfo.values || [],
                 isRequired: !prop.questionToken,
