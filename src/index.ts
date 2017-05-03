@@ -1,8 +1,15 @@
-import { parse } from './propTypesParser';
-import { StyleguidistComponent, StyleguidistProps } from './docgenConverter';
+import {
+    parse,
+    StyleguidistComponent,
+    StyleguidistProps,
+    PropItem,
+    PropItemType,
+} from './propTypesParser';
 
 export {
     parse,
     StyleguidistComponent,
     StyleguidistProps,
+    PropItem,
+    PropItemType,
 }
