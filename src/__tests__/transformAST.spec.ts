@@ -66,7 +66,6 @@ describe('transformAST', () => {
         assert.equal(r1.exported, false);
         assert.deepEqual(r1.properties, [{
                 'name': 'prop1',
-                'text': 'prop1: string;',
                 'type': 'string',
                 'isRequired': true,
                 'comment': 'prop1 comment',
@@ -78,14 +77,12 @@ describe('transformAST', () => {
         assert.equal(r2.exported, true);
         assert.deepEqual(r2.properties, [{
                 'name': 'prop1',
-                'text': 'prop1: string;',
                 'type': 'string',
                 'isRequired': true,
                 'comment': 'prop1 comment',
                 'values': [],
             }, {
                 'name': 'prop2',
-                'text': 'prop2: string;',
                 'type': 'string',
                 'isRequired': true,
                 'comment': 'prop2 comment',

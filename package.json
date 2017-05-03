@@ -1,6 +1,6 @@
 {
   "name": "react-docgen-typescript",
-  "version": "0.0.9",
+  "version": "0.1.9",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -24,17 +24,14 @@
     "@types/node": "^7.0.5",
     "@types/react": "^15.0.14",
     "@types/react-dom": "^0.14.23",
-    "@types/react-redux": "^4.4.36",
     "babel-core": "^6.8.0",
     "babel-loader": "^6.2.4",
     "chai": "^3.5.0",
     "file-loader": "^0.8.5",
     "mocha": "^2.5.3",
     "react": "^15.4.2",
-    "react-bluekit": "^0.4.1",
     "react-dom": "^15.4.2",
     "react-styleguidist": "^2.2.1",
-    "ts-node": "^2.1.0",
     "typescript": "^2.2.1"
   },
   "files": [

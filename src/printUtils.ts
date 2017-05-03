@@ -132,9 +132,6 @@ export function simplePrint(checker: ts.TypeChecker, node: ts.Node, indent = 0) 
     if (node.kind === ts.SyntaxKind.CallExpression) {
         const d = node as ts.CallExpression;
         info.push('arguments: ' + d.arguments.map(i => i.getText()).join(';'));        
-        if (d.contextualType) {
-            info.push('contextualType: ' + d.contextualType.symbol.name);
-        }
     }
 
     if (isNodeExported(node)) {
