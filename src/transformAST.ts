@@ -76,7 +76,7 @@ function findAllNodes(rootNode: ts.Node, result: ts.Node[]) {
  * Transform source file AST (abstract syntax tree) to our 
  * model (classes, interfaces, variables, methods).
  */
-export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker) {
+export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker) {    
     const nodes = [];
     findAllNodes(sourceFile, nodes);
     
@@ -116,7 +116,7 @@ export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker)
                     callExpressionArguments = callExpresson.arguments.map(i => i.getText());
                 }
             }
-            
+
             return { 
                 name: identifier.text,
                 exported: isNodeExported(i),
