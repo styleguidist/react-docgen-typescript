@@ -18,7 +18,7 @@ describe('transformAST', () => {
     
     it('should provide data about variables', () => {
         const result = target.variables;
-        assert.equal(result.length, 5);
+        assert.equal(result.length, 8);
 
         const r1 = result[0];
         assert.equal(r1.name, 'unexportedVar');
@@ -48,14 +48,41 @@ describe('transformAST', () => {
         assert.equal(r4.arrowFunctionType, 'string');
         assert.deepEqual(r4.arrowFunctionParams, ['number', 'string']);
 
-        // hoc
+        // hoc class
         const r5 = result[4];
-        assert.equal(r5.name, 'exportedHoc');
+        assert.equal(r5.name, 'exportedHoc1');
         assert.equal(r5.exported, true);
         assert.equal(r5.type, 'ExportedClass');
         assert.equal(r5.kind, 'callExpression');
-        assert.equal(r5.comment, 'exportedHoc comment');
+        assert.equal(r5.comment, 'exportedHoc1 comment');
         assert.deepEqual(r5.callExpressionArguments, ['ExportedClass']);
+
+        // hoc function
+        const r6 = result[5];
+        assert.equal(r6.name, 'exportedHoc2');
+        assert.equal(r6.exported, true);
+        assert.equal(r6.type, 'exportedFunction');
+        assert.equal(r6.kind, 'callExpression');
+        assert.equal(r6.comment, 'exportedHoc2 comment');
+        assert.deepEqual(r6.callExpressionArguments, ['exportedFunction']);
+
+        // external hoc class
+        const r7 = result[6];
+        assert.equal(r7.name, 'exportedExternalHoc1');
+        assert.equal(r7.exported, true);
+        assert.equal(r7.type, 'ExportedClass');
+        assert.equal(r7.kind, 'callExpression');
+        assert.equal(r7.comment, 'exportedExternalHoc1 comment');
+        assert.deepEqual(r7.callExpressionArguments, ['ExportedClass']);
+
+        // external hoc function
+        const r8 = result[7];
+        assert.equal(r8.name, 'exportedExternalHoc2');
+        assert.equal(r8.exported, true);
+        assert.equal(r8.type, 'exportedFunction');
+        assert.equal(r8.kind, 'callExpression');
+        assert.equal(r8.comment, 'exportedExternalHoc2 comment');
+        assert.deepEqual(r8.callExpressionArguments, ['exportedFunction']);
     });
 
     it('should provide data about interfaces', () => {

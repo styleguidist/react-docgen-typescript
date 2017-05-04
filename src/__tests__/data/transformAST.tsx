@@ -1,3 +1,5 @@
+import { externalHoc } from './transformAST_hoc';
+
 const unexportedVar = 10;
 export const exportedVar = 10;
 
@@ -51,5 +53,15 @@ export function hoc<T>(component: T): T {
     return component;
 }
 
-/** exportedHoc comment */
-export const exportedHoc = hoc(ExportedClass);
+/** exportedHoc1 comment */
+export const exportedHoc1 = hoc(ExportedClass);
+
+/** exportedHoc2 comment */
+export const exportedHoc2 = hoc(exportedFunction);
+
+
+/** exportedExternalHoc1 comment */
+export const exportedExternalHoc1 = externalHoc(ExportedClass);
+
+/** exportedExternalHoc2 comment */
+export const exportedExternalHoc2 = externalHoc(exportedFunction);

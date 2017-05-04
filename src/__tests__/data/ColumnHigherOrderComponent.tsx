@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { externalHoc } from "./ColumnHigherOrderComponentHoc";
 /**
  * Column properties.
  */
@@ -62,13 +63,16 @@ function hoc<T>(C: T): T {
     return ((props) => <div>{C}</div>) as any as T;
 }
 
-/** ColumnHighOrderComponent1 specific comment */
-export const ColumnHighOrderComponent1 = hoc(Column);
+/** ColumnHigherOrderComponent1 specific comment */
+export const ColumnHigherOrderComponent1 = hoc(Column);
 
-export const ColumnHighOrderComponent2 = hoc(Column);
+export const ColumnHigherOrderComponent2 = hoc(Column);
 
-/** RowHighOrderComponent1 specific comment */
-export const RowHighOrderComponent1 = hoc(Row);
+/** RowHigherOrderComponent1 specific comment */
+export const RowHigherOrderComponent1 = hoc(Row);
 
-export const RowHighOrderComponent2 = hoc(Row);
+export const RowHigherOrderComponent2 = hoc(Row);
+
+export const ColumnExternalHigherOrderComponent = externalHoc(Column);
+export const RowExternalHigherOrderComponent = externalHoc(Row);
 
