@@ -1,12 +1,12 @@
 # react-docgen-typescript
 
-<img src="https://travis-ci.org/pvasek/react-docgen-typescript.svg?branch=master"/>
+[![Build Status](https://travis-ci.org/styleguidist/react-docgen-typescript.svg)](https://travis-ci.org/styleguidist/react-docgen-typescript)
 
-<img src="https://nodei.co/npm/react-docgen-typescript.png?downloadRank=true&downloads=true"/>
+![](https://nodei.co/npm/react-docgen-typescript.png?downloadRank=true&downloads=true)
 
-A simple parser for react properties defined in typescript instead of propTypes. 
+A simple parser for React properties defined in TypeScript instead of propTypes. 
 
-It can be used with [react-styleguidist](https://github.com/sapegin/react-styleguidist).
+It can be used with [React Styleguidist](https://github.com/styleguidist/react-styleguidist).
 
 ## Installation 
 
@@ -14,16 +14,17 @@ It can be used with [react-styleguidist](https://github.com/sapegin/react-styleg
 npm install --save-dev react-docgen-typescript
 ```
 
-## react-styleguidist integration
+## React Styleguidist integration
 
 Include following line in your `styleguide.config.js`:
 
 ```javascript
 propsParser: require('react-docgen-typescript').parse
 ```
+
 ## Example
 
-In the example folder you can see react-styleguidist integration.
+In the example folder you can see React Styleguidist integration.
 
 The component [`Column.tsx`](./examples/react-styleguidist-example/components/Column.tsx)
 
@@ -35,15 +36,15 @@ import { Component } from 'react';
  * Column properties.
  */
 export interface IColumnProps {
-	/** prop1 description */
+    /** prop1 description */
     prop1?: string;
-	/** prop2 description */
+    /** prop2 description */
     prop2: number;
-	/** 
+    /** 
      * prop3 description 
      */
     prop3: () => void;
-	/** prop4 description */
+    /** prop4 description */
     prop4: 'option1' | 'option2' | 'option3';
 }
 
@@ -51,13 +52,14 @@ export interface IColumnProps {
  * Form column.
  */
 export class Column extends Component<IColumnProps, {}> {
-    
     render() {
         return <div>Test</div>;
-    }            
+    }
 }
 ```
+
 Will generate the following stylesheet:
+
 ![Stylesheet example](./stylesheet-example-column.png "Stylesheet example")
 
 The functional component [`Grid.tsx`](./examples/react-styleguidist-example/components/Grid.tsx)
@@ -91,6 +93,7 @@ export const Grid = (props: IGridProps) => {
 ```
 
 Will generate the following stylesheet:
+
 ![Stylesheet example](./stylesheet-example-grid.png "Stylesheet example")
 
 ## Thanks to contributors
@@ -102,4 +105,5 @@ Will generate the following stylesheet:
 @diegolanda Diego - support for different kinds of components
 
 ## Thanks to others
-The integration with reac-styleguidist wouldn't be possible without [Vyacheslav Slinko](https://github.com/vslinko) pull request [#118](https://github.com/sapegin/react-styleguidist/pull/118) react-styleguidist.
+
+The integration with React Styleguidist wouldn't be possible without [Vyacheslav Slinko](https://github.com/vslinko) pull request [#118](https://github.com/styleguidist/react-styleguidist/pull/118) at React Styleguidist.
