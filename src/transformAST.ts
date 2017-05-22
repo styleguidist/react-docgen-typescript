@@ -42,7 +42,7 @@ function getType(prop: ts.PropertySignature): MemberType {
 }
 
 function getMethods(checker: ts.TypeChecker, type: ts.Type, classDeclaratinNode: ts.ClassDeclaration) {
-    return classDeclaratinNode.members
+    return classDeclaratinNode.members.filter(x => x.name !== undefined)
         .map(i => ({ name: i.name.getText() }));
 }
 
