@@ -36,6 +36,26 @@ describe('getFileDocumentation', () => {
         assert.equal(true, i.members[3].isRequired);
     });
 
+    it('Should parse class-based components (2)', () => {
+        const fileName = path.join(__dirname, '../../src/__tests__/data/AppMenu.tsx'); // it's running in ./temp
+        const result = getFileDocumentation(fileName);
+        assert.ok(result.components);
+        assert.equal(1, result.components.length);
+
+        const c = result.components[0];
+        assert.equal('AppMenu', c.name);
+        assert.equal('App Menu Component', c.comment);
+        assert.equal('Component', c.extends);
+        assert.isNotNull(c.propInterface);
+
+        const i = c.propInterface;
+        assert.equal('IAppMenuProps', i.name);
+        assert.equal('App Menu Props', i.comment);
+        assert.equal(1, i.members.length);
+        assert.equal('menu', i.members[0].name);
+        assert.equal('Menu items', i.members[0].comment);
+    });    
+
     it('Should parse class-based components with unexported props interface', () => {
         const fileName = path.join(__dirname, '../../src/__tests__/data/ColumnWithoutExportedProps.tsx'); // it's running in ./temp    
         const result = getFileDocumentation(fileName);
