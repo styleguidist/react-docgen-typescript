@@ -10,7 +10,6 @@ import {
     FileDoc
 } from './model';
 
-
 const defaultOptions: ts.CompilerOptions = {
     target: ts.ScriptTarget.Latest,
     module: ts.ModuleKind.CommonJS
@@ -95,8 +94,8 @@ export function getFileDocumentation(fileName: string, options: ts.CompilerOptio
     const components: ComponentDoc[] = [];        
     let program = ts.createProgram([fileName], options);
     let checker = program.getTypeChecker();
+    const sourceFile = program.getSourceFile(fileName);
     const model = transformAST(program.getSourceFile(fileName), checker);
-    
     const { interfaces, classes, variables } = model;
 
     const classComponents: ComponentDoc[] = classes

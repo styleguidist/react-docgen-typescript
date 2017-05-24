@@ -82,7 +82,7 @@ export function simplePrint(checker: ts.TypeChecker, node: ts.Node, indent = 0) 
     if (node.kind === ts.SyntaxKind.ClassDeclaration) {
         const d = node as ts.ClassDeclaration;
         info.push('name: ' + d.name.text);
-        info.push('members: [' + d.members.map(i => i.name.getText()).join(', ') + ']');
+        info.push('members: [' + d.members.map(i => i.name ? i.name.getText() : "NAME_UNDEFINED").join(', ') + ']');
     }
 
     if (node.kind === ts.SyntaxKind.Identifier) {
