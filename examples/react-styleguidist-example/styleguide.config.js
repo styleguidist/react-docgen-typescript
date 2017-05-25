@@ -11,19 +11,6 @@ module.exports = {
   },
   resolver: require('react-docgen').resolver.findAllComponentDefinitions,
 
-  propsParser: require('../../lib/propTypesParser').parse,
-
-  updateWebpackConfig: function (webpackConfig, env) {
-    webpackConfig.resolve.extensions.push('.ts');
-    webpackConfig.resolve.extensions.push('.tsx');
-
-    webpackConfig.module.loaders.push(
-      {
-        test: /\.tsx?$/,
-        include: __dirname,
-        loader: 'awesome-typescript-loader'
-      }
-    );
-    return webpackConfig;
-  }
+  //propsParser: require('../../lib/propTypesParser').parse,
+  propsParser: require('react-docgen-typescript').parse,
 };
