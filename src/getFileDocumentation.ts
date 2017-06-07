@@ -9,6 +9,7 @@ import {
     ComponentDoc,
     FileDoc
 } from './model';
+import { simplePrint } from "./printUtils";
 
 const defaultOptions: ts.CompilerOptions = {
     target: ts.ScriptTarget.Latest,
@@ -97,7 +98,7 @@ export function getFileDocumentation(fileName: string, options: ts.CompilerOptio
     const sourceFile = program.getSourceFile(fileName);
     const model = transformAST(program.getSourceFile(fileName), checker);
     const { interfaces, classes, variables } = model;
-
+    
     const classComponents: ComponentDoc[] = classes
         .filter(i => isClassComponent(i))
         .map(i => ({

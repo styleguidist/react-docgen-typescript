@@ -261,4 +261,12 @@ describe('getFileDocumentation', () => {
         const p6 = r6.propInterface;
         assert.equal('IRowProps', p6.name);       
     });
+
+    it('Should accept type as props', function() {
+        const fileName = path.join(__dirname, '../../src/__tests__/data/FlippableImage.tsx'); // it's running in ./temp        
+        const result = getFileDocumentation(fileName);
+        assert.ok(result.components);
+        assert.equal(1, result.components.length);
+
+    });
 });

@@ -132,4 +132,9 @@ describe('transformAST', () => {
         assert.equal(r2.comment, 'ExportedClass comment');
         assert.deepEqual(r2.methods, [{name: 'method1'}, {name: 'method2'}]);
     });
+
+    it('should provide data about types', () => {
+        assert.equal(1, target.types.length);
+        assert.equal('ExportedType1', target.types[0].name);
+    })
 });

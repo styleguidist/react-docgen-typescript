@@ -19,6 +19,9 @@ export function syntaxKindToName(kind: ts.SyntaxKind) {
 export function flagsToText(kind: ts.TypeFlags) {
     return (<any>ts).TypeFlags[kind];
 }
+export function symbolFlagsToText(kind: ts.SymbolFlags) {
+    return (<any>ts).SymbolFlags[kind];
+}
 
 /** True if this is visible outside this file, false otherwise */
 function isNodeExported(node: ts.Node): boolean {

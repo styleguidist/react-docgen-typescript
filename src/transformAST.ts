@@ -8,8 +8,9 @@ import {
     ClassEntry,
     PropertyEntry
 } from './model';
+import { simplePrint, syntaxKindToName, flagsToText, symbolFlagsToText } from "./printUtils";
 
-/** 
+/**
  * Checks if the node is exported. 
  */
 function isNodeExported(node: ts.Node): boolean {
@@ -20,7 +21,7 @@ function isNodeExported(node: ts.Node): boolean {
     if (modifiers) {
         for (let i = 0; i < (modifiers as Array<any>).length; i++) {
             if (modifiers[i].kind === ts.SyntaxKind.ExportKeyword) {
-                return node.parent.kind === ts.SyntaxKind.SourceFile
+                return node.parent !== undefined && node.parent.kind === ts.SyntaxKind.SourceFile
             }
         }
     }
@@ -37,19 +38,20 @@ function getType(prop: ts.PropertySignature): MemberType {
     }
     //noinspection TypeScriptUnresolvedFunction
     return {
-        type: prop.type.getText(),
+        type: unionType.getText(),
     }
 }
 
 function getMethods(checker: ts.TypeChecker, type: ts.Type, classDeclaratinNode: ts.ClassDeclaration) {
-    return classDeclaratinNode.members.filter(x => x.name !== undefined)
+    return classDeclaratinNode.members
+        .filter(x => x.name !== undefined)
         .map(i => ({ name: i.name.getText() }));
 }
 
-function getProperties(checker: ts.TypeChecker, type: ts.Type, interfaceDeclaratinNode: ts.InterfaceDeclaration): PropertyEntry[] {
+function getProperties(checker: ts.TypeChecker, type: ts.Type, parent: ts.Node): PropertyEntry[] {
     
     return type.getProperties() 
-        .filter(i => i.valueDeclaration.parent === interfaceDeclaratinNode)
+        .filter(i => parent === null &&  i.valueDeclaration.parent === parent)
         .map(i => {
             const symbol = checker.getSymbolAtLocation(i.valueDeclaration.name);
             const prop = i.valueDeclaration as ts.PropertySignature;                        
@@ -77,7 +79,7 @@ function findAllNodes(rootNode: ts.Node, result: ts.Node[]) {
  * model (classes, interfaces, variables, methods).
  */
 export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker) {    
-    const nodes = [];
+    const nodes: ts.Node[] = [];
     findAllNodes(sourceFile, nodes);
     
     const variables: VariableEntry[] = nodes
@@ -173,9 +175,46 @@ export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker)
             };
         });
 
+        const types: InterfaceEntry[] = nodes
+            .filter(i => i.kind === ts.SyntaxKind.TypeAliasDeclaration)
+            .map(i => i as ts.TypeAliasDeclaration)
+            .map(i => {
+                const type = checker.getTypeAtLocation(i.name) as ts.IntersectionType;                
+                const properties = [];
+                type.types.forEach(t => {
+                    const props = (t as any).properties;
+                    if (props) {
+                        props.forEach((p: ts.Symbol) => {
+                            const propertySingatures = p.getDeclarations()
+                                .filter(d => d.kind === ts.SyntaxKind.PropertySignature);
+                            const propertySignature = propertySingatures[0] as ts.PropertySignature;
+                            const typeInfo = getType(propertySignature);
+                            properties.push({
+                                name: p.getName(),
+                                type: typeInfo.type,
+                                values: typeInfo.values || [],
+                                isRequired: !propertySignature.questionToken,
+                                comment: ts.displayPartsToString(p.getDocumentationComment()).trim(),
+                            })
+                        });                        
+                    }
+                    properties.push(...getProperties(checker, t, null));
+                });
+                const symbol = checker.getSymbolAtLocation(i.name);
+                return {
+                    name: i.name.getText(),
+                    properties,
+                    exported: isNodeExported(i),
+                    comment: !symbol ? "" : ts.displayPartsToString(symbol.getDocumentationComment())
+                };
+            });
+
+        //console.log("TYPES: ", JSON.stringify(types, null, 4));
+        
         return {
             classes,
             interfaces,
             variables,
+            types: types,
         }
 }
