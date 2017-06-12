@@ -97,24 +97,30 @@ export function getFileDocumentation(fileName: string, options: ts.CompilerOptio
     let checker = program.getTypeChecker();
     const sourceFile = program.getSourceFile(fileName);
     const model = transformAST(program.getSourceFile(fileName), checker);
-    const { interfaces, classes, variables } = model;
+    const { interfaces, classes, variables, types } = model;
     
+    // let's treat types as interfaces here both can include valid props definition
+    const allInterfaces = [...interfaces, ...types];
+    allInterfaces.forEach(i => {
+        i.properties = i.properties.filter(j => j.isOwn);
+    });
+
     const classComponents: ComponentDoc[] = classes
         .filter(i => isClassComponent(i))
         .map(i => ({
             name: i.name,
             extends: i.baseType.name,
             comment: i.comment,
-            propInterface: getClassPropInterface(interfaces, i),            
+            propInterface: getClassPropInterface(allInterfaces, i),            
         }));    
 
     const varComponents = variables
-        .filter(i => isVarComponent(i, interfaces))
+        .filter(i => isVarComponent(i, allInterfaces))
         .map(i => ({
             name: i.name,
             extends: 'StatelessComponent',
             comment: i.comment,
-            propInterface: getVarPropInterface(interfaces, i),            
+            propInterface: getVarPropInterface(allInterfaces, i),            
         }));
 
     const hocClassComponents = variables
@@ -127,11 +133,11 @@ export function getFileDocumentation(fileName: string, options: ts.CompilerOptio
             name: i.variable.name,
             extends: i.variable.callExpressionArguments[0],
             comment: i.variable.comment || i.origin.comment,
-            propInterface: getClassPropInterface(interfaces, i.origin),            
+            propInterface: getClassPropInterface(allInterfaces, i.origin),            
         }));
 
     const hocVarComponents = variables
-        .filter(i => isHocVarComponent(i, variables, interfaces))
+        .filter(i => isHocVarComponent(i, variables, allInterfaces))
         .map(i => ({ 
             variable: i, 
             origin: variables.filter(c => c.name === i.callExpressionArguments[0])[0] 
@@ -140,7 +146,7 @@ export function getFileDocumentation(fileName: string, options: ts.CompilerOptio
             name: i.variable.name,
             extends: i.variable.callExpressionArguments[0],
             comment: i.variable.comment || i.origin.comment,
-            propInterface: getVarPropInterface(interfaces, i.origin),            
+            propInterface: getVarPropInterface(allInterfaces, i.origin),            
         }));
 
     return { 

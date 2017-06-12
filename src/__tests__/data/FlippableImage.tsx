@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+/** Props comment */
 export type Props = React.HTMLAttributes<HTMLImageElement> & {
   /** whether the image is flipped horizontally */
   isFlippedX?: boolean;

@@ -30,6 +30,11 @@ export interface ExportedInterface {
     prop2: string;
 }
 
+export interface ExportedInheritedInterface extends ExportedInterface {
+    /** ownProp1 comment */
+    ownProp1: string;
+}
+
 export class OurBaseClass<T1, T2> {
 }
 

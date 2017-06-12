@@ -49,15 +49,16 @@ function getMethods(checker: ts.TypeChecker, type: ts.Type, classDeclaratinNode:
 }
 
 function getProperties(checker: ts.TypeChecker, type: ts.Type, parent: ts.Node): PropertyEntry[] {
-    
     return type.getProperties() 
-        .filter(i => parent === null &&  i.valueDeclaration.parent === parent)
+        //.filter(i => parent === null || i.valueDeclaration.parent === parent)
         .map(i => {
             const symbol = checker.getSymbolAtLocation(i.valueDeclaration.name);
             const prop = i.valueDeclaration as ts.PropertySignature;                        
             const typeInfo = getType(prop);
+
             return {
                 name: i.getName(),
+                isOwn: i.valueDeclaration.parent === parent,
                 // text: i.valueDeclaration.getText(),
                 type: typeInfo.type,
                 values: typeInfo.values || [],
@@ -183,22 +184,16 @@ export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker)
                 const properties = [];
                 type.types.forEach(t => {
                     const props = (t as any).properties;
+                    let ownProperties = [];
                     if (props) {
-                        props.forEach((p: ts.Symbol) => {
-                            const propertySingatures = p.getDeclarations()
-                                .filter(d => d.kind === ts.SyntaxKind.PropertySignature);
-                            const propertySignature = propertySingatures[0] as ts.PropertySignature;
-                            const typeInfo = getType(propertySignature);
-                            properties.push({
-                                name: p.getName(),
-                                type: typeInfo.type,
-                                values: typeInfo.values || [],
-                                isRequired: !propertySignature.questionToken,
-                                comment: ts.displayPartsToString(p.getDocumentationComment()).trim(),
-                            })
-                        });                        
+                        ownProperties = props
+                            .map((p: ts.Symbol) => p.getName());
                     }
-                    properties.push(...getProperties(checker, t, null));
+                    properties.push(...getProperties(checker, t, i));
+
+                    properties
+                        .filter(p => ownProperties.indexOf(p.name) > -1)
+                        .forEach(p => p.isOwn = true);
                 });
                 const symbol = checker.getSymbolAtLocation(i.name);
                 return {
@@ -209,8 +204,6 @@ export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker)
                 };
             });
 
-        //console.log("TYPES: ", JSON.stringify(types, null, 4));
-        
         return {
             classes,
             interfaces,

@@ -29,6 +29,7 @@ export interface VariableEntry {
 export interface PropertyEntry {
     name: string;
     type: string;
+    isOwn: boolean;
     values: string[];
     isRequired: boolean;
     comment: string;
