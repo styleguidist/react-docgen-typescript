@@ -96,6 +96,13 @@ Will generate the following stylesheet:
 
 ![Stylesheet example](./stylesheet-example-grid.png "Stylesheet example")
 
+## Contributions
+The typescript is pretty complex and there
+are many different way how to define components and their props that is
+hard to keep up. That means only one thing, contributions are highly 
+welcome. Just keep in mind that if possible each PR should also include 
+test for the part it's fixing.
+
 ## Thanks to contributors
 
 @JocD Jacques Dukes - complete support for functional components and much more
