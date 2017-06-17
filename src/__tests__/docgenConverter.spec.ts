@@ -24,6 +24,7 @@ describe('docgenConverter', () => {
                 }]
         });
 
+        assert.isNotNull(result);
         assert.equal('name1', result.displayName);
         assert.equal('comment1', result.description);
         const prop1Result = result.props['prop1'];

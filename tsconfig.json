@@ -2,10 +2,12 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es5",
-    "noImplicitAny": false,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": false,
     "sourceMap": true,
     "outDir": "lib",
-    "strict": false,
     "jsx": "react",
     "typeRoots": [
       "node_modules/@types"

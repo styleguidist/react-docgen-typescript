@@ -14,7 +14,7 @@ export function navigate(node: ts.Node, ...path: ts.SyntaxKind[]): ts.Node {
 }
 
 export function getFlatChildren(node: ts.Node): ts.Node[] {
-    const result = [];
+    const result: ts.Node[] = [];
     
     function f(node: ts.Node) {
         result.push(node);

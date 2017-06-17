@@ -69,7 +69,11 @@ function getInterfaceDoc(entry: InterfaceEntry): InterfaceDoc {
 
 function getClassPropInterface(interfaces: InterfaceEntry[], classEntry: ClassEntry): InterfaceDoc {
     if (classEntry.baseType.typeArguments.length === 0) {
-        return null;
+        return {
+            name: 'none',
+            comment: '',
+            members: [],
+        };
     }
 
     const propInterfaceName = classEntry.baseType.typeArguments[0];
@@ -85,7 +89,11 @@ function getPropInterface(interfaces: InterfaceEntry[], propInterfaceName: strin
     const matchedInterfaces = interfaces.filter(j => j.name === propInterfaceName);
     if (matchedInterfaces.length === 0) {
         console.warn(`Property interface ${propInterfaceName} cannot be found`)
-        return null;
+        return {
+            name: propInterfaceName,
+            comment: '',
+            members: [],
+        };
     }
 
     return getInterfaceDoc(matchedInterfaces[0]);
