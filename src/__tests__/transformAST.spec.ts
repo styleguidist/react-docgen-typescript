@@ -166,7 +166,9 @@ describe('transformAST', () => {
         assert.equal(target.types.length, 1);
         const t1 = target.types[0];
         assert.equal(t1.name, 'ExportedType1');
-        assert.equal(t1.properties.length, 284);
+        // because ExportedType1 inherites from built in type and can 
+        // change over time we don't use exact number here
+        assert.isTrue(t1.properties.length > 200);
         assert.equal(t1.properties.filter(i => i.isOwn).length, 2);
     })
 });
