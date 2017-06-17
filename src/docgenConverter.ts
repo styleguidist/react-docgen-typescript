@@ -1,7 +1,7 @@
 import { FileDoc, InterfaceDoc, MemberDoc } from './model';
 import { StyleguidistComponent, StyleguidistProps, PropItem } from './propTypesParser';
 
-export function convertToDocgen(doc: FileDoc): StyleguidistComponent {
+export function convertToDocgen(doc: FileDoc): StyleguidistComponent | null {
     const components = doc.components;
 
     if (components.length === 0) {
@@ -20,8 +20,6 @@ export function convertToDocgen(doc: FileDoc): StyleguidistComponent {
     };
 }
 
-
-
 function getProps(props: InterfaceDoc): StyleguidistProps {
     return props.members.reduce((acc, i) => {
         const item: PropItem = {
@@ -36,5 +34,5 @@ function getProps(props: InterfaceDoc): StyleguidistProps {
 
         acc[i.name] = item;
         return acc;
-    }, {});
+    }, ({} as any));
 }

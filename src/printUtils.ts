@@ -40,7 +40,7 @@ function isNodeExported(node: ts.Node): boolean {
 }
 
 function symbolMapToString(map: ts.Map<ts.Symbol>): string {
-    const values = [];
+    const values: string[] = [];
     map.forEach((value, key) => {
         values.push(value.name);
     });

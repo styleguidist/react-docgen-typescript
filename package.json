@@ -13,23 +13,18 @@
   },
   "author": "pvasek",
   "license": "MIT",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/chai": "^3.4.35",
+    "@types/chai": "^4.0.0",
     "@types/mocha": "^2.2.39",
     "@types/node": "^7.0.16",
     "@types/react": "^15.0.14",
-    "@types/react-dom": "^0.14.23",
-    "babel-core": "^6.8.0",
-    "babel-loader": "^6.2.4",
-    "chai": "^3.5.0",
-    "file-loader": "^0.8.5",
+    "@types/source-map-support": "^0.4.0",
+    "chai": "^4.0.2",
     "mocha": "^2.5.3",
     "react": "^15.4.2",
-    "react-dom": "^15.4.2",
-    "react-styleguidist": "^2.2.1",
-    "typescript": "^2.2.1"
+    "source-map-support": "^0.4.15",
+    "typescript": "^2.3.4"
   },
   "files": [
     "lib",

@@ -6,7 +6,8 @@ import {
     VeriableKind,
     InterfaceEntry,
     ClassEntry,
-    PropertyEntry
+    PropertyEntry,
+    BaseClassEntry
 } from './model';
 import { simplePrint, syntaxKindToName, flagsToText, symbolFlagsToText } from "./printUtils";
 
@@ -45,13 +46,17 @@ function getType(prop: ts.PropertySignature): MemberType {
 function getMethods(checker: ts.TypeChecker, type: ts.Type, classDeclaratinNode: ts.ClassDeclaration) {
     return classDeclaratinNode.members
         .filter(x => x.name !== undefined)
-        .map(i => ({ name: i.name.getText() }));
+        .map(i => ({ name: i.name ? i.name.getText() : 'unknown' }));
 }
 
 function getProperties(checker: ts.TypeChecker, type: ts.Type, parent: ts.Node): PropertyEntry[] {
     return type.getProperties() 
-        //.filter(i => parent === null || i.valueDeclaration.parent === parent)
+        .filter(i => i.valueDeclaration)
         .map(i => {
+            if (i.valueDeclaration === undefined || i.valueDeclaration === null) {
+                throw Error('The valueDeclaration does not exist')
+            }
+            
             const symbol = checker.getSymbolAtLocation(i.valueDeclaration.name);
             const prop = i.valueDeclaration as ts.PropertySignature;                        
             const typeInfo = getType(prop);
@@ -88,24 +93,31 @@ export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker)
         .map(i => i as ts.VariableStatement)
         .filter(i => i.declarationList.declarations 
             && i.declarationList.declarations.length === 1
-            && i.declarationList.declarations[0].name.kind === ts.SyntaxKind.Identifier)
+            && i.declarationList.declarations[0].name.kind === ts.SyntaxKind.Identifier
+            && i.declarationList.declarations[0].initializer)
         .map(i => {
             const d = i.declarationList.declarations[0] as ts.VariableDeclaration;
             const identifier = d.name as ts.Identifier;
+
+            if (!d.initializer) {
+                throw Error('The initializer property does not exist')
+            }
+
             const symbol = checker.getSymbolAtLocation(identifier);
-            let arrowFunctionType: string = null;                
-            let literalFlags: ts.TypeFlags = null;
+            let arrowFunctionType: string = 'undefined';                
             let kind: VeriableKind = 'unknown';
             const varType = checker.getTypeAtLocation(d);
 
             const initializerType = checker.getTypeAtLocation(d.initializer);
             const initializerFlags = initializerType.flags;
-            let arrowFunctionParams = [];
-            let callExpressionArguments = [];
+            let arrowFunctionParams: string[] = [];
+            let callExpressionArguments: string[] = [];
             if (d.initializer.kind === ts.SyntaxKind.ArrowFunction) {
                 const arrowFunc = d.initializer as ts.ArrowFunction; 
                 if (arrowFunc.parameters) {
-                    arrowFunctionParams = arrowFunc.parameters.map(i => i.type.getText())
+                    arrowFunctionParams = arrowFunc
+                        .parameters
+                        .map(p => p.type ? p.type.getText() : 'unknown')
                 }
                 arrowFunctionType = arrowFunc.type ? arrowFunc.type.getText() : 'undefined';
                 kind = 'arrowFunction'
@@ -124,12 +136,11 @@ export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker)
                 name: identifier.text,
                 exported: isNodeExported(i),
                 comment: symbol ? ts.displayPartsToString(symbol.getDocumentationComment()).trim() : '',
+                type: varType.symbol ? varType.symbol.getName() : 'unknown',
                 kind,
-                type: varType.symbol ? varType.symbol.getName() : null,
                 arrowFunctionType,
                 arrowFunctionParams,
                 callExpressionArguments,
-                literalFlags,
                 initializerFlags,
             };
         });
@@ -155,15 +166,20 @@ export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker)
             const symbol = checker.getSymbolAtLocation(i.name);
             const type = checker.getTypeAtLocation(i.name);
             const baseTypes = type.getBaseTypes();
-            let baseType = null;
+            let baseType: BaseClassEntry = {
+                name: 'unknown',
+                typeArguments: [],
+            };
+            
             if (baseTypes.length) {
                 const t = baseTypes[0];
                 const typeArguments = navigate(i,
                     ts.SyntaxKind.HeritageClause,
                     ts.SyntaxKind.ExpressionWithTypeArguments) as ts.ExpressionWithTypeArguments;
                 baseType = {
-                    name: t.symbol.getName(),
-                    typeArguments: typeArguments ? typeArguments.typeArguments.map(t => t.getText()) : []
+                    name: t.symbol ? t.symbol.getName() : 'unknown',
+                    typeArguments: typeArguments && typeArguments.typeArguments ? 
+                        typeArguments.typeArguments.map(t => t.getText()) : []
                 };
             }
 
@@ -181,10 +197,10 @@ export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker)
             .map(i => i as ts.TypeAliasDeclaration)
             .map(i => {
                 const type = checker.getTypeAtLocation(i.name) as ts.IntersectionType;                
-                const properties = [];
+                const properties: PropertyEntry[] = [];
                 type.types.forEach(t => {
                     const props = (t as any).properties;
-                    let ownProperties = [];
+                    let ownProperties: string[] = [];
                     if (props) {
                         ownProperties = props
                             .map((p: ts.Symbol) => p.getName());
