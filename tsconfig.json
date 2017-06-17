@@ -5,6 +5,7 @@
     "noImplicitAny": false,
     "sourceMap": true,
     "outDir": "lib",
+    "strict": false,
     "jsx": "react",
     "typeRoots": [
       "node_modules/@types"

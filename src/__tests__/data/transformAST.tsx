@@ -1,4 +1,5 @@
 import { externalHoc } from './transformAST_hoc';
+import * as React from 'react';
 
 const unexportedVar = 10;
 export const exportedVar = 10;
@@ -27,6 +28,11 @@ export interface ExportedInterface {
     prop1: string;
     /** prop2 comment */
     prop2: string;
+}
+
+export interface ExportedInheritedInterface extends ExportedInterface {
+    /** ownProp1 comment */
+    ownProp1: string;
 }
 
 export class OurBaseClass<T1, T2> {
@@ -65,3 +71,11 @@ export const exportedExternalHoc1 = externalHoc(ExportedClass);
 
 /** exportedExternalHoc2 comment */
 export const exportedExternalHoc2 = externalHoc(exportedFunction);
+
+/** exported intersection type */
+export type ExportedType1 = React.HTMLAttributes<HTMLImageElement> & { 
+    /** the first property */
+    prop1: "value1" | "value2";
+    /** the second property */
+    prop2: number;
+ };

@@ -87,7 +87,7 @@ describe('transformAST', () => {
 
     it('should provide data about interfaces', () => {
         const result = target.interfaces;
-        assert.equal(result.length, 2);
+        assert.equal(result.length, 3);
         const r1 = result[0];
         assert.equal(r1.name, 'UnexportedInterface');
         assert.equal(r1.exported, false);
@@ -95,6 +95,7 @@ describe('transformAST', () => {
                 'name': 'prop1',
                 'type': 'string',
                 'isRequired': true,
+                'isOwn': true,
                 'comment': 'prop1 comment',
                 'values': [],
             }]);
@@ -106,15 +107,43 @@ describe('transformAST', () => {
                 'name': 'prop1',
                 'type': 'string',
                 'isRequired': true,
+                'isOwn': true,
                 'comment': 'prop1 comment',
                 'values': [],
             }, {
                 'name': 'prop2',
                 'type': 'string',
                 'isRequired': true,
+                'isOwn': true,
                 'comment': 'prop2 comment',
                 'values': [],
             }]);
+        const r3 = result[2];
+        assert.equal(r3.name, 'ExportedInheritedInterface');
+        assert.equal(r3.exported, true);
+        assert.deepEqual(r3.properties, [{
+                'name': 'ownProp1',
+                'type': 'string',
+                'isRequired': true,
+                'isOwn': true,
+                'comment': 'ownProp1 comment',
+                'values': [],
+            }, {
+                'name': 'prop1',
+                'type': 'string',
+                'isRequired': true,
+                'isOwn': false,
+                'comment': 'prop1 comment',
+                'values': [],
+            }, {
+                'name': 'prop2',
+                'type': 'string',
+                'isRequired': true,
+                'isOwn': false,
+                'comment': 'prop2 comment',
+                'values': [],
+            },
+        ]);
     });
 
     it('should provide data about classes', () => {        
@@ -132,4 +161,14 @@ describe('transformAST', () => {
         assert.equal(r2.comment, 'ExportedClass comment');
         assert.deepEqual(r2.methods, [{name: 'method1'}, {name: 'method2'}]);
     });
+
+    it('should provide data about types', () => {
+        assert.equal(target.types.length, 1);
+        const t1 = target.types[0];
+        assert.equal(t1.name, 'ExportedType1');
+        // because ExportedType1 inherites from built in type and can 
+        // change over time we don't use exact number here
+        assert.isTrue(t1.properties.length > 200);
+        assert.equal(t1.properties.filter(i => i.isOwn).length, 2);
+    })
 });

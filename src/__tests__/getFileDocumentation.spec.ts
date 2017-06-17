@@ -10,30 +10,30 @@ describe('getFileDocumentation', () => {
         assert.equal(1, result.components.length);
 
         const c = result.components[0];
-        assert.equal('Column', c.name);
-        assert.equal('Form column.', c.comment);
-        assert.equal('Component', c.extends);
+        assert.equal(c.name, 'Column');
+        assert.equal(c.comment, 'Form column.');
+        assert.equal(c.extends, 'Component');
         assert.isNotNull(c.propInterface);
 
         const i = c.propInterface;
-        assert.equal('IColumnProps', i.name);
-        assert.equal('Column properties.', i.comment);
-        assert.equal(4, i.members.length);
-        assert.equal('prop1', i.members[0].name);
-        assert.equal('prop1 description', i.members[0].comment);
-        assert.equal(false, i.members[0].isRequired);
+        assert.equal(i.name, 'IColumnProps');
+        assert.equal(i.comment, 'Column properties.');
+        assert.equal(i.members.length, 4);
+        assert.equal(i.members[0].name, 'prop1');
+        assert.equal(i.members[0].comment, 'prop1 description');
+        assert.equal(i.members[0].isRequired, false);
 
-        assert.equal('prop2', i.members[1].name);
-        assert.equal('prop2 description', i.members[1].comment);
-        assert.equal(true, i.members[1].isRequired);
+        assert.equal(i.members[1].name, 'prop2');
+        assert.equal(i.members[1].comment, 'prop2 description');
+        assert.equal(i.members[1].isRequired, true);
 
-        assert.equal('prop3', i.members[2].name);
-        assert.equal('prop3 description', i.members[2].comment);
-        assert.equal(true, i.members[2].isRequired);
+        assert.equal(i.members[2].name, 'prop3');
+        assert.equal(i.members[2].comment, 'prop3 description');
+        assert.equal(i.members[2].isRequired, true);
 
-        assert.equal('prop4', i.members[3].name);
-        assert.equal('prop4 description', i.members[3].comment);
-        assert.equal(true, i.members[3].isRequired);
+        assert.equal(i.members[3].name, 'prop4');
+        assert.equal(i.members[3].comment, 'prop4 description');
+        assert.equal(i.members[3].isRequired, true);
     });
 
     it('Should parse class-based components (2)', () => {
@@ -43,17 +43,17 @@ describe('getFileDocumentation', () => {
         assert.equal(1, result.components.length);
 
         const c = result.components[0];
-        assert.equal('AppMenu', c.name);
-        assert.equal('App Menu Component', c.comment);
-        assert.equal('Component', c.extends);
+        assert.equal(c.name, 'AppMenu');
+        assert.equal(c.comment, 'App Menu Component');
+        assert.equal(c.extends, 'Component');
         assert.isNotNull(c.propInterface);
 
         const i = c.propInterface;
-        assert.equal('IAppMenuProps', i.name);
-        assert.equal('App Menu Props', i.comment);
+        assert.equal(i.name, 'IAppMenuProps');
+        assert.equal(i.comment, 'App Menu Props');
         assert.equal(1, i.members.length);
-        assert.equal('menu', i.members[0].name);
-        assert.equal('Menu items', i.members[0].comment);
+        assert.equal(i.members[0].name, 'menu');
+        assert.equal(i.members[0].comment, 'Menu items');
     });    
 
     it('Should parse class-based components with unexported props interface', () => {
@@ -63,30 +63,30 @@ describe('getFileDocumentation', () => {
         assert.equal(1, result.components.length);
 
         const c = result.components[0];
-        assert.equal('Column', c.name);
-        assert.equal('Form column.', c.comment);
-        assert.equal('Component', c.extends);
+        assert.equal(c.name, 'Column');
+        assert.equal(c.comment, 'Form column.');
+        assert.equal(c.extends, 'Component');
         assert.isNotNull(c.propInterface);
 
         const i = c.propInterface;
-        assert.equal('IColumnProps', i.name);
-        assert.equal('Column properties.', i.comment);
+        assert.equal(i.name, 'IColumnProps');
+        assert.equal(i.comment, 'Column properties.');
         assert.equal(4, i.members.length);
-        assert.equal('prop1', i.members[0].name);
-        assert.equal('prop1 description', i.members[0].comment);
-        assert.equal(false, i.members[0].isRequired);
+        assert.equal(i.members[0].name, 'prop1');
+        assert.equal(i.members[0].comment, 'prop1 description');
+        assert.equal(i.members[0].isRequired, false);
 
-        assert.equal('prop2', i.members[1].name);
-        assert.equal('prop2 description', i.members[1].comment);
-        assert.equal(true, i.members[1].isRequired);
+        assert.equal(i.members[1].name, 'prop2');
+        assert.equal(i.members[1].comment, 'prop2 description');
+        assert.equal(i.members[1].isRequired, true);
 
-        assert.equal('prop3', i.members[2].name);
-        assert.equal('prop3 description', i.members[2].comment);
-        assert.equal(true, i.members[2].isRequired);
+        assert.equal(i.members[2].name, 'prop3');
+        assert.equal(i.members[2].comment, 'prop3 description');
+        assert.equal(i.members[2].isRequired, true);
 
-        assert.equal('prop4', i.members[3].name);
-        assert.equal('prop4 description', i.members[3].comment);
-        assert.equal(true, i.members[3].isRequired);
+        assert.equal(i.members[3].name, 'prop4');
+        assert.equal(i.members[3].comment, 'prop4 description');
+        assert.equal(i.members[3].isRequired, true);
     });
 
     it('Should parse functional components', () => {
@@ -96,30 +96,30 @@ describe('getFileDocumentation', () => {
         assert.equal(1, result.components.length);
 
         const c = result.components[0];
-        assert.equal('Row', c.name);
-        assert.equal('Form row.', c.comment);
-        assert.equal('StatelessComponent', c.extends);
+        assert.equal(c.name, 'Row');
+        assert.equal(c.comment, 'Form row.');
+        assert.equal(c.extends, 'StatelessComponent');
         assert.isNotNull(c.propInterface)
 
         const i = c.propInterface;
-        assert.equal('IRowProps', i.name);
-        assert.equal('Row properties.', i.comment);
-        assert.equal(4, i.members.length);
-        assert.equal('prop1', i.members[0].name);
-        assert.equal('prop1 description', i.members[0].comment);
-        assert.equal(false, i.members[0].isRequired);
+        assert.equal(i.name, 'IRowProps');
+        assert.equal(i.comment, 'Row properties.');
+        assert.equal(i.members.length, 4);
+        assert.equal(i.members[0].name, 'prop1');
+        assert.equal(i.members[0].comment, 'prop1 description');
+        assert.equal(i.members[0].isRequired, false);
 
-        assert.equal('prop2', i.members[1].name);
-        assert.equal('prop2 description', i.members[1].comment);
-        assert.equal(true, i.members[1].isRequired);
+        assert.equal(i.members[1].name, 'prop2');
+        assert.equal(i.members[1].comment, 'prop2 description');
+        assert.equal(i.members[1].isRequired, true);
 
-        assert.equal('prop3', i.members[2].name);
-        assert.equal('prop3 description', i.members[2].comment);
-        assert.equal(true, i.members[2].isRequired);
+        assert.equal(i.members[2].name, 'prop3');
+        assert.equal(i.members[2].comment, 'prop3 description');
+        assert.equal(i.members[2].isRequired, true);
 
-        assert.equal('prop4', i.members[3].name);
-        assert.equal('prop4 description', i.members[3].comment);
-        assert.equal(true, i.members[3].isRequired);
+        assert.equal(i.members[3].name, 'prop4');
+        assert.equal(i.members[3].comment, 'prop4 description');
+        assert.equal(i.members[3].isRequired, true);
     });
 
     it('Should parse class-based pure components', () => {
@@ -127,138 +127,156 @@ describe('getFileDocumentation', () => {
         const result = getFileDocumentation(fileName);
 
         assert.ok(result.components);
-        assert.equal(1, result.components.length);
+        assert.equal(result.components.length, 1);
 
         const c = result.components[0];
-        assert.equal('Row', c.name);
-        assert.equal('Form row.', c.comment);
-        assert.equal('PureComponent', c.extends);
+        assert.equal(c.name, 'Row');
+        assert.equal(c.comment, 'Form row.');
+        assert.equal(c.extends, 'PureComponent');
         assert.isNotNull(c.propInterface);
 
         const i = c.propInterface
-        assert.equal('IRowProps', i.name);
-        assert.equal('Row properties.', i.comment);
-        assert.equal(4, i.members.length);
-        assert.equal('prop1', i.members[0].name);
-        assert.equal('prop1 description', i.members[0].comment);
-        assert.equal(false, i.members[0].isRequired);
+        assert.equal(i.name, 'IRowProps');
+        assert.equal(i.comment, 'Row properties.');
+        assert.equal(i.members.length, 4);
+        assert.equal(i.members[0].name, 'prop1');
+        assert.equal(i.members[0].comment, 'prop1 description');
+        assert.equal(i.members[0].isRequired, false);
 
-        assert.equal('prop2', i.members[1].name);
-        assert.equal('prop2 description', i.members[1].comment);
-        assert.equal(true, i.members[1].isRequired);
+        assert.equal(i.members[1].name, 'prop2');
+        assert.equal(i.members[1].comment, 'prop2 description');
+        assert.equal(i.members[1].isRequired, true);
 
-        assert.equal('prop3', i.members[2].name);
-        assert.equal('prop3 description', i.members[2].comment);
-        assert.equal(true, i.members[2].isRequired);
+        assert.equal(i.members[2].name, 'prop3');
+        assert.equal(i.members[2].comment, 'prop3 description');
+        assert.equal(i.members[2].isRequired, true);
 
-        assert.equal('prop4', i.members[3].name);
-        assert.equal('prop4 description', i.members[3].comment);
-        assert.equal(true, i.members[3].isRequired);
+        assert.equal(i.members[3].name, 'prop4');
+        assert.equal(i.members[3].comment, 'prop4 description');
+        assert.equal(i.members[3].isRequired, true);
     });
 
     it('Should avoid parsing exported objects as components', () => {
         const fileName = path.join(__dirname, '../../src/__tests__/data/ConstExport.tsx'); // it's running in ./temp
         const result = getFileDocumentation(fileName);
         assert.ok(result.components);        
-        assert.equal(1, result.components.length);
+        assert.equal(result.components.length, 1);
 
         const c = result.components[0];
-        assert.equal('Row', c.name);
-        assert.equal('Form row.', c.comment);
-        assert.equal('StatelessComponent', c.extends);
+        assert.equal(c.name, 'Row');
+        assert.equal(c.comment, 'Form row.');
+        assert.equal(c.extends, 'StatelessComponent');
         assert.isNotNull(c);
 
         const i = c.propInterface;
-        assert.equal('IRowProps', i.name);
-        assert.equal('Row properties.', i.comment);
-        assert.equal(4, i.members.length);
-        assert.equal('prop1', i.members[0].name);
-        assert.equal('prop1 description', i.members[0].comment);
-        assert.equal(false, i.members[0].isRequired);
+        assert.equal(i.name, 'IRowProps');
+        assert.equal(i.comment, 'Row properties.');
+        assert.equal(i.members.length, 4);
+        assert.equal(i.members[0].name, 'prop1');
+        assert.equal(i.members[0].comment, 'prop1 description');
+        assert.equal(i.members[0].isRequired, false);
 
-        assert.equal('prop2', i.members[1].name);
-        assert.equal('prop2 description', i.members[1].comment);
-        assert.equal(true, i.members[1].isRequired);
+        assert.equal(i.members[1].name, 'prop2');
+        assert.equal(i.members[1].comment, 'prop2 description');
+        assert.equal(i.members[1].isRequired, true);
 
-        assert.equal('prop3', i.members[2].name);
-        assert.equal('prop3 description', i.members[2].comment);
-        assert.equal(true, i.members[2].isRequired);
+        assert.equal(i.members[2].name, 'prop3');
+        assert.equal(i.members[2].comment, 'prop3 description');
+        assert.equal(i.members[2].isRequired, true);
 
-        assert.equal('prop4', i.members[3].name);
-        assert.equal('prop4 description', i.members[3].comment);
-        assert.equal(true, i.members[3].isRequired);
+        assert.equal(i.members[3].name, 'prop4');
+        assert.equal(i.members[3].comment, 'prop4 description');
+        assert.equal(i.members[3].isRequired, true);
     });
 
     it('Should parse higher order components', () => {
         const fileName = path.join(__dirname, '../../src/__tests__/data/ColumnHigherOrderComponent.tsx'); // it's running in ./temp        
         const result = getFileDocumentation(fileName);
         assert.ok(result.components);
-        assert.equal(6, result.components.length);
+        assert.equal(result.components.length, 6);
 
         const r1 = result.components[0];
-        assert.equal('ColumnHigherOrderComponent1', r1.name);
-        assert.equal('ColumnHigherOrderComponent1 specific comment', r1.comment);
-        assert.equal('Column', r1.extends);
+        assert.equal(r1.name, 'ColumnHigherOrderComponent1');
+        assert.equal(r1.comment, 'ColumnHigherOrderComponent1 specific comment');
+        assert.equal(r1.extends, 'Column');
         assert.isNotNull(r1.propInterface);
 
         const p1 = r1.propInterface;
-        assert.equal('IColumnProps', p1.name);
-        assert.equal('Column properties.', p1.comment);
-        assert.equal(4, p1.members.length);
-        assert.equal('prop1', p1.members[0].name);
-        assert.equal('prop1 description', p1.members[0].comment);
-        assert.equal(false, p1.members[0].isRequired);
+        assert.equal(p1.name, 'IColumnProps');
+        assert.equal(p1.comment, 'Column properties.');
+        assert.equal(p1.members.length, 4);
+        assert.equal(p1.members[0].name, 'prop1');
+        assert.equal(p1.members[0].comment, 'prop1 description');
+        assert.equal(p1.members[0].isRequired, false);
 
-        assert.equal('prop2', p1.members[1].name);
-        assert.equal('prop2 description', p1.members[1].comment);
-        assert.equal(true, p1.members[1].isRequired);
+        assert.equal(p1.members[1].name, 'prop2');
+        assert.equal(p1.members[1].comment, 'prop2 description');
+        assert.equal(p1.members[1].isRequired, true);
 
-        assert.equal('prop3', p1.members[2].name);
-        assert.equal('prop3 description', p1.members[2].comment);
-        assert.equal(true, p1.members[2].isRequired);
+        assert.equal(p1.members[2].name, 'prop3');
+        assert.equal(p1.members[2].comment, 'prop3 description');
+        assert.equal(p1.members[2].isRequired, true);
 
-        assert.equal('prop4', p1.members[3].name);
-        assert.equal('prop4 description', p1.members[3].comment);
-        assert.equal(true, p1.members[3].isRequired);
+        assert.equal(p1.members[3].name, 'prop4');
+        assert.equal(p1.members[3].comment, 'prop4 description');
+        assert.equal(p1.members[3].isRequired, true);
 
         const r2 = result.components[1];
-        assert.equal('ColumnHigherOrderComponent2', r2.name);
-        assert.equal('Form column.', r2.comment);
-        assert.equal('Column', r2.extends);
+        assert.equal(r2.name, 'ColumnHigherOrderComponent2');
+        assert.equal(r2.comment, 'Form column.');
+        assert.equal(r2.extends, 'Column');
         assert.isNotNull(r2.propInterface);
         const p2 = r2.propInterface;
-        assert.equal('IColumnProps', p2.name);
+        assert.equal(p2.name, 'IColumnProps');
 
         const r3 = result.components[2];
-        assert.equal('ColumnExternalHigherOrderComponent', r3.name);
-        assert.equal('Form column.', r3.comment);
-        assert.equal('Column', r3.extends);
+        assert.equal(r3.name, 'ColumnExternalHigherOrderComponent');
+        assert.equal(r3.comment, 'Form column.');
+        assert.equal(r3.extends, 'Column');
         assert.isNotNull(r3.propInterface);
         const p3 = r3.propInterface;
-        assert.equal('IColumnProps', p3.name);
+        assert.equal(p3.name, 'IColumnProps');
 
         const r4 = result.components[3];
-        assert.equal('RowHigherOrderComponent1', r4.name);
-        assert.equal('RowHigherOrderComponent1 specific comment', r4.comment);
-        assert.equal('Row', r4.extends);
+        assert.equal(r4.name, 'RowHigherOrderComponent1');
+        assert.equal(r4.comment, 'RowHigherOrderComponent1 specific comment');
+        assert.equal(r4.extends, 'Row');
         assert.isNotNull(r4.propInterface);
         const p4 = r4.propInterface;
-        assert.equal('IRowProps', p4.name);
+        assert.equal(p4.name, 'IRowProps');
 
         const r5 = result.components[4];
-        assert.equal('RowHigherOrderComponent2', r5.name);
-        assert.equal('Form row.', r5.comment);
-        assert.equal('Row', r5.extends);
+        assert.equal(r5.name, 'RowHigherOrderComponent2');
+        assert.equal(r5.comment, 'Form row.');
+        assert.equal(r5.extends, 'Row');
         assert.isNotNull(r5.propInterface);
         const p5 = r5.propInterface;
-        assert.equal('IRowProps', p5.name);  
+        assert.equal(p5.name, 'IRowProps');
 
         const r6 = result.components[5];
-        assert.equal('RowExternalHigherOrderComponent', r6.name);
-        assert.equal('Form row.', r6.comment);
-        assert.equal('Row', r6.extends);
+        assert.equal(r6.name, 'RowExternalHigherOrderComponent');
+        assert.equal(r6.comment, 'Form row.');
+        assert.equal(r6.extends, 'Row');
         assert.isNotNull(r6.propInterface);
         const p6 = r6.propInterface;
-        assert.equal('IRowProps', p6.name);       
+        assert.equal(p6.name, 'IRowProps');       
+    });
+
+    it('Should accept type as props', function() {
+        const fileName = path.join(__dirname, '../../src/__tests__/data/FlippableImage.tsx'); // it's running in ./temp        
+        const result = getFileDocumentation(fileName);
+        assert.ok(result.components);
+        assert.equal(1, result.components.length);
+        const r1 = result.components[0];
+        assert.equal(r1.name, 'FlippableImage')
+        assert.isNotNull(r1.propInterface);
+        const p1 = r1.propInterface;
+        assert.equal(p1.name, 'Props');
+        assert.equal(p1.comment, 'Props comment ');
+        assert.equal(p1.members.length, 2);
+        assert.equal(p1.members[0].name, 'isFlippedX');
+        assert.equal(p1.members[0].comment, 'whether the image is flipped horizontally');
+        assert.equal(p1.members[1].name, 'isFlippedY');
+        assert.equal(p1.members[1].comment, 'whether the image is flipped vertically');
     });
 });

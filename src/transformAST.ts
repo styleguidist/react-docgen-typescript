@@ -8,8 +8,9 @@ import {
     ClassEntry,
     PropertyEntry
 } from './model';
+import { simplePrint, syntaxKindToName, flagsToText, symbolFlagsToText } from "./printUtils";
 
-/** 
+/**
  * Checks if the node is exported. 
  */
 function isNodeExported(node: ts.Node): boolean {
@@ -20,7 +21,7 @@ function isNodeExported(node: ts.Node): boolean {
     if (modifiers) {
         for (let i = 0; i < (modifiers as Array<any>).length; i++) {
             if (modifiers[i].kind === ts.SyntaxKind.ExportKeyword) {
-                return node.parent.kind === ts.SyntaxKind.SourceFile
+                return node.parent !== undefined && node.parent.kind === ts.SyntaxKind.SourceFile
             }
         }
     }
@@ -37,25 +38,27 @@ function getType(prop: ts.PropertySignature): MemberType {
     }
     //noinspection TypeScriptUnresolvedFunction
     return {
-        type: prop.type.getText(),
+        type: unionType.getText(),
     }
 }
 
 function getMethods(checker: ts.TypeChecker, type: ts.Type, classDeclaratinNode: ts.ClassDeclaration) {
-    return classDeclaratinNode.members.filter(x => x.name !== undefined)
+    return classDeclaratinNode.members
+        .filter(x => x.name !== undefined)
         .map(i => ({ name: i.name.getText() }));
 }
 
-function getProperties(checker: ts.TypeChecker, type: ts.Type, interfaceDeclaratinNode: ts.InterfaceDeclaration): PropertyEntry[] {
-    
+function getProperties(checker: ts.TypeChecker, type: ts.Type, parent: ts.Node): PropertyEntry[] {
     return type.getProperties() 
-        .filter(i => i.valueDeclaration.parent === interfaceDeclaratinNode)
+        //.filter(i => parent === null || i.valueDeclaration.parent === parent)
         .map(i => {
             const symbol = checker.getSymbolAtLocation(i.valueDeclaration.name);
             const prop = i.valueDeclaration as ts.PropertySignature;                        
             const typeInfo = getType(prop);
+
             return {
                 name: i.getName(),
+                isOwn: i.valueDeclaration.parent === parent,
                 // text: i.valueDeclaration.getText(),
                 type: typeInfo.type,
                 values: typeInfo.values || [],
@@ -77,7 +80,7 @@ function findAllNodes(rootNode: ts.Node, result: ts.Node[]) {
  * model (classes, interfaces, variables, methods).
  */
 export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker) {    
-    const nodes = [];
+    const nodes: ts.Node[] = [];
     findAllNodes(sourceFile, nodes);
     
     const variables: VariableEntry[] = nodes
@@ -173,9 +176,38 @@ export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker)
             };
         });
 
+        const types: InterfaceEntry[] = nodes
+            .filter(i => i.kind === ts.SyntaxKind.TypeAliasDeclaration)
+            .map(i => i as ts.TypeAliasDeclaration)
+            .map(i => {
+                const type = checker.getTypeAtLocation(i.name) as ts.IntersectionType;                
+                const properties = [];
+                type.types.forEach(t => {
+                    const props = (t as any).properties;
+                    let ownProperties = [];
+                    if (props) {
+                        ownProperties = props
+                            .map((p: ts.Symbol) => p.getName());
+                    }
+                    properties.push(...getProperties(checker, t, i));
+
+                    properties
+                        .filter(p => ownProperties.indexOf(p.name) > -1)
+                        .forEach(p => p.isOwn = true);
+                });
+                const symbol = checker.getSymbolAtLocation(i.name);
+                return {
+                    name: i.name.getText(),
+                    properties,
+                    exported: isNodeExported(i),
+                    comment: !symbol ? "" : ts.displayPartsToString(symbol.getDocumentationComment())
+                };
+            });
+
         return {
             classes,
             interfaces,
             variables,
+            types: types,
         }
 }

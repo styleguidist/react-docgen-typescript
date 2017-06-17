@@ -1,6 +1,6 @@
 {
   "name": "react-docgen-typescript",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -8,16 +8,12 @@
     "prepublish": "tsc -d",
     "test": "tsc && mocha ./lib/**/__tests__/**.js",
     "test:debug": "tsc && mocha --debug ./lib/**/__tests__/**.js",
-    "example": "tsc && node ./node_modules/react-styleguidist/bin/styleguidist server --config ./examples/react-styleguidist-example/styleguide.config.js",
-    "example:webpack": "webpack --config ./examples/react-styleguidist-example/webpack.config.js",
     "print": "npm run tsc && node ./lib/print.js",
     "print:sample1": "npm run tsc && node ./lib/print.js ./src/__tests__/data/ColumnHigherOrderComponent.tsx simple"
   },
   "author": "pvasek",
   "license": "MIT",
   "dependencies": {
-    "awesome-typescript-loader": "^3.0.8",
-    "typescript": "^2.2.1"
   },
   "devDependencies": {
     "@types/chai": "^3.4.35",
