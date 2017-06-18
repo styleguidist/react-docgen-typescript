@@ -22,6 +22,9 @@ export function flagsToText(kind: ts.TypeFlags) {
 export function symbolFlagsToText(kind: ts.SymbolFlags) {
     return (<any>ts).SymbolFlags[kind];
 }
+export function nodeFlagsToText(kind: ts.NodeFlags) {
+    return (<any>ts).NodeFlags[kind];
+}
 
 /** True if this is visible outside this file, false otherwise */
 function isNodeExported(node: ts.Node): boolean {

@@ -87,7 +87,7 @@ describe('transformAST', () => {
 
     it('should provide data about interfaces', () => {
         const result = target.interfaces;
-        assert.equal(result.length, 3);
+        assert.equal(result.length, 4);
         const r1 = result[0];
         assert.equal(r1.name, 'UnexportedInterface');
         assert.equal(r1.exported, false);
@@ -144,11 +144,14 @@ describe('transformAST', () => {
                 'values': [],
             },
         ]);
+        const r4 = result[3];
+        assert.equal(r4.name, 'ExternalInterface');
+        assert.equal(r4.exported, true);
     });
 
     it('should provide data about classes', () => {        
         const result = target.classes;
-        assert.equal(result.length, 3);
+        assert.equal(result.length, 4);
         const r1 = result[1];
         assert.equal(r1.name, 'UnexportedClass');
         assert.equal(r1.exported, false);
@@ -160,6 +163,12 @@ describe('transformAST', () => {
         assert.equal(r2.exported, true);
         assert.equal(r2.comment, 'ExportedClass comment');
         assert.deepEqual(r2.methods, [{name: 'method1'}, {name: 'method2'}]);
+
+        const r4 = result[3];
+        assert.equal(r4.name, 'ExportedClassWithExternalDependency');
+        assert.equal(r4.exported, true);
+        assert.equal(r4.comment, 'ExportedClassWithExternalDependency comment');
+        assert.deepEqual(r4.baseType.typeArguments.length, 2);
     });
 
     it('should provide data about types', () => {
