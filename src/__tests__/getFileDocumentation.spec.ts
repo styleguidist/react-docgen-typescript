@@ -292,4 +292,11 @@ describe('getFileDocumentation', () => {
         assert.equal(p1.name, 'ExternalPropsComponentProps');
         // assert.equal(p1.comment, 'ExternalPropsComponentProps props');
     });
+
+    it('Should parse file that worked in v0.0.11', function() {
+        const fileName = path.join(__dirname, '../../src/__tests__/data/Regression_v0_0_12.tsx'); // it's running in ./temp        
+        const result = getFileDocumentation(fileName);
+        assert.ok(result.components);
+    })
+
 });
