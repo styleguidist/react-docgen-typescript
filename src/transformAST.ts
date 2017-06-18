@@ -172,18 +172,22 @@ export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker)
         .map(i => {
             const type = checker.getTypeAtLocation(i.name) as ts.IntersectionType;                
             const properties: PropertyEntry[] = [];
-            type.types.forEach(t => {
-                const props = (t as any).properties;
-                let ownProperties: string[] = [];
-                if (props) {
-                    ownProperties = props
-                        .map((p: ts.Symbol) => p.getName());
-                }
-                properties.push(...getProperties(checker, t, i));
 
-                properties
-                    .forEach(p => p.isOwn = ownProperties.indexOf(p.name) > -1);
-            });
+            if (type.types) {                
+                type.types.forEach(t => {
+                    const props = (t as any).properties;
+                    let ownProperties: string[] = [];
+                    if (props) {
+                        ownProperties = props
+                            .map((p: ts.Symbol) => p.getName());
+                    }
+                    properties.push(...getProperties(checker, t, i));
+
+                    properties
+                        .forEach(p => p.isOwn = ownProperties.indexOf(p.name) > -1);
+                });
+            }
+
             const symbol = checker.getSymbolAtLocation(i.name);
             return {
                 name: i.name.getText(),
