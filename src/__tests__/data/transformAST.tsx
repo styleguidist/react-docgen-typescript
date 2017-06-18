@@ -1,5 +1,6 @@
-import { externalHoc } from './transformAST_hoc';
 import * as React from 'react';
+import { externalHoc } from './transformAST_hoc';
+import { ExternalInterface } from './transformAST_external';
 
 const unexportedVar = 10;
 export const exportedVar = 10;
@@ -79,3 +80,10 @@ export type ExportedType1 = React.HTMLAttributes<HTMLImageElement> & {
     /** the second property */
     prop2: number;
  };
+
+ /** ExportedClassWithExternalDependency comment */
+export class ExportedClassWithExternalDependency extends OurBaseClass<ExternalInterface, {}> {
+    method1(): string {
+        return "";
+    }
+}

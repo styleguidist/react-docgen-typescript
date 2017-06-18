@@ -279,4 +279,17 @@ describe('getFileDocumentation', () => {
         assert.equal(p1.members[1].name, 'isFlippedY');
         assert.equal(p1.members[1].comment, 'whether the image is flipped vertically');
     });
+
+    it('Should recognize props defined in different file', function() {
+        const fileName = path.join(__dirname, '../../src/__tests__/data/ExternalPropsComponent.tsx'); // it's running in ./temp        
+        const result = getFileDocumentation(fileName);
+        assert.ok(result.components);
+        assert.equal(1, result.components.length);
+        const r1 = result.components[0];
+        assert.equal(r1.name, 'ExternalPropsComponent')        
+        assert.isNotNull(r1.propInterface);
+        const p1 = r1.propInterface;
+        assert.equal(p1.name, 'ExternalPropsComponentProps');
+        // assert.equal(p1.comment, 'ExternalPropsComponentProps props');
+    });
 });

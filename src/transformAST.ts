@@ -9,7 +9,7 @@ import {
     PropertyEntry,
     BaseClassEntry
 } from './model';
-import { simplePrint, syntaxKindToName, flagsToText, symbolFlagsToText } from "./printUtils";
+import { simplePrint, syntaxKindToName, flagsToText, symbolFlagsToText, nodeFlagsToText } from "./printUtils";
 
 /**
  * Checks if the node is exported. 
@@ -50,6 +50,13 @@ function getMethods(checker: ts.TypeChecker, type: ts.Type, classDeclaratinNode:
 }
 
 function getProperties(checker: ts.TypeChecker, type: ts.Type, parent: ts.Node): PropertyEntry[] {
+    const baseTypes = type.getBaseTypes() || [];
+    const inheritedProperties = baseTypes
+            .reduce((acc, bt) => [
+                ...acc, 
+                ...bt.getProperties().map(p => p.getName())
+            ], [] as string[]);    
+     
     return type.getProperties() 
         .filter(i => i.valueDeclaration)
         .map(i => {
@@ -58,13 +65,13 @@ function getProperties(checker: ts.TypeChecker, type: ts.Type, parent: ts.Node):
             }
             
             const symbol = checker.getSymbolAtLocation(i.valueDeclaration.name);
-            const prop = i.valueDeclaration as ts.PropertySignature;                        
+            const prop = i.valueDeclaration as ts.PropertySignature;                  
             const typeInfo = getType(prop);
 
+            const propertyName = i.getName();
             return {
-                name: i.getName(),
-                isOwn: i.valueDeclaration.parent === parent,
-                // text: i.valueDeclaration.getText(),
+                name: propertyName,
+                isOwn: inheritedProperties.indexOf(propertyName) === -1,
                 type: typeInfo.type,
                 values: typeInfo.values || [],
                 isRequired: !prop.questionToken,
@@ -159,6 +166,33 @@ export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker)
             };
         });
 
+    const types: InterfaceEntry[] = nodes
+        .filter(i => i.kind === ts.SyntaxKind.TypeAliasDeclaration)
+        .map(i => i as ts.TypeAliasDeclaration)
+        .map(i => {
+            const type = checker.getTypeAtLocation(i.name) as ts.IntersectionType;                
+            const properties: PropertyEntry[] = [];
+            type.types.forEach(t => {
+                const props = (t as any).properties;
+                let ownProperties: string[] = [];
+                if (props) {
+                    ownProperties = props
+                        .map((p: ts.Symbol) => p.getName());
+                }
+                properties.push(...getProperties(checker, t, i));
+
+                properties
+                    .forEach(p => p.isOwn = ownProperties.indexOf(p.name) > -1);
+            });
+            const symbol = checker.getSymbolAtLocation(i.name);
+            return {
+                name: i.name.getText(),
+                properties,
+                exported: isNodeExported(i),
+                comment: !symbol ? "" : ts.displayPartsToString(symbol.getDocumentationComment())
+            };
+        });
+
     const classes: ClassEntry[] = nodes
         .filter(i => i.kind === ts.SyntaxKind.ClassDeclaration)
         .map(i => i as ts.ClassDeclaration)
@@ -176,6 +210,29 @@ export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker)
                 const typeArguments = navigate(i,
                     ts.SyntaxKind.HeritageClause,
                     ts.SyntaxKind.ExpressionWithTypeArguments) as ts.ExpressionWithTypeArguments;
+
+                 
+
+                if (typeArguments && typeArguments.typeArguments) {
+                    typeArguments.typeArguments.forEach(ta => {
+                        const taType = checker.getTypeAtLocation(ta);
+                        if (taType && taType.symbol) {
+                            const taTypeName = taType.symbol.getName();
+                            // check if the type is defined in another file
+                            if (interfaces.every(int => int.name !== taTypeName)
+                                && taTypeName !== '__type') {
+                                // in that case we need to include the interface explicitly
+                                interfaces.push({
+                                    name: taType.symbol.name,
+                                    comment: ts.displayPartsToString(taType.symbol.getDocumentationComment()).trim(),
+                                    exported: true, // it has to be exported in order to be used,
+                                    properties: getProperties(checker, taType, null),
+                                });
+                            }                            
+                        }
+                    })
+                }
+
                 baseType = {
                     name: t.symbol ? t.symbol.getName() : 'unknown',
                     typeArguments: typeArguments && typeArguments.typeArguments ? 
@@ -191,34 +248,6 @@ export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker)
                 methods: getMethods(checker, type, i),
             };
         });
-
-        const types: InterfaceEntry[] = nodes
-            .filter(i => i.kind === ts.SyntaxKind.TypeAliasDeclaration)
-            .map(i => i as ts.TypeAliasDeclaration)
-            .map(i => {
-                const type = checker.getTypeAtLocation(i.name) as ts.IntersectionType;                
-                const properties: PropertyEntry[] = [];
-                type.types.forEach(t => {
-                    const props = (t as any).properties;
-                    let ownProperties: string[] = [];
-                    if (props) {
-                        ownProperties = props
-                            .map((p: ts.Symbol) => p.getName());
-                    }
-                    properties.push(...getProperties(checker, t, i));
-
-                    properties
-                        .filter(p => ownProperties.indexOf(p.name) > -1)
-                        .forEach(p => p.isOwn = true);
-                });
-                const symbol = checker.getSymbolAtLocation(i.name);
-                return {
-                    name: i.name.getText(),
-                    properties,
-                    exported: isNodeExported(i),
-                    comment: !symbol ? "" : ts.displayPartsToString(symbol.getDocumentationComment())
-                };
-            });
 
         return {
             classes,
