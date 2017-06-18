@@ -44,7 +44,7 @@ describe('transformAST', () => {
         assert.equal(r4.name, 'exportedVarFunction');
         assert.equal(r4.exported, true);
         assert.equal(r4.kind, 'arrowFunction');
-        assert.equal(r4.comment, 'exportedVarFunction comment');
+        assert.equal(r4.comment, 'exportedVarFunction comment\n@tag1\n@tag2 partA partB partC');
         assert.equal(r4.arrowFunctionType, 'string');
         assert.deepEqual(r4.arrowFunctionParams, ['number', 'string']);
 
@@ -98,10 +98,18 @@ describe('transformAST', () => {
                 'isOwn': true,
                 'comment': 'prop1 comment',
                 'values': [],
+            }, {
+                'name': 'prop2',
+                'type': 'string',
+                'isRequired': false,
+                'isOwn': true,
+                'comment': 'prop2 comment\n@tag1\n@tag2 partA partB partC',
+                'values': [],
             }]);
 
         const r2 = result[1];
         assert.equal(r2.name, 'ExportedInterface');
+        assert.equal(r2.comment, 'Interface comment\n@tag1\n@tag2 partA partB partC');
         assert.equal(r2.exported, true);
         assert.deepEqual(r2.properties, [{
                 'name': 'prop1',
@@ -147,6 +155,7 @@ describe('transformAST', () => {
         const r4 = result[3];
         assert.equal(r4.name, 'ExternalInterface');
         assert.equal(r4.exported, true);
+        assert.equal(r4.comment, 'ExternalInterface comment\n@tag');
     });
 
     it('should provide data about classes', () => {        
@@ -161,7 +170,7 @@ describe('transformAST', () => {
         const r2 = result[2];
         assert.equal(r2.name, 'ExportedClass');
         assert.equal(r2.exported, true);
-        assert.equal(r2.comment, 'ExportedClass comment');
+        assert.equal(r2.comment, 'ExportedClass comment\n@tag1 partA partB\n@tag2');
         assert.deepEqual(r2.methods, [{name: 'method1'}, {name: 'method2'}]);
 
         const r4 = result[3];
@@ -175,6 +184,8 @@ describe('transformAST', () => {
         assert.equal(target.types.length, 1);
         const t1 = target.types[0];
         assert.equal(t1.name, 'ExportedType1');
+        assert.equal(t1.comment, 'exported intersection type\n@tag1 partA partB\n@tag2');
+
         // because ExportedType1 inherites from built in type and can 
         // change over time we don't use exact number here
         assert.isTrue(t1.properties.length > 200);
