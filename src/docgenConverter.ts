@@ -1,11 +1,16 @@
+import * as path from 'path';
 import { FileDoc, InterfaceDoc, MemberDoc } from './model';
 import { StyleguidistComponent, StyleguidistProps, PropItem } from './propTypesParser';
 
-export function convertToDocgen(doc: FileDoc): StyleguidistComponent | null {
+export function convertToDocgen(filePath: string, doc: FileDoc): StyleguidistComponent {
     const components = doc.components;
 
     if (components.length === 0) {
-        return null;
+        return {
+            displayName: path.basename(filePath, path.extname(filePath)),
+            description: '',
+            props: {},
+        };
     }
     const comp = components[0];
     
