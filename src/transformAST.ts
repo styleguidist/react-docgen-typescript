@@ -119,7 +119,10 @@ export function transformAST(sourceFile: ts.SourceFile, checker: ts.TypeChecker)
             const initializerFlags = initializerType.flags;
             let arrowFunctionParams: string[] = [];
             let callExpressionArguments: string[] = [];
-            if (d.initializer.kind === ts.SyntaxKind.ArrowFunction) {
+            
+            if (!d.initializer) {
+                kind = 'unknown';
+            } else if (d.initializer.kind === ts.SyntaxKind.ArrowFunction) {
                 const arrowFunc = d.initializer as ts.ArrowFunction; 
                 if (arrowFunc.parameters) {
                     arrowFunctionParams = arrowFunc

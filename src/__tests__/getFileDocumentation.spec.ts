@@ -299,4 +299,45 @@ describe('getFileDocumentation', () => {
         assert.ok(result.components);
     })
 
+    it('Should parse inline function ', () => {
+        const fileName = path.join(__dirname, '../../src/__tests__/data/InlineConst.tsx'); // it's running in ./temp
+        const result = getFileDocumentation(fileName);
+
+        assert.ok(result.components);
+        assert.equal(1, result.components.length);
+
+        const c = result.components[0];
+        assert.equal('MyComponent', c.name);
+        assert.equal('My InlineConst Component', c.comment);
+        assert.equal('Component', c.extends);
+        assert.isNotNull(c.propInterface);
+
+        const i = c.propInterface;
+        assert.equal('IReproProps', i.name);
+        assert.equal('A repro props interface', i.comment);
+        assert.equal(1, i.members.length);
+        assert.equal('foo', i.members[0].name);
+        assert.equal('A foo property', i.members[0].comment);
+    }); 
+
+    it('Should parse component with unassigned let', () => {
+        const fileName = path.join(__dirname, '../../src/__tests__/data/UnassignedLet.tsx'); // it's running in ./temp
+        const result = getFileDocumentation(fileName);
+
+        assert.ok(result.components);
+        assert.equal(1, result.components.length);
+
+        const c = result.components[0];
+        assert.equal('Repro', c.name);
+        assert.equal('My Repro Component', c.comment);
+        assert.equal('Component', c.extends);
+        assert.isNotNull(c.propInterface);
+
+        const i = c.propInterface;
+        assert.equal('IReproProps', i.name);
+        assert.equal('A repro props interface', i.comment);
+        assert.equal(1, i.members.length);
+        assert.equal('foo', i.members[0].name);
+        assert.equal('A foo property', i.members[0].comment);
+    }); 
 });
