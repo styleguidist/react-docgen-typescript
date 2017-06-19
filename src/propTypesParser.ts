@@ -28,5 +28,5 @@ export interface PropItemType {
  */
 export function parse(filePath: string): StyleguidistComponent {
     const doc = getFileDocumentation(filePath);
-    return convertToDocgen(doc);		
+    return convertToDocgen(filePath, doc);		
 }

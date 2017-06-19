@@ -6,7 +6,7 @@ import { StyleguidistComponent } from '../propTypesParser';
 
 describe('docgenConverter', () => {
     it('Should work with class Component', () => {
-        const result = convertToDocgen({
+        const result = convertToDocgen('', {
             components: [
                 { 
                     name: 'name1',
@@ -34,7 +34,7 @@ describe('docgenConverter', () => {
     });
 
     it('Should work with functional StatelessComponent', () => {
-        const result = convertToDocgen({
+        const result = convertToDocgen('', {
             components: [
                 { 
                     name: 'name1',
@@ -66,7 +66,7 @@ describe('docgenConverter', () => {
         let warnCallCount = 0;
         console.warn = () => warnCallCount++;
         try {
-            result = convertToDocgen({
+            result = convertToDocgen('', {
                 components: [
                     { 
                         name: 'name1',
@@ -91,7 +91,7 @@ describe('docgenConverter', () => {
         let warnCallCount = 0;
         console.warn = () => warnCallCount++;
         try {
-            result = convertToDocgen({
+            result = convertToDocgen('', {
                 components: [
                     { 
                         name: 'name1',
@@ -109,4 +109,10 @@ describe('docgenConverter', () => {
         assert.equal('name1', result.displayName);
         assert.equal('comment1', result.description);
     });
+
+    it('Should return empty object if there are no components', () => {
+        const result = convertToDocgen('/root/MyComponent.tsx', { components: [] });
+        assert.isOk(result);
+        assert.equal(result.displayName, 'MyComponent');
+    })
 });
