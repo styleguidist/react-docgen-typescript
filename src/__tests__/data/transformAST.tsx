@@ -8,7 +8,11 @@ export const exportedVar = 10;
 /** unexportedVarFunction comment */
 const unexportedVarFunction = (param1: string): number => 0
 ;
-/** exportedVarFunction comment */
+/** exportedVarFunction comment
+ *
+ * @tag1
+ * @tag2 partA partB partC
+ */
 export const exportedVarFunction = (param1: number, param2: string): string => "";
 
 function unexportedFunction(param1: number): string {
@@ -22,8 +26,21 @@ function exportedFunction(param1: string, param2: number): number {
 interface UnexportedInterface {
     /** prop1 comment */
     prop1: string;
+
+    /**
+     * prop2 comment
+     * @tag1
+     * @tag2 partA partB partC
+     */
+    prop2?: string;
 }
 
+/**
+ * Interface comment
+ * 
+ * @tag1
+ * @tag2 partA partB partC
+ */
 export interface ExportedInterface {
     /** prop1 comment */
     prop1: string;
@@ -46,7 +63,10 @@ class UnexportedClass extends OurBaseClass<ExportedInterface, {}> {
     }
 }
 
-/** ExportedClass comment */
+/** ExportedClass comment
+ * @tag1 partA partB
+ * @tag2
+ */
 export class ExportedClass {
     method1(): string {
         return "";
@@ -73,7 +93,10 @@ export const exportedExternalHoc1 = externalHoc(ExportedClass);
 /** exportedExternalHoc2 comment */
 export const exportedExternalHoc2 = externalHoc(exportedFunction);
 
-/** exported intersection type */
+/** exported intersection type
+ * @tag1 partA partB
+ * @tag2
+ */
 export type ExportedType1 = React.HTMLAttributes<HTMLImageElement> & { 
     /** the first property */
     prop1: "value1" | "value2";

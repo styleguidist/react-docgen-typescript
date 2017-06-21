@@ -77,6 +77,11 @@ export function simplePrint(checker: ts.TypeChecker, node: ts.Node, indent = 0) 
         if (comments.length > 0) {
             info.push(prefix + 'comment: \'' + comments.map(i => i.text).join('; ') + '\'');
         }
+        const jsdoctags = s.getJsDocTags();
+        if (jsdoctags.length > 0) {
+            info.push(prefix + 'jsdoctags: \'' +
+                jsdoctags.map(i => `@${i.name} ${i.text}`).join('; ') + '\'');
+        }
     }
 
     if (node.kind === ts.SyntaxKind.FunctionDeclaration) {

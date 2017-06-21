@@ -272,7 +272,7 @@ describe('getFileDocumentation', () => {
         assert.isNotNull(r1.propInterface);
         const p1 = r1.propInterface;
         assert.equal(p1.name, 'Props');
-        assert.equal(p1.comment, 'Props comment ');
+        assert.equal(p1.comment, 'Props comment');
         assert.equal(p1.members.length, 2);
         assert.equal(p1.members[0].name, 'isFlippedX');
         assert.equal(p1.members[0].comment, 'whether the image is flipped horizontally');
