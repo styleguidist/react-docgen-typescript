@@ -95,12 +95,12 @@ function getProperties(checker: ts.TypeChecker, type: ts.Type, propsObj: ts.Symb
         });
 }
 
-function getComponentInfo(checker: ts.TypeChecker, name: string, propsSymbol: ts.Symbol): StyleguidistComponent {
+function getComponentInfo(checker: ts.TypeChecker, component: ts.Symbol, name: string, propsSymbol: ts.Symbol): StyleguidistComponent {
     const propsType = checker.getTypeOfSymbolAtLocation(propsSymbol, propsSymbol.valueDeclaration);
     const propertiesOfProps = getProperties(checker, propsType, propsSymbol);
     const result: StyleguidistComponent = {
         displayName: name,
-        description: '',
+        description: getFullJsDocComment(component),
         props: propertiesOfProps.reduce((acc, i) => {
             acc[i.name] = i;
             return acc;
@@ -151,7 +151,7 @@ export function parse(fileName: string): StyleguidistComponent[] {
             // theoretically check its return type to see if it's ReactElement or friends.
 
             const propsParam = params[0];
-            result.push(getComponentInfo(checker, componentName, propsParam));
+            result.push(getComponentInfo(checker, exportItem, componentName, propsParam));
         }
 
         for (const sig of constructSignatures) {
@@ -163,7 +163,7 @@ export function parse(fileName: string): StyleguidistComponent[] {
                 continue;
             }
 
-            result.push(getComponentInfo(checker, componentName, props));
+            result.push(getComponentInfo(checker, exportItem, componentName, props));
         }
     }	
 
