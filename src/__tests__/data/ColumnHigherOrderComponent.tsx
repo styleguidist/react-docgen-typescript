@@ -3,17 +3,9 @@ import { externalHoc } from "./ColumnHigherOrderComponentHoc";
 /**
  * Column properties.
  */
-export interface IColumnProps extends React.HTMLAttributes<any> {
+export interface IColumnProps {
     /** prop1 description */
-    prop1?: string;
-    /** prop2 description */
-    prop2: number;
-    /**
-     * prop3 description
-     */
-    prop3: () => void;
-    /** prop4 description */
-    prop4: 'option1' | 'option2' | "option3";
+    prop1: string;
 }
 
 /**
@@ -35,15 +27,7 @@ class Column extends React.Component<IColumnProps, {}> {
  */
 export interface IRowProps {
     /** prop1 description */
-    prop1?: string;
-    /** prop2 description */
-    prop2: number;
-    /**
-     * prop3 description
-     */
-    prop3: () => void;
-    /** prop4 description */
-    prop4: 'option1' | 'option2' | "option3";
+    prop1: string;
 }
 
 /**
@@ -63,16 +47,21 @@ function hoc<T>(C: T): T {
     return ((props) => <div>{C}</div>) as any as T;
 }
 
-/** ColumnHigherOrderComponent1 specific comment */
+/** ColumnHigherOrderComponent1 description */
 export const ColumnHigherOrderComponent1 = hoc(Column);
 
+/** ColumnHigherOrderComponent2 description */
 export const ColumnHigherOrderComponent2 = hoc(Column);
 
-/** RowHigherOrderComponent1 specific comment */
+/** RowHigherOrderComponent1 description */
 export const RowHigherOrderComponent1 = hoc(Row);
 
+/** RowHigherOrderComponent2 description */
 export const RowHigherOrderComponent2 = hoc(Row);
 
+/** ColumnExternalHigherOrderComponent description */
 export const ColumnExternalHigherOrderComponent = externalHoc(Column);
+
+/** RowExternalHigherOrderComponent description */
 export const RowExternalHigherOrderComponent = externalHoc(Row);
 

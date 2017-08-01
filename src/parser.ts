@@ -2,13 +2,13 @@ import * as ts from 'typescript';
 import * as path from 'path';
 import * as fs from 'fs';
 
-export interface StyleguidistComponent {
+export interface ComponentDoc {
     displayName: string;
     description: string;
-    props: StyleguidistProps;
+    props: Props;
 }
 
-export interface StyleguidistProps {
+export interface Props {
     [key: string]: PropItem;
 }
 
@@ -60,7 +60,7 @@ export function withConfig(tsconfigPath: string) {
  */
 export function withCompilerOptions(compilerOptions: ts.CompilerOptions) {
     return {
-        parse(filePath: string): StyleguidistComponent[] {
+        parse(filePath: string): ComponentDoc[] {
             const program = ts.createProgram([filePath], compilerOptions);
 
             const parser = new Parser(program);
@@ -87,7 +87,7 @@ class Parser {
         this.checker = program.getTypeChecker();
     }
 
-    public getComponentInfo(exp: ts.Symbol, source: ts.SourceFile): StyleguidistComponent {
+    public getComponentInfo(exp: ts.Symbol, source: ts.SourceFile): ComponentDoc {
         const type = this.checker.getTypeOfSymbolAtLocation(exp, exp.valueDeclaration);
 
         let propsType = this.extractPropsFromTypeIfStatelessComponent(type);
@@ -153,11 +153,11 @@ class Parser {
         return null;
     }
 
-    public getPropsInfo(propsObj: ts.Symbol): StyleguidistProps {
+    public getPropsInfo(propsObj: ts.Symbol): Props {
         const propsType = this.checker.getTypeOfSymbolAtLocation(propsObj, propsObj.valueDeclaration);
         const propertiesOfProps = propsType.getProperties();
 
-        const result: StyleguidistProps = {};
+        const result: Props = {};
 
         propertiesOfProps.forEach(prop => {
             const propName = prop.getName();
@@ -169,6 +169,7 @@ class Parser {
             const propTypeString = this.checker.typeToString(propType);
 
             const isOptional = (prop.getFlags() & ts.SymbolFlags.Optional) !== 0;
+
 
             const jsDocComment = this.findDocComment(prop);
 
@@ -224,7 +225,6 @@ class Parser {
 
         return (mainComment + '\n' + tagComments.join('\n')).trim();
     }
-
 }
 
 function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {

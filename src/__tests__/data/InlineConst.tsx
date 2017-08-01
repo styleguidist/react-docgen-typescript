@@ -4,12 +4,12 @@ import * as React from 'react';
  * A repro props interface
  */
 export interface IReproProps {
-    /** A foo property */
+    /** foo description */
     foo: any;
 }
 
 /**
- * My InlineConst Component
+ * MyComponent description
  */
 export class MyComponent extends React.Component<IReproProps, {}> {
     render() {

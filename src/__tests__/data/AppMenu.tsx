@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-/** App Menu Props */
+/** IAppMenuProps props */
 export interface IAppMenuProps {
-  /** Menu items */
+  /** menu description */
   menu: any;
 }
 
@@ -10,7 +10,7 @@ export interface IAppMenuState {
   menu: any;
 }
 
-/** App Menu Component */
+/** AppMenu description */
 export class AppMenu extends React.Component<IAppMenuProps, IAppMenuState> {
   constructor(props, context) {
     super(props, context);
