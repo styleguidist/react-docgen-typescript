@@ -1,4 +1,10 @@
-import { parse as newParse } from './parser';
+import { 
+    parse as newParse, 
+    ComponentDoc,
+    Props,
+    PropItem,
+    PropItemType
+} from './parser';
 
 /**
  * This method exists for backward compatibility only.
