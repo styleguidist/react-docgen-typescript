@@ -150,4 +150,13 @@ describe('parser', () => {
             }
         });
     });
+
+    it('should parse react stateless component', function(){
+        check('Stateless', {
+            Stateless: {
+                children,
+                myProp: { type: 'string' },
+            }
+        });
+    });    
 });

@@ -105,6 +105,8 @@ the part it's fixing.
 
 ## Thanks to contributors
 
+@RoystonS Royston Shufflebotham - complete parser rewrite that use typescript parser in much better way and overcome many issues of previous implementation
+
 @JocD Jacques Dukes - complete support for functional components and much more
 
 @sapegin Artem Sapegin - fix for compatibility with react-styleguidist v5

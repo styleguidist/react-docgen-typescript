@@ -118,13 +118,13 @@ class Parser {
 
             for (let sig of callSignatures) {
                 const params = sig.getParameters();
-                if (params.length === 1) {
-
-                    // We've found an exported function with a single parameter.
-                    // Might be a stateless component. For now this is fine, but we could
-                    // theoretically check its return type to see if it's ReactElement or friends.
-
-                    const propsParam = params[0];
+                if (params.length === 0) {
+                    continue;
+                }
+                // Maybe we could check return type instead, 
+                // but not sure if Element, ReactElement<T> are all possible values                
+                const propsParam = params[0];
+                if (propsParam.name === 'props' || params.length === 1) {                    
                     return propsParam;
                 }
             }
