@@ -4,15 +4,14 @@ type Coords = { x: number; y: number };
 
 export interface Props extends React.HTMLAttributes<Element> {
   /**
-   * The x-axis value of the zoom origin, which corresponds to the mouse pointer
-   * location relative to the wrapped element without the zoom applied
+   * originX description
    */
   originX: number;
-  /** The y-axis value of the zoom origin, which corresponds to the mouse pointer
-   * location relative to the wrapped element without the zoom applied
+  /** 
+   * originY description
    */
   originY: number;
-  /** The zoom level */
+  /** scaleFactor description */
   scaleFactor: number;
   /** Maximum zoom level */
   maxScale?: number;
@@ -45,8 +44,8 @@ function getCanZoomOut({ minScale = Infinity, scaleFactor }: Props): boolean {
   return scaleFactor > minScale;
 }
 
-/** A Zoomable component wraps any DOM element and provides mouse-based
- * zooming capabilities. Support for touch gestures is planned soon.
+/** 
+ * Zoomable description
  */
 export class Zoomable extends React.PureComponent<Props, State> {
 

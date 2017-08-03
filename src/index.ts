@@ -1,15 +1,15 @@
 import {
     parse,
-    StyleguidistComponent,
-    StyleguidistProps,
+    ComponentDoc,
+    Props,
     PropItem,
     PropItemType,
-} from './propTypesParser';
+} from './parser';
 
 export {
     parse,
-    StyleguidistComponent,
-    StyleguidistProps,
+    ComponentDoc,
+    Props,
     PropItem,
     PropItemType,
 }

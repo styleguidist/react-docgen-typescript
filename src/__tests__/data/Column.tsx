@@ -1,8 +1,9 @@
 import * as React from 'react';
+
 /**
  * Column properties.
  */
-export interface IColumnProps extends React.HTMLAttributes<any> {
+export interface IColumnProps {
     /** prop1 description */
     prop1?: string;
     /** prop2 description */
@@ -16,7 +17,7 @@ export interface IColumnProps extends React.HTMLAttributes<any> {
 }
 
 /**
- * Form column.
+ * Column description
  */
 export class Column extends React.Component<IColumnProps, {}> {
     public static defaultProps: Partial<IColumnProps> = {

@@ -2,13 +2,13 @@ import * as React from 'react';
 
 /** Props comment */
 export type Props = React.HTMLAttributes<HTMLImageElement> & {
-  /** whether the image is flipped horizontally */
+  /** isFlippedX description */
   isFlippedX?: boolean;
-  /** whether the image is flipped vertically */
+  /** isFlippedY description */
   isFlippedY?: boolean;
 }
 
-/** An enhanced image component */
+/** FlippableImage description */
 export const FlippableImage = (props: Props) => {
   const {
     src,
