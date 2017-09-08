@@ -102,6 +102,16 @@ describe('parser', () => {
         });
     });
 
+    it('should parse react component with properties extended from an external .tsx file', function(){
+        check('ExtendsExternalPropsComponent', {
+            ExtendsExternalPropsComponent: {
+                children,
+                prop1: { type: 'number', required: false, description: 'prop1' },
+                prop2: { type: 'string', required: false, description: 'prop2' },
+            }
+        });
+    });
+
     it('should parse react component with properties defined as type', function(){
         check('FlippableImage', {
             FlippableImage: {
