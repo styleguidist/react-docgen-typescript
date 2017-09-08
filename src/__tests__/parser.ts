@@ -42,15 +42,13 @@ describe('parser', () => {
             RowHigherOrderComponent2: {
                 prop1: { type: 'string' },
             },
-            // TODO: these are for some reason missing
-            // ColumnExternalHigherOrderComponent: {
-            //     children,
-            //     prop1: { type: 'string' },
-            // },
-            // RowExternalHigherOrderComponent: {
-            //     children,
-            //     prop1: { type: 'string' },
-            // }
+            ColumnExternalHigherOrderComponent: {
+                children,
+                prop1: { type: 'string' },
+            },
+            RowExternalHigherOrderComponent: {
+                prop1: { type: 'string' },
+            }
         });
     });
 
@@ -102,7 +100,7 @@ describe('parser', () => {
         });
     });
 
-    it.only('should parse react component with properties extended from an external .tsx file', function(){
+    it('should parse react component with properties extended from an external .tsx file', function(){
         check('ExtendsExternalPropsComponent', {
             ExtendsExternalPropsComponent: {
                 children,
