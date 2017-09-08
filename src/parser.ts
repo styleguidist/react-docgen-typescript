@@ -171,10 +171,7 @@ class Parser {
         const result: Props = {};
 
         propertiesOfProps.forEach(prop => {
-            console.log("parser.getPropsInfo prop: ", prop.name);
-            
-            const propName = prop.getName();
-            
+            const propName = prop.getName();            
 
             // Find type of prop by looking in context of the props object itself.
             const propType = this.checker.getTypeOfSymbolAtLocation(prop, propsObj.valueDeclaration);
