@@ -102,7 +102,7 @@ describe('parser', () => {
         });
     });
 
-    it('should parse react component with properties extended from an external .tsx file', function(){
+    it.only('should parse react component with properties extended from an external .tsx file', function(){
         check('ExtendsExternalPropsComponent', {
             ExtendsExternalPropsComponent: {
                 children,

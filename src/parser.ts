@@ -24,23 +24,35 @@ export interface PropItemType {
     value?: any;
 }
 
+export interface FileParser {
+    parse(filePath: string): ComponentDoc[];
+}
+
 const defaultOptions: ts.CompilerOptions = {
     target: ts.ScriptTarget.Latest,
-    module: ts.ModuleKind.CommonJS
+    module: ts.ModuleKind.CommonJS,
+    jsx: ts.JsxEmit.React,
 };
 
 /**
  * Parses a file with default TS options
- * @param filePath 
+ * @param filePath component file that should be parsed
  */
 export function parse(filePath: string) {
     return withCompilerOptions(defaultOptions).parse(filePath);
 }
 
 /**
+ * Constructs a parser for a default configuration.
+ */
+export function withDefaultConfig(): FileParser {
+    return withCompilerOptions(defaultOptions);
+}
+
+/**
  * Constructs a parser for a specified tsconfig file.
  */
-export function withConfig(tsconfigPath: string) {
+export function withCustomConfig(tsconfigPath: string): FileParser {
     const configJson = JSON.parse(fs.readFileSync(tsconfigPath, 'utf8'));
     const basePath = path.dirname(tsconfigPath);
 
@@ -58,7 +70,7 @@ export function withConfig(tsconfigPath: string) {
 /**
  * Constructs a parser for a specified set of TS compiler options.
  */
-export function withCompilerOptions(compilerOptions: ts.CompilerOptions) {
+export function withCompilerOptions(compilerOptions: ts.CompilerOptions): FileParser {
     return {
         parse(filePath: string): ComponentDoc[] {
             const program = ts.createProgram([filePath], compilerOptions);
@@ -89,7 +101,6 @@ class Parser {
 
     public getComponentInfo(exp: ts.Symbol, source: ts.SourceFile): ComponentDoc {
         const type = this.checker.getTypeOfSymbolAtLocation(exp, exp.valueDeclaration);
-
         let propsType = this.extractPropsFromTypeIfStatelessComponent(type);
         if (!propsType) {
             propsType = this.extractPropsFromTypeIfStatefulComponent(type);
@@ -160,6 +171,8 @@ class Parser {
         const result: Props = {};
 
         propertiesOfProps.forEach(prop => {
+            console.log("parser.getPropsInfo prop: ", prop.name);
+            
             const propName = prop.getName();
             
 

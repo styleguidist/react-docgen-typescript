@@ -1,5 +1,7 @@
 import {
     parse,
+    withDefaultConfig,
+    withCustomConfig,
     ComponentDoc,
     Props,
     PropItem,
@@ -8,6 +10,8 @@ import {
 
 export {
     parse,
+    withDefaultConfig,
+    withCustomConfig,
     ComponentDoc,
     Props,
     PropItem,
