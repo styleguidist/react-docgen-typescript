@@ -26,6 +26,18 @@ describe('parser', () => {
         });
     });
 
+    it('should parse simple react class component with picked properties', function() {
+        // we are not able to get correct descriptions for prop1,prop2
+        check('ColumnWithPick', {
+            Column: {
+                children,
+                prop1: { type: 'string', required: false, description: '' },
+                prop2: { type: 'number', description: '' },
+                propx: { type: 'number' },
+            }
+        });
+    });
+
     it('should parse HOCs', function() {
         check('ColumnHigherOrderComponent', {
             ColumnHigherOrderComponent1: {

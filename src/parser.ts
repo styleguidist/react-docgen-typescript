@@ -222,6 +222,11 @@ class Parser {
      */
     getFullJsDocComment(symbol: ts.Symbol) {
 
+        // in some cases this can be undefined (Pick<Type, 'prop1'|'prop2'>)
+        if (symbol.getDocumentationComment === undefined) {
+            return "";
+        }
+
         const mainComment = ts.displayPartsToString(symbol.getDocumentationComment());
 
         const tags = symbol.getJsDocTags() || [];
