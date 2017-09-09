@@ -6,7 +6,7 @@
   "scripts": {
     "tsc": "tsc",
     "prepublish": "tsc -d",
-    "test": "tsc && mocha ./lib/**/__tests__/**.js",
+    "test": "tsc && mocha --timeout 10000 ./lib/**/__tests__/**.js",
     "test:debug": "tsc && mocha --debug ./lib/**/__tests__/**.js",
     "print": "npm run tsc && node ./lib/print.js",
     "print:sample1": "npm run tsc && node ./lib/print.js ./src/__tests__/data/ColumnHigherOrderComponent.tsx simple"
