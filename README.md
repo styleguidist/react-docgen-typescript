@@ -19,13 +19,13 @@ npm install --save-dev react-docgen-typescript
 Include following line in your `styleguide.config.js`:
 
 ```javascript
-propsParser: require('react-docgen-typescript').withDefaultConfig()
+propsParser: require('react-docgen-typescript').withDefaultConfig().parse
 ```
 
 or if you want to use custom tsconfig file
 
 ```javascript
-propsParser: require('react-docgen-typescript').withCustomConfig('./tsconfig.json')
+propsParser: require('react-docgen-typescript').withCustomConfig('./tsconfig.json').parse
 ```
 
 ## Example
