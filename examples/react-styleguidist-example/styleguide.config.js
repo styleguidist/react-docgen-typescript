@@ -10,7 +10,5 @@ module.exports = {
       });
   },
   resolver: require('react-docgen').resolver.findAllComponentDefinitions,
-
-  //propsParser: require('../../lib/propTypesParser').parse,
-  propsParser: require('react-docgen-typescript').parse,
+  propsParser: require('react-docgen-typescript').withDefaultConfig().parse
 };
