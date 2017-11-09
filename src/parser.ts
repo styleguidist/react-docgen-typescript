@@ -287,7 +287,6 @@ class Parser {
             const propMap = (properties as ts.NodeArray<ts.PropertyAssignment>).reduce((acc, property) => {
                 const literalValue = getLiteralValueFromPropertyAssignment(property);
                 if (typeof literalValue === 'string') {
-                    if (!property.name) { console.log(property); }
                     acc[getPropertyName(property.name)] = getLiteralValueFromPropertyAssignment(property);
                 }
                 return acc;
