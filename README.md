@@ -119,6 +119,8 @@ the part it's fixing.
 
 @diegolanda Diego - support for different kinds of components
 
+@brettjurgens Brett Jurgens - adding support for default props
+
 ## Thanks to others
 
 The integration with React Styleguidist wouldn't be possible without [Vyacheslav Slinko](https://github.com/vslinko) pull request [#118](https://github.com/styleguidist/react-styleguidist/pull/118) at React Styleguidist.
