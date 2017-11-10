@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import { check } from "./testUtils";
 
 describe('parser', () => {
-    
+
     const children = { type: 'ReactNode', required: false, description: '', };
 
     it('should parse simple react class component', function() {
@@ -71,10 +71,10 @@ describe('parser', () => {
                 prop1: { type: 'string', required: false },
                 prop2: { type: 'number' },
                 // HtmlAttributes
-                defaultChecked: { 
-                    type: 'boolean', 
-                    required: false, 
-                    description: '' 
+                defaultChecked: {
+                    type: 'boolean',
+                    required: false,
+                    description: ''
                 }
                 // ...
             }
@@ -98,7 +98,7 @@ describe('parser', () => {
                 prop2: { type: 'number' },
             },
             // TODO: this wasn't there before, i would guess that that's correct
-            test: {                
+            test: {
             }
         }, false);
     });
@@ -141,6 +141,21 @@ describe('parser', () => {
         });
     });
 
+    it('should parse react component with default props', function(){
+        check('ComponentWithDefaultProps', {
+            ComponentWithDefaultProps: {
+                children,
+                sampleDefaultFromJSDoc: { type: '"hello" | "goodbye"', required: true, defaultValue: "hello", description: 'sample with default value' },
+                sampleTrue: { type: "boolean", required: false, defaultValue: "true" },
+                sampleFalse: { type: "boolean", required: false, defaultValue: "false" },
+                sampleString: { type: "string", required: false, defaultValue: "hello" },
+                sampleObject: { type: "{ [key: string]: any; }", required: false, defaultValue: "{ a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } }" },
+                sampleNull: { type: "null", required: false, defaultValue: "null" },
+                sampleUndefined: { type: "any", required: false, defaultValue: "undefined" },
+            }
+        });
+    });
+
     it('should parse react PureComponent', function(){
         check('PureRow', {
             Row: {
@@ -178,5 +193,16 @@ describe('parser', () => {
                 myProp: { type: 'string' },
             }
         });
-    });    
+    });
+
+    it('should parse react stateless component with default props', function(){
+        check('StatelessWithDefaultProps', {
+            StatelessWithDefaultProps: {
+                children,
+                sampleJSDoc: { type: "string", required: false, defaultValue: "test" },
+                sampleProp: { type: "string", required: false, defaultValue: "hello" },
+            }
+        });
+    });
+
 });

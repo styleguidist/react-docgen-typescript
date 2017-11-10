@@ -2,15 +2,17 @@ import * as ts from 'typescript';
 import * as path from 'path';
 import * as fs from 'fs';
 
+export interface StringIndexedObject<T> {
+    [key: string]: T;
+}
+
 export interface ComponentDoc {
     displayName: string;
     description: string;
     props: Props;
 }
 
-export interface Props {
-    [key: string]: PropItem;
-}
+export interface Props extends StringIndexedObject<PropItem> { }
 
 export interface PropItem {
     required: boolean;
@@ -92,6 +94,18 @@ export function withCompilerOptions(compilerOptions: ts.CompilerOptions): FilePa
     };
 }
 
+interface JSDoc {
+    description: string;
+    fullComment: string;
+    tags: StringIndexedObject<string>;
+}
+
+const defaultJSDoc: JSDoc = {
+    fullComment: '',
+    tags: {},
+    description: ''
+};
+
 class Parser {
     private checker: ts.TypeChecker;
 
@@ -108,11 +122,12 @@ class Parser {
 
         if (propsType) {
             const componentName = computeComponentName(exp, source);
-            const props = this.getPropsInfo(propsType);
+            const defaultProps = this.extractDefaultPropsFromComponent(exp, source);
+            const props = this.getPropsInfo(propsType, defaultProps);
 
             return {
                 displayName: componentName,
-                description: this.findDocComment(exp),
+                description: this.findDocComment(exp).fullComment,
                 props: props
             };
         }
@@ -132,10 +147,10 @@ class Parser {
                 if (params.length === 0) {
                     continue;
                 }
-                // Maybe we could check return type instead, 
-                // but not sure if Element, ReactElement<T> are all possible values                
+                // Maybe we could check return type instead,
+                // but not sure if Element, ReactElement<T> are all possible values
                 const propsParam = params[0];
-                if (propsParam.name === 'props' || params.length === 1) {                    
+                if (propsParam.name === 'props' || params.length === 1) {
                     return propsParam;
                 }
             }
@@ -164,18 +179,18 @@ class Parser {
         return null;
     }
 
-    public getPropsInfo(propsObj: ts.Symbol): Props {
+    public getPropsInfo(propsObj: ts.Symbol, defaultProps: StringIndexedObject<string> = {}): Props {
         const propsType = this.checker.getTypeOfSymbolAtLocation(propsObj, propsObj.valueDeclaration);
         const propertiesOfProps = propsType.getProperties();
 
         const result: Props = {};
 
         propertiesOfProps.forEach(prop => {
-            const propName = prop.getName();            
+            const propName = prop.getName();
 
             // Find type of prop by looking in context of the props object itself.
             const propType = this.checker.getTypeOfSymbolAtLocation(prop, propsObj.valueDeclaration);
-            
+
             const propTypeString = this.checker.typeToString(propType);
 
             const isOptional = (prop.getFlags() & ts.SymbolFlags.Optional) !== 0;
@@ -183,22 +198,28 @@ class Parser {
 
             const jsDocComment = this.findDocComment(prop);
 
+            let defaultValue = null;
+
+            if (defaultProps[propName] !== undefined) {
+                defaultValue = { value: defaultProps[propName] };
+            } else if (jsDocComment.tags.default) {
+                defaultValue = { value: jsDocComment.tags.default };
+            }
+
             result[propName] = {
                 required: !isOptional,
                 type: { name: propTypeString },
-                description: jsDocComment,
-
-                // TODO
-                defaultValue: null
+                description: jsDocComment.fullComment,
+                defaultValue
             };
         });
 
         return result;
     }
 
-    findDocComment(symbol: ts.Symbol) {
+    findDocComment(symbol: ts.Symbol): JSDoc {
         const comment = this.getFullJsDocComment(symbol);
-        if (comment) {
+        if (comment.fullComment) {
             return comment;
         }
 
@@ -206,40 +227,123 @@ class Parser {
         const commentsOnRootSymbols = rootSymbols
             .filter(x => x !== symbol)
             .map(x => this.getFullJsDocComment(x))
-            .filter(x => !!x);
+            .filter(x => !!x.fullComment);
 
         if (commentsOnRootSymbols.length) {
             return commentsOnRootSymbols[0];
         }
 
-        return '';
+        return defaultJSDoc;
     }
 
     /**
      * Extracts a full JsDoc comment from a symbol, even
-     * thought TypeScript has broken down the JsDoc comment into plain
+     * though TypeScript has broken down the JsDoc comment into plain
      * text and JsDoc tags.
      */
-    getFullJsDocComment(symbol: ts.Symbol) {
+    getFullJsDocComment(symbol: ts.Symbol): JSDoc {
 
         // in some cases this can be undefined (Pick<Type, 'prop1'|'prop2'>)
         if (symbol.getDocumentationComment === undefined) {
-            return "";
+            return defaultJSDoc;
         }
 
         const mainComment = ts.displayPartsToString(symbol.getDocumentationComment());
 
         const tags = symbol.getJsDocTags() || [];
-        const tagComments = tags.map(t => {
-            let result = '@' + t.name;
-            if (t.text) {
-                result += ' ' + t.text;
-            }
-            return result;
-        });
 
-        return (mainComment + '\n' + tagComments.join('\n')).trim();
+        const tagComments: string[] = [];
+        const tagMap: StringIndexedObject<string> = {};
+
+        tags.forEach(tag => {
+            const trimmedText = (tag.text || '').trim();
+            const currentValue = tagMap[tag.name];
+            tagMap[tag.name] = currentValue ? currentValue + '\n' + trimmedText : trimmedText;
+
+            if (tag.name !== 'default') { tagComments.push(formatTag(tag)); }
+        })
+
+        return ({
+            fullComment: (mainComment + '\n' + tagComments.join('\n')).trim(),
+            tags: tagMap,
+            description: mainComment
+        });
     }
+
+    extractDefaultPropsFromComponent(symbol: ts.Symbol, source: ts.SourceFile) {
+        const possibleStatements = source.statements.filter(statement => this.checker.getSymbolAtLocation((statement as ts.ClassDeclaration).name) === symbol);
+        if (!possibleStatements.length) {
+            return {};
+        }
+        const statement = possibleStatements[0];
+        if (statementIsClassDeclaration(statement) && statement.members.length) {
+            const possibleDefaultProps = statement.members.filter(member => member.name && getPropertyName(member.name) === 'defaultProps');
+            if (!possibleDefaultProps.length) {
+                return {};
+            }
+            const defaultProps = possibleDefaultProps[0];
+            const { initializer } = (defaultProps as ts.PropertyDeclaration);
+            const { properties } = (initializer as ts.ObjectLiteralExpression);
+            const propMap = (properties as ts.NodeArray<ts.PropertyAssignment>).reduce((acc, property) => {
+                const literalValue = getLiteralValueFromPropertyAssignment(property);
+                if (typeof literalValue === 'string') {
+                    acc[getPropertyName(property.name)] = getLiteralValueFromPropertyAssignment(property);
+                }
+                return acc;
+            }, {} as StringIndexedObject<string>)
+            return propMap;
+        }
+        return {};
+    }
+}
+
+function statementIsClassDeclaration (statement: ts.Statement): statement is ts.ClassDeclaration {
+    return !!(statement as ts.ClassDeclaration).members;
+}
+
+function getPropertyName(name: ts.PropertyName): string | null {
+    switch (name.kind) {
+        case ts.SyntaxKind.NumericLiteral:
+        case ts.SyntaxKind.StringLiteral:
+        case ts.SyntaxKind.Identifier:
+            return name.text;
+        case ts.SyntaxKind.ComputedPropertyName:
+            return name.getText();
+        default:
+            return null;
+    }
+}
+
+function getLiteralValueFromPropertyAssignment(property: ts.PropertyAssignment): string | null {
+    const { initializer } = property;
+    switch(initializer.kind) {
+        case ts.SyntaxKind.FalseKeyword:
+            return 'false';
+        case ts.SyntaxKind.TrueKeyword:
+            return 'true';
+        case ts.SyntaxKind.StringLiteral:
+            return (initializer as ts.StringLiteral).text.trim();
+        case ts.SyntaxKind.NumericLiteral:
+            return `${(initializer as ts.NumericLiteral).text}`;
+        case ts.SyntaxKind.NullKeyword:
+            return 'null';
+        case ts.SyntaxKind.Identifier:
+            // can potentially find other identifiers in the source and map those in the future
+            return (initializer as ts.Identifier).text === 'undefined' ? 'undefined' : null;
+        case ts.SyntaxKind.ObjectLiteralExpression:
+            // return the source text for an object literal
+            return (initializer as ts.ObjectLiteralExpression).getText();
+        default:
+            return null;
+    }
+}
+
+function formatTag (tag: ts.JSDocTagInfo) {
+    let result = '@' + tag.name;
+    if (tag.text) {
+        result += ' ' + tag.text;
+    }
+    return result;
 }
 
 function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
