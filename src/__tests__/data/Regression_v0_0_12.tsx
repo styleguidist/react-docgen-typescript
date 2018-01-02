@@ -69,5 +69,3 @@ export class Zoomable extends React.PureComponent<Props, State> {
     );
   }
 }
-
-export default Zoomable;

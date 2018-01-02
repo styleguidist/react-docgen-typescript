@@ -9,5 +9,3 @@ export const Stateless: React.StatelessComponent<StatelessProps> = props =>
   <div>
     My Property = {props.myProp}
   </div>;
-
-export default Stateless;

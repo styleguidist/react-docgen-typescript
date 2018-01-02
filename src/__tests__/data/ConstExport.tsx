@@ -37,5 +37,3 @@ export const Row = (props: IRowProps) => {
 const nonExportedFunc = (props: IRowProps) => {
     return <div>No Export</div>
 };
-
-export default Row;

@@ -19,5 +19,3 @@ export class Row extends React.PureComponent<IRowProps, {}> {
         return <div>Test</div>;
     }
 };
-
-export default Row;
