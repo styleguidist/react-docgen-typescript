@@ -30,5 +30,3 @@ export class Column extends React.Component<ColumnProps, {}> {
         return <div>{prop1}</div>;
     }
 }
-
-export default Column;

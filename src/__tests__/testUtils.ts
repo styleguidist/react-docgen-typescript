@@ -2,8 +2,8 @@ import { assert } from 'chai';
 import * as path from 'path';
 import { parse, ComponentDoc, PropItem } from '../parser';
 
-export interface ExpectedComponents {
-    [key: string]: ExpectedComponent;
+export interface ExpectedComponents {    
+    [key: string]: ExpectedComponent;    
 }
 
 export interface ExpectedComponent {
@@ -41,7 +41,7 @@ export function checkComponent(actual: ComponentDoc[], expected: ExpectedCompone
         const propNames = Object.getOwnPropertyNames(componentDoc.props);
         const compName = componentDoc.displayName;
 
-        if (componentDoc.description !== `${compName} description`) {
+        if (componentDoc.description !== `${expected.$description || compName} description`) {
             errors.push(`${compName} description is different - expected: '${compName} description', actual: '${componentDoc.description}'`)
         }
 

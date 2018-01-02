@@ -17,4 +17,3 @@ StatelessWithDefaultProps.defaultProps = {
   sampleProp: 'test'
 };
 
-export default StatelessWithDefaultProps;

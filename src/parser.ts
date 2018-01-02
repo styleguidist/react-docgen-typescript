@@ -89,7 +89,17 @@ export function withCompilerOptions(compilerOptions: ts.CompilerOptions): FilePa
                 .map(exp => parser.getComponentInfo(exp, sourceFile))
                 .filter(comp => comp);
 
-            return components;
+            // this should filter out components with the same name as default export
+            const filteredComponents = components    
+                .filter((comp, index) => {
+                    const isUnique = components
+                        .slice(index + 1)
+                        .filter(i => i.displayName === comp.displayName)
+                        .length === 0;
+                    return isUnique;
+                });
+
+            return filteredComponents;
         }
     };
 }
@@ -114,7 +124,11 @@ class Parser {
     }
 
     public getComponentInfo(exp: ts.Symbol, source: ts.SourceFile): ComponentDoc {
-        const type = this.checker.getTypeOfSymbolAtLocation(exp, exp.valueDeclaration);
+        const type = this.checker.getTypeOfSymbolAtLocation(exp, exp.valueDeclaration || exp.declarations[0]);
+        if (!exp.valueDeclaration) {
+            exp = type.symbol;
+        }
+
         let propsType = this.extractPropsFromTypeIfStatelessComponent(type);
         if (!propsType) {
             propsType = this.extractPropsFromTypeIfStatefulComponent(type);

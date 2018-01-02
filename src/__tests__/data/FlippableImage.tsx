@@ -34,5 +34,3 @@ export const FlippableImage = (props: Props) => {
     />
   );
 };
-
-export default FlippableImage;
