@@ -1,6 +1,6 @@
 {
   "name": "react-docgen-typescript",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -14,16 +14,16 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "@types/chai": "^4.0.0",
-    "@types/mocha": "^2.2.39",
+    "@types/chai": "^4.1.0",
+    "@types/mocha": "^2.2.46",
     "@types/node": "^7.0.16",
-    "@types/react": "^15.0.14",
+    "@types/react": "^16.0.34",
     "@types/source-map-support": "^0.4.0",
-    "chai": "^4.0.2",
-    "mocha": "^2.5.3",
+    "chai": "^4.1.2",
+    "mocha": "^4.1.0",
     "react": "^15.4.2",
-    "source-map-support": "^0.4.15",
-    "typescript": "^2.3.4"
+    "source-map-support": "^0.5.0",
+    "typescript": "^2.6.2"
   },
   "files": [
     "lib",

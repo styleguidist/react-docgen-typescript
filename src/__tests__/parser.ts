@@ -242,4 +242,36 @@ describe('parser', () => {
         });
     });
 
+    it('should parse functional component component defined as function', function(){
+        check('FunctionDeclaration', {
+            Jumbotron: {
+                prop1: { type: "string", required: true },
+            }
+        });
+    });
+
+    it('should parse functional component component defined as const', function(){
+        check('FunctionalComponentAsConst', {
+            Jumbotron: {
+                prop1: { type: "string", required: true },
+            }
+        });
+    });
+
+    it('should parse functional component component defined as function as default export', function(){
+        check('FunctionDeclarationAsDefaultExport', {
+            Jumbotron: {
+                prop1: { type: "string", required: true },
+            }
+        });
+    });
+
+    it('should parse functional component component defined as const as default export', function(){
+        check('FunctionalComponentAsConstAsDefaultExport', {
+            // in this case the component name is taken from the file name
+            FunctionalComponentAsConstAsDefaultExport: {
+                prop1: { type: "string", required: true },
+            }
+        }, true, 'Jumbotron description');
+    });
 });
