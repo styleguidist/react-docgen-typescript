@@ -274,4 +274,13 @@ describe('parser', () => {
             }
         }, true, 'Jumbotron description');
     });
+
+    it('should parse functional component component defined as const as named export', function(){
+        check('FunctionalComponentAsConstAsNamedExport', {
+            // in this case the component name is taken from the file name
+            FunctionalComponentAsConstAsNamedExport: {
+                prop1: { type: "string", required: true },
+            }
+        }, true, 'Jumbotron description');
+    });    
 });
