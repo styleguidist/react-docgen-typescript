@@ -363,7 +363,7 @@ function formatTag (tag: ts.JSDocTagInfo) {
 function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
     const exportName = exp.getName();
 
-    if (exportName === 'default') {
+    if (exportName === 'default' || exportName === '__function') {
         // Default export for a file: named after file
         return path.basename(source.fileName, path.extname(source.fileName));
     } else {

@@ -17,13 +17,18 @@ export interface ExpectedProp {
     defaultValue?: string;
 }
 
-export function check(component: string, expected: ExpectedComponents, exactProperties: boolean = true) {
+export function check(component: string, expected: ExpectedComponents, 
+    exactProperties: boolean = true, description: string = null) {
+
     const fileName = path.join(__dirname, '../../src/__tests__/data', `${component}.tsx`); // it's running in ./temp
     const result = parse(fileName);
-    checkComponent(result, expected, exactProperties);
+    checkComponent(result, expected, exactProperties, description);
 }
 
-export function checkComponent(actual: ComponentDoc[], expected: ExpectedComponents, exactProperties: boolean = true) {
+export function checkComponent(actual: ComponentDoc[], 
+    expected: ExpectedComponents, exactProperties: boolean = true,
+    description: string = null) {
+
     const expectedComponentNames = Object.getOwnPropertyNames(expected);
     assert.equal(actual.length, expectedComponentNames.length,
         `The number of expected components is different - \r\n\expected: ${expectedComponentNames}, \r\n\actual: ${actual.map(i => i.displayName)}`);
@@ -41,7 +46,10 @@ export function checkComponent(actual: ComponentDoc[], expected: ExpectedCompone
         const propNames = Object.getOwnPropertyNames(componentDoc.props);
         const compName = componentDoc.displayName;
 
-        if (componentDoc.description !== `${compName} description`) {
+        const expectedComponentDescription = description 
+            || `${compName} description`;
+
+        if (componentDoc.description !== expectedComponentDescription) {
             errors.push(`${compName} description is different - expected: '${compName} description', actual: '${componentDoc.description}'`)
         }
 
