@@ -157,11 +157,17 @@ class Parser {
             const defaultProps = this.extractDefaultPropsFromComponent(exp, source);
             const props = this.getPropsInfo(propsType, defaultProps);
 
-            if (typeof this.opts.propFilter === 'function') {
-              for (const propName of Object.keys(props)) {
-                const prop = props[propName];
-                const propItem: PropItem & PropItemType = {...prop, name: propName };
-                const component: Component = { name: componentName };
+            for (const propName of Object.keys(props)) {
+              const prop = props[propName];
+              const propItem: PropItem & PropItemType = {...prop, name: propName };
+
+              // skip children property in case it has no custom documentation
+              if (propItem.name === 'children' && prop.description.length === 0) {
+                delete props[propName];
+              }
+
+              const component: Component = { name: componentName };
+              if (typeof this.opts.propFilter === 'function') {
                 const keep = this.opts.propFilter(propItem, component);
                 if (!keep) {
                   delete props[propName];
