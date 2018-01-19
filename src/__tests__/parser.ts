@@ -267,29 +267,103 @@ describe('parser', () => {
     describe('Parser options', function() {
 
         describe('Property filtering', function() {
-            const propFilter: PropFilter = (prop, component) => prop.name && prop.description.length > 0
 
-            it('should ignore any property that is not documented explicitly', function() {
-                check('Column', {
-                    Column: {
-                        prop1: { type: 'string', required: false },
-                        prop2: { type: 'number' },
-                        prop3: { type: '() => void'},
-                        prop4: { type: '"option1" | "option2" | "option3"' },
-                    }
-                }, true, null, { propFilter });
+            describe('children', function() {
+
+                it('should ignore property "children" if not explicitly documented', function() {
+                    check('Column', {
+                        Column: {
+                            prop1: { type: 'string', required: false },
+                            prop2: { type: 'number' },
+                            prop3: { type: '() => void'},
+                            prop4: { type: '"option1" | "option2" | "option3"' },
+                        }
+                    }, true);
+                });
+
+                it('should not ignore any property that is documented explicitly', function() {
+                    check('ColumnWithAnnotatedChildren', {
+                        Column: {
+                            children: { type: 'ReactNode', required: false, description: 'children description'},
+                            prop1: { type: 'string', required: false },
+                            prop2: { type: 'number' },
+                            prop3: { type: '() => void'},
+                            prop4: { type: '"option1" | "option2" | "option3"' }
+                        }
+                    }, true);
+                });
             });
 
-            it('should not ignore any property that is documented explicitly', function() {
-                check('ColumnWithAnnotatedChildren', {
+            describe('propsFilter method', function() {
+
+                it('should apply filter function and filter components accordingly', function() {
+                    const propFilter: PropFilter = (prop, component) => prop.name !== 'prop1';
+                    check('Column', {
+                        Column: {
+                            prop2: { type: 'number' },
+                            prop3: { type: '() => void'},
+                            prop4: { type: '"option1" | "option2" | "option3"' }
+                        }
+                    }, true, null, { propFilter });
+                });
+
+                it('should apply filter function and filter components accordingly', function() {
+                    const propFilter: PropFilter = (prop, component) => {
+                      if (component.name === 'Column') {
+                        return prop.name !== 'prop1';
+                      }
+                      return true;
+                    };
+                    check('Column', {
+                        Column: {
+                            prop2: { type: 'number' },
+                            prop3: { type: '() => void'},
+                            prop4: { type: '"option1" | "option2" | "option3"' }
+                        }
+                    }, true, null, { propFilter });
+                    check('AppMenu', {
+                        AppMenu: {
+                            menu: { type: 'any' },
+                        }
+                    }, true, null, { propFilter });
+                });
+            });
+
+            describe('skipPropsWithName', function() {
+              it('should skip a single property in skipPropsWithName', function() {
+                const propFilter = { skipPropsWithName: 'prop1' };
+                check('Column', {
                     Column: {
-                        children: { type: 'ReactNode', required: false, description: 'children description'},
-                        prop1: { type: 'string', required: false },
                         prop2: { type: 'number' },
                         prop3: { type: '() => void'},
                         prop4: { type: '"option1" | "option2" | "option3"' }
                     }
                 }, true, null, { propFilter });
+              });
+
+              it('should skip multiple properties in skipPropsWithName', function() {
+                const propFilter = { skipPropsWithName: ['prop1', 'prop2'] };
+                check('Column', {
+                    Column: {
+                        prop3: { type: '() => void'},
+                        prop4: { type: '"option1" | "option2" | "option3"' }
+                    }
+                }, true, null, { propFilter });
+              });
+            });
+
+            describe('skipPropsWithoutDoc', function() {
+
+              it('should skip a properties without documentation', function() {
+                const propFilter = { skipPropsWithoutDoc: false };
+                check('ColumnWithUndocumentedProps', {
+                    Column: {
+                        prop1: { type: 'string', required: false },
+                        prop2: { type: 'number' }
+                    }
+                }, true, null, { propFilter });
+              });
+
             });
 
         });

@@ -34,7 +34,12 @@ export interface PropItemType {
 export type PropFilter = (props: PropItem, componentName: Component) => boolean;
 
 export interface ParserOptions {
-  propFilter?: PropFilter
+  propFilter?: StaticPropFilter | PropFilter
+}
+
+export interface StaticPropFilter {
+  skipPropsWithName?: string[] | string;
+  skipPropsWithoutDoc?: boolean;
 }
 
 export const defaultParserOpts: ParserOptions = {};
@@ -153,6 +158,7 @@ class Parser {
             const componentName = computeComponentName(exp, source);
             const defaultProps = this.extractDefaultPropsFromComponent(exp, source);
             const props = this.getPropsInfo(propsType, defaultProps);
+            const { propFilter } = this.opts;
 
             for (const propName of Object.keys(props)) {
               const prop = props[propName];
@@ -163,9 +169,19 @@ class Parser {
               }
 
               const component: Component = { name: componentName };
-              if (typeof this.opts.propFilter === 'function') {
-                const keep = this.opts.propFilter(prop, component);
+              if (typeof propFilter === 'function') {
+                const keep = propFilter(prop, component);
                 if (!keep) {
+                  delete props[propName];
+                }
+              } else if (typeof propFilter === 'object') {
+                const { skipPropsWithName, skipPropsWithoutDoc } = propFilter as StaticPropFilter;
+                if (typeof skipPropsWithName === 'string' && skipPropsWithName === propName) {
+                  delete props[propName];
+                } else if (Array.isArray(skipPropsWithName) && skipPropsWithName.indexOf(propName) > -1) {
+                  delete props[propName]
+                }
+                if (skipPropsWithoutDoc && prop.description.length === 0) {
                   delete props[propName];
                 }
               }
