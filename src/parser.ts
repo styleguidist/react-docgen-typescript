@@ -31,7 +31,7 @@ export interface PropItemType {
     value?: any;
 }
 
-export type PropFilter = (props: PropItem, componentName: Component) => boolean;
+export type PropFilter = (props: PropItem, component: Component) => boolean;
 
 export interface ParserOptions {
   propFilter?: StaticPropFilter | PropFilter
