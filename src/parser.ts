@@ -12,17 +12,14 @@ export interface ComponentDoc {
     props: Props;
 }
 
-export interface Props extends StringIndexedObject<Prop> { }
+export interface Props extends StringIndexedObject<PropItem> { }
 
 export interface PropItem {
+  name: string;
   required: boolean;
   type: PropItemType;
   description: string;
   defaultValue: any;
-}
-
-export interface Prop extends PropItem {
-  name: string;
 }
 
 export interface Component {
@@ -34,7 +31,7 @@ export interface PropItemType {
     value?: any;
 }
 
-export type PropFilter = (props: Prop, componentName: Component) => boolean;
+export type PropFilter = (props: PropItem, componentName: Component) => boolean;
 
 export interface ParserOptions {
   propFilter?: PropFilter

@@ -4,7 +4,6 @@ import {
     withCustomConfig,
     ComponentDoc,
     Props,
-    Prop,
     PropItem,
     PropItemType,
 } from './parser';
@@ -15,7 +14,6 @@ export {
     withCustomConfig,
     ComponentDoc,
     Props,
-    Prop,
     PropItem,
     PropItemType,
 }
