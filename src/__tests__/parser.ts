@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import { check } from "./testUtils";
-import { PropsFilter } from '../parser';
+import { PropFilter } from '../parser';
 
 describe('parser', () => {
 
@@ -287,7 +287,7 @@ describe('parser', () => {
     describe('Parser options', function() {
 
         describe('Property filtering', function() {
-            const propsFilter: PropsFilter = (prop, componentName) => prop.name && prop.description.length > 0
+            const propFilter: PropFilter = (prop, componentName) => prop.name && prop.description.length > 0
 
             it('should ignore any property that is not documented explicitly', function() {
                 check('Column', {
@@ -297,7 +297,7 @@ describe('parser', () => {
                         prop3: { type: '() => void'},
                         prop4: { type: '"option1" | "option2" | "option3"' },
                     }
-                }, true, null, { propsFilter });
+                }, true, null, { propFilter });
             });
 
             it('should not ignore any property that is documented explicitly', function() {
@@ -309,7 +309,7 @@ describe('parser', () => {
                         prop3: { type: '() => void'},
                         prop4: { type: '"option1" | "option2" | "option3"' }
                     }
-                }, true, null, { propsFilter });
+                }, true, null, { propFilter });
             });
 
         });

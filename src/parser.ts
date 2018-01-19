@@ -26,10 +26,10 @@ export interface PropItemType {
     value?: any;
 }
 
-export type PropsFilter = (props: PropItem & PropItemType, componentName: string) => boolean;
+export type PropFilter = (props: PropItem & PropItemType, componentName: string) => boolean;
 
 export interface ParserOptions {
-  propsFilter?: PropsFilter
+  propFilter?: PropFilter
 }
 
 export const defaultParserOpts: ParserOptions = {};
@@ -149,11 +149,11 @@ class Parser {
             const defaultProps = this.extractDefaultPropsFromComponent(exp, source);
             const props = this.getPropsInfo(propsType, defaultProps);
 
-            if (typeof this.opts.propsFilter === 'function') {
+            if (typeof this.opts.propFilter === 'function') {
               for (const propName of Object.keys(props)) {
                 const prop = props[propName];
                 const propItem: PropItem & PropItemType = {...prop, name: propName };
-                const keep = this.opts.propsFilter(propItem, componentName);
+                const keep = this.opts.propFilter(propItem, componentName);
                 if (!keep) {
                   delete props[propName];
                 }
