@@ -21,12 +21,20 @@ export interface PropItem {
     defaultValue: any;
 }
 
+export interface Prop extends PropItem {
+  name: string;
+}
+
+export interface Component {
+  name: string;
+}
+
 export interface PropItemType {
     name: string;
     value?: any;
 }
 
-export type PropFilter = (props: PropItem & PropItemType, componentName: string) => boolean;
+export type PropFilter = (props: Prop, componentName: Component) => boolean;
 
 export interface ParserOptions {
   propFilter?: PropFilter
@@ -153,7 +161,8 @@ class Parser {
               for (const propName of Object.keys(props)) {
                 const prop = props[propName];
                 const propItem: PropItem & PropItemType = {...prop, name: propName };
-                const keep = this.opts.propFilter(propItem, componentName);
+                const component: Component = { name: componentName };
+                const keep = this.opts.propFilter(propItem, component);
                 if (!keep) {
                   delete props[propName];
                 }

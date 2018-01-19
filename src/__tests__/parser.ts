@@ -287,7 +287,7 @@ describe('parser', () => {
     describe('Parser options', function() {
 
         describe('Property filtering', function() {
-            const propFilter: PropFilter = (prop, componentName) => prop.name && prop.description.length > 0
+            const propFilter: PropFilter = (prop, component) => prop.name && prop.description.length > 0
 
             it('should ignore any property that is not documented explicitly', function() {
                 check('Column', {
