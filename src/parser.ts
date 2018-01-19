@@ -26,13 +26,13 @@ export interface PropItemType {
     value?: any;
 }
 
+export type PropsFilter = (props: PropItem & PropItemType, componentName: string) => boolean;
+
 export interface ParserOptions {
-  ignoreChildrenIfNoDocAvailable: boolean;
+  propsFilter?: PropsFilter
 }
 
-export const defaultParserOpts: ParserOptions = {
-  ignoreChildrenIfNoDocAvailable: false
-};
+export const defaultParserOpts: ParserOptions = {};
 
 export interface FileParser {
     parse(filePath: string): ComponentDoc[];
@@ -149,10 +149,15 @@ class Parser {
             const defaultProps = this.extractDefaultPropsFromComponent(exp, source);
             const props = this.getPropsInfo(propsType, defaultProps);
 
-            if (this.opts.ignoreChildrenIfNoDocAvailable &&
-                Object.prototype.hasOwnProperty.call(props, "children") &&
-                props.children.description.length === 0) {
-                delete props.children;
+            if (typeof this.opts.propsFilter === 'function') {
+              for (const propName of Object.keys(props)) {
+                const prop = props[propName];
+                const propItem: PropItem & PropItemType = {...prop, name: propName };
+                const keep = this.opts.propsFilter(propItem, componentName);
+                if (!keep) {
+                  delete props[propName];
+                }
+              }
             }
 
             return {
