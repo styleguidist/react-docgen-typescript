@@ -12,13 +12,13 @@ export interface ComponentDoc {
     props: Props;
 }
 
-export interface Props extends StringIndexedObject<PropItem> { }
+export interface Props extends StringIndexedObject<Prop> { }
 
 export interface PropItem {
-    required: boolean;
-    type: PropItemType;
-    description: string;
-    defaultValue: any;
+  required: boolean;
+  type: PropItemType;
+  description: string;
+  defaultValue: any;
 }
 
 export interface Prop extends PropItem {
@@ -159,16 +159,15 @@ class Parser {
 
             for (const propName of Object.keys(props)) {
               const prop = props[propName];
-              const propItem: PropItem & PropItemType = {...prop, name: propName };
 
               // skip children property in case it has no custom documentation
-              if (propItem.name === 'children' && prop.description.length === 0) {
+              if (prop.name === 'children' && prop.description.length === 0) {
                 delete props[propName];
               }
 
               const component: Component = { name: componentName };
               if (typeof this.opts.propFilter === 'function') {
-                const keep = this.opts.propFilter(propItem, component);
+                const keep = this.opts.propFilter(prop, component);
                 if (!keep) {
                   delete props[propName];
                 }
@@ -257,6 +256,7 @@ class Parser {
             }
 
             result[propName] = {
+                name: propName,
                 required: !isOptional,
                 type: { name: propTypeString },
                 description: jsDocComment.fullComment,

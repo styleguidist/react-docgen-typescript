@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import * as path from 'path';
-import { parse, ComponentDoc, PropItem, defaultParserOpts, ParserOptions } from '../parser';
+import { parse, ComponentDoc, defaultParserOpts, ParserOptions } from '../parser';
 
 export interface ExpectedComponents {
     [key: string]: ExpectedComponent;

@@ -2,7 +2,6 @@ import {
     parse as newParse, 
     ComponentDoc,
     Props,
-    PropItem,
     PropItemType
 } from './parser';
 
