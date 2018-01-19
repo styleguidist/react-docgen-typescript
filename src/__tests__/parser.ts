@@ -284,12 +284,12 @@ describe('parser', () => {
         }, true, 'Jumbotron description');
     });    
 
-    describe('parser options', function() {
+    describe('Parser options', function() {
 
-        describe('ignoreChildrenPropIfNoDocAvailable', function() {
+        describe('Property filtering', function() {
             const propsFilter: PropsFilter = (prop, componentName) => prop.name && prop.description.length > 0
 
-            it('should ignore "children" property if not documented explicitly', function() {
+            it('should ignore any property that is not documented explicitly', function() {
                 check('Column', {
                     Column: {
                         prop1: { type: 'string', required: false },
@@ -300,7 +300,7 @@ describe('parser', () => {
                 }, true, null, { propsFilter });
             });
 
-            it('should not ignore "children" property if documented explicitly', function() {
+            it('should not ignore any property that is documented explicitly', function() {
                 check('ColumnWithAnnotatedChildren', {
                     Column: {
                         children: { type: 'ReactNode', required: false, description: 'children description'},
