@@ -17,7 +17,6 @@ describe('parser', () => {
         });
     });
 
-
     it('should parse simple react class component as default export', function() {
         check('ColumnWithDefaultExport', {
             Column: {
@@ -283,4 +282,36 @@ describe('parser', () => {
             }
         }, true, 'Jumbotron description');
     });    
+
+    describe('parser options', function() {
+
+        describe('ignoreChildrenPropIfNoDocAvailable', function() {
+
+            it('should ignore "children" property if not documented explicitly', function() {
+                check('Column', {
+                    Column: {
+                        prop1: { type: 'string', required: false },
+                        prop2: { type: 'number' },
+                        prop3: { type: '() => void'},
+                        prop4: { type: '"option1" | "option2" | "option3"' },
+                    }
+                }, true, null, { ignoreChildrenIfNoDocAvailable: true });
+            });
+
+            it('should not ignore "children" property if documented explicitly', function() {
+                check('ColumnWithAnnotatedChildren', {
+                    Column: {
+                        children: { type: 'ReactNode', required: false, description: 'children description'},
+                        prop1: { type: 'string', required: false },
+                        prop2: { type: 'number' },
+                        prop3: { type: '() => void'},
+                        prop4: { type: '"option1" | "option2" | "option3"' }
+                    }
+                }, true, null, { ignoreChildrenIfNoDocAvailable: true });
+            });
+
+        });
+
+    });
+
 });
