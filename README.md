@@ -19,14 +19,22 @@ npm install --save-dev react-docgen-typescript
 Include following line in your `styleguide.config.js`:
 
 ```javascript
-propsParser: require('react-docgen-typescript').withDefaultConfig().parse
+propsParser: require('react-docgen-typescript').withDefaultConfig([parserOptions]).parse
 ```
 
 or if you want to use custom tsconfig file
 
 ```javascript
-propsParser: require('react-docgen-typescript').withCustomConfig('./tsconfig.json').parse
+propsParser: require('react-docgen-typescript').withCustomConfig('./tsconfig.json', [parserOptions]).parse
 ```
+
+### parserOptions
+- `skipPropsWithName?: string[] | string;`
+- `skipPropsWithoutDoc?: boolean;`
+
+or
+
+`(props: PropItem, component: Component) => boolean`
 
 ## Example
 
@@ -120,6 +128,8 @@ the part it's fixing.
 @diegolanda Diego - support for different kinds of components
 
 @brettjurgens Brett Jurgens - adding support for default props
+
+@dotcs Fabian Mueller - introduced parserOptions for skipping undocumented properties
 
 ## Thanks to others
 
