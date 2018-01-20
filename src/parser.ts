@@ -2,6 +2,8 @@ import * as ts from 'typescript';
 import * as path from 'path';
 import * as fs from 'fs';
 
+import { buildFilter } from './buildFilter';
+
 export interface StringIndexedObject<T> {
     [key: string]: T;
 }
@@ -136,11 +138,11 @@ const defaultJSDoc: JSDoc = {
 
 class Parser {
     private checker: ts.TypeChecker;
-    private opts: ParserOptions;
+    private propFilter: PropFilter;
 
     constructor(program: ts.Program, opts: ParserOptions) {
         this.checker = program.getTypeChecker();
-        this.opts = opts;
+        this.propFilter = buildFilter(opts);
     }
 
     public getComponentInfo(exp: ts.Symbol, source: ts.SourceFile): ComponentDoc {
@@ -158,32 +160,12 @@ class Parser {
             const componentName = computeComponentName(exp, source);
             const defaultProps = this.extractDefaultPropsFromComponent(exp, source);
             const props = this.getPropsInfo(propsType, defaultProps);
-            const { propFilter } = this.opts;
 
             for (const propName of Object.keys(props)) {
               const prop = props[propName];
-
-              // skip children property in case it has no custom documentation
-              if (prop.name === 'children' && prop.description.length === 0) {
+              const component: Component = {name: componentName};
+              if (!this.propFilter(prop, component)) {
                 delete props[propName];
-              }
-
-              const component: Component = { name: componentName };
-              if (typeof propFilter === 'function') {
-                const keep = propFilter(prop, component);
-                if (!keep) {
-                  delete props[propName];
-                }
-              } else if (typeof propFilter === 'object') {
-                const { skipPropsWithName, skipPropsWithoutDoc } = propFilter as StaticPropFilter;
-                if (typeof skipPropsWithName === 'string' && skipPropsWithName === propName) {
-                  delete props[propName];
-                } else if (Array.isArray(skipPropsWithName) && skipPropsWithName.indexOf(propName) > -1) {
-                  delete props[propName]
-                }
-                if (skipPropsWithoutDoc && prop.description.length === 0) {
-                  delete props[propName];
-                }
               }
             }
 
