@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import * as path from 'path';
-import { parse, ComponentDoc, PropItem } from '../parser';
+import { parse, ComponentDoc, defaultParserOpts, ParserOptions } from '../parser';
 
 export interface ExpectedComponents {
     [key: string]: ExpectedComponent;
@@ -18,10 +18,10 @@ export interface ExpectedProp {
 }
 
 export function check(component: string, expected: ExpectedComponents, 
-    exactProperties: boolean = true, description: string = null) {
+    exactProperties: boolean = true, description: string = null, parserOpts?: ParserOptions) {
 
     const fileName = path.join(__dirname, '../../src/__tests__/data', `${component}.tsx`); // it's running in ./temp
-    const result = parse(fileName);
+    const result = parse(fileName, parserOpts);
     checkComponent(result, expected, exactProperties, description);
 }
 
