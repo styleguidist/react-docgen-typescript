@@ -1,8 +1,8 @@
-import { 
-    parse as newParse, 
+import {
     ComponentDoc,
-    Props,
-    PropItemType
+    parse as newParse,
+    PropItemType,
+    Props
 } from './parser';
 
 /**

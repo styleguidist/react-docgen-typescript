@@ -24,15 +24,15 @@ export interface IComponentWithDefaultPropsProps {
 /** ComponentWithDefaultProps description */
 export class ComponentWithDefaultProps extends React.Component<IComponentWithDefaultPropsProps, {}> {
   static defaultProps: Partial<IComponentWithDefaultPropsProps> = {
-    sampleTrue: true,
     sampleFalse: false,
-    sampleString: 'hello',
-    sampleObject: { a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } },
     sampleNull: null,
+    sampleObject: { a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } },
+    sampleString: 'hello',
+    sampleTrue: true,
     sampleUndefined: undefined
-  }
+  };
 
-  render() {
+  public render() {
     return (
       <div>test</div>
     );

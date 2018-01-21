@@ -22,11 +22,11 @@ export class AppMenu extends React.Component<IAppMenuProps, IAppMenuState> {
   }
 
   componentWillReceiveProps(newProps: IAppMenuProps) {
-
+    /* empty on purpose */
   }
 
   handleClick( info ) {
-
+    /* empty on purpose */
   }
 
   render() {

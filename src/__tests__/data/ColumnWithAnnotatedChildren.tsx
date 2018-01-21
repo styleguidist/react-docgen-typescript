@@ -13,7 +13,7 @@ export interface IColumnProps {
      */
     prop3: () => void;
     /** prop4 description */
-    prop4: 'option1' | 'option2' | "option3";
+    prop4: 'option1' | 'option2' | 'option3';
 
     /** children description */
     children?: React.ReactNode;
@@ -27,7 +27,7 @@ export class Column extends React.Component<IColumnProps, {}> {
         prop1: 'prop1'
     };
 
-    render() {
+    public render() {
         const {prop1} = this.props;
         return <div>{prop1}</div>;
     }

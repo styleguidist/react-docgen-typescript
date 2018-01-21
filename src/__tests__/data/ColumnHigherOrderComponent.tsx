@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { externalHoc } from "./ColumnHigherOrderComponentHoc";
+import { externalHoc } from './ColumnHigherOrderComponentHoc';
 /**
  * Column properties.
  */
@@ -16,7 +16,7 @@ class Column extends React.Component<IColumnProps, {}> {
         prop1: 'prop1'
     };
 
-    render() {
+    public render() {
         const {prop1} = this.props;
         return <div>{prop1}</div>;
     }
@@ -34,11 +34,11 @@ export interface IRowProps {
  * Form row.
  */
 const Row = (props: IRowProps) => {
-    const innerFunc = (props: IRowProps) => {
-        return <span>Inner Func</span>
+    const innerFunc = (rowProps: IRowProps) => {
+        return <span>Inner Func</span>;
     };
-    const innerNonExportedFunc = (props: IRowProps) => {
-        return <span>Inner Func</span>
+    const innerNonExportedFunc = (rowProps: IRowProps) => {
+        return <span>Inner Func</span>;
     };
     return <div>Test</div>;
 };
@@ -64,4 +64,3 @@ export const ColumnExternalHigherOrderComponent = externalHoc(Column);
 
 /** RowExternalHigherOrderComponent description */
 export const RowExternalHigherOrderComponent = externalHoc(Row);
-

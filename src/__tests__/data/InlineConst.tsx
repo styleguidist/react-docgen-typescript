@@ -12,8 +12,8 @@ export interface IReproProps {
  * MyComponent description
  */
 export class MyComponent extends React.Component<IReproProps, {}> {
-    render() {
-        const repeat = func => setInterval(func, 16);
+    public render() {
+        const repeat = (func) => setInterval(func, 16);
 
         return (
             <div>test</div>

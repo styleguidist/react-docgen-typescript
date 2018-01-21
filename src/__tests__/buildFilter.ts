@@ -1,16 +1,16 @@
 import { assert, expect } from 'chai';
 import { buildFilter } from '../buildFilter';
-import { ParserOptions, Props, PropItem } from '../parser';
+import { ParserOptions, PropItem, Props } from '../parser';
 
-function createProp(name: string, required: boolean = false, defaultValue: any = undefined, 
-  description: string = '', type = {name: 'string'}): PropItem {
+function createProp(name: string, required: boolean = false, defaultValue?: any,
+                    description: string = '', type = {name: 'string'}): PropItem {
   return {
-    name,
-    type,
-    required,
     defaultValue,
-    description
-  }
+    description,
+    name,
+    required,
+    type
+  };
 }
 
 describe('buildFilter', () => {
@@ -30,7 +30,9 @@ describe('buildFilter', () => {
       const children = createProp('children', false, undefined, 'children description');
       const opts: ParserOptions = {};
       const filterFn = buildFilter(opts);
-      expect([prop1, prop2, children].filter((prop) => filterFn(prop, {name: prop.name}))).to.eql([prop1, prop2, children]);
+      expect(
+        [prop1, prop2, children].filter((prop) => filterFn(prop, {name: prop.name}))).to.eql([prop1, prop2, children]
+      );
     });
   });
 

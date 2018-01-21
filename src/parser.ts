@@ -1,6 +1,6 @@
-import * as ts from 'typescript';
-import * as path from 'path';
 import * as fs from 'fs';
+import * as path from 'path';
+import * as ts from 'typescript';
 
 import { buildFilter } from './buildFilter';
 
@@ -36,7 +36,7 @@ export interface PropItemType {
 export type PropFilter = (props: PropItem, component: Component) => boolean;
 
 export interface ParserOptions {
-  propFilter?: StaticPropFilter | PropFilter
+  propFilter?: StaticPropFilter | PropFilter;
 }
 
 export interface StaticPropFilter {
@@ -51,9 +51,9 @@ export interface FileParser {
 }
 
 const defaultOptions: ts.CompilerOptions = {
-    target: ts.ScriptTarget.Latest,
-    module: ts.ModuleKind.CommonJS,
     jsx: ts.JsxEmit.React,
+    module: ts.ModuleKind.CommonJS,
+    target: ts.ScriptTarget.Latest
 };
 
 /**
@@ -92,7 +92,8 @@ export function withCustomConfig(tsconfigPath: string, parserOpts: ParserOptions
 /**
  * Constructs a parser for a specified set of TS compiler options.
  */
-export function withCompilerOptions(compilerOptions: ts.CompilerOptions, parserOpts: ParserOptions = defaultParserOpts): FileParser {
+export function withCompilerOptions(
+  compilerOptions: ts.CompilerOptions, parserOpts: ParserOptions = defaultParserOpts): FileParser {
     return {
         parse(filePath: string): ComponentDoc[] {
             const program = ts.createProgram([filePath], compilerOptions);
@@ -106,15 +107,15 @@ export function withCompilerOptions(compilerOptions: ts.CompilerOptions, parserO
             const exports = checker.getExportsOfModule(moduleSymbol);
 
             const components = exports
-                .map(exp => parser.getComponentInfo(exp, sourceFile))
-                .filter(comp => comp);
+                .map((exp) => parser.getComponentInfo(exp, sourceFile))
+                .filter((comp) => comp);
 
             // this should filter out components with the same name as default export
-            const filteredComponents = components    
+            const filteredComponents = components
                 .filter((comp, index) => {
                     const isUnique = components
                         .slice(index + 1)
-                        .filter(i => i.displayName === comp.displayName)
+                        .filter((i) => i.displayName === comp.displayName)
                         .length === 0;
                     return isUnique;
                 });
@@ -131,9 +132,9 @@ interface JSDoc {
 }
 
 const defaultJSDoc: JSDoc = {
+    description: '',
     fullComment: '',
-    tags: {},
-    description: ''
+    tags: {}
 };
 
 class Parser {
@@ -170,9 +171,9 @@ class Parser {
             }
 
             return {
-                displayName: componentName,
                 description: this.findDocComment(exp).fullComment,
-                props: props
+                displayName: componentName,
+                props
             };
         }
 
@@ -186,7 +187,7 @@ class Parser {
             // Could be a stateless component.  Is a function, so the props object we're interested
             // in is the (only) parameter.
 
-            for (let sig of callSignatures) {
+            for (const sig of callSignatures) {
                 const params = sig.getParameters();
                 if (params.length === 0) {
                     continue;
@@ -210,7 +211,7 @@ class Parser {
             // React.Component. Is a class, so the props object we're interested
             // in is the type of 'props' property of the object constructed by the class.
 
-            for (let sig of constructSignatures) {
+            for (const sig of constructSignatures) {
                 const instanceType = sig.getReturnType();
                 const props = instanceType.getProperty('props');
 
@@ -229,7 +230,7 @@ class Parser {
 
         const result: Props = {};
 
-        propertiesOfProps.forEach(prop => {
+        propertiesOfProps.forEach((prop) => {
             const propName = prop.getName();
 
             // Find type of prop by looking in context of the props object itself.
@@ -237,8 +238,8 @@ class Parser {
 
             const propTypeString = this.checker.typeToString(propType);
 
+            // tslint:disable-next-line:no-bitwise
             const isOptional = (prop.getFlags() & ts.SymbolFlags.Optional) !== 0;
-
 
             const jsDocComment = this.findDocComment(prop);
 
@@ -251,18 +252,18 @@ class Parser {
             }
 
             result[propName] = {
+                defaultValue,
+                description: jsDocComment.fullComment,
                 name: propName,
                 required: !isOptional,
-                type: { name: propTypeString },
-                description: jsDocComment.fullComment,
-                defaultValue
+                type: { name: propTypeString }
             };
         });
 
         return result;
     }
 
-    findDocComment(symbol: ts.Symbol): JSDoc {
+    public findDocComment(symbol: ts.Symbol): JSDoc {
         const comment = this.getFullJsDocComment(symbol);
         if (comment.fullComment) {
             return comment;
@@ -270,9 +271,9 @@ class Parser {
 
         const rootSymbols = this.checker.getRootSymbols(symbol);
         const commentsOnRootSymbols = rootSymbols
-            .filter(x => x !== symbol)
-            .map(x => this.getFullJsDocComment(x))
-            .filter(x => !!x.fullComment);
+            .filter((x) => x !== symbol)
+            .map((x) => this.getFullJsDocComment(x))
+            .filter((x) => !!x.fullComment);
 
         if (commentsOnRootSymbols.length) {
             return commentsOnRootSymbols[0];
@@ -286,7 +287,7 @@ class Parser {
      * though TypeScript has broken down the JsDoc comment into plain
      * text and JsDoc tags.
      */
-    getFullJsDocComment(symbol: ts.Symbol): JSDoc {
+    public getFullJsDocComment(symbol: ts.Symbol): JSDoc {
 
         // in some cases this can be undefined (Pick<Type, 'prop1'|'prop2'>)
         if (symbol.getDocumentationComment === undefined) {
@@ -300,29 +301,31 @@ class Parser {
         const tagComments: string[] = [];
         const tagMap: StringIndexedObject<string> = {};
 
-        tags.forEach(tag => {
+        tags.forEach((tag) => {
             const trimmedText = (tag.text || '').trim();
             const currentValue = tagMap[tag.name];
             tagMap[tag.name] = currentValue ? currentValue + '\n' + trimmedText : trimmedText;
 
             if (tag.name !== 'default') { tagComments.push(formatTag(tag)); }
-        })
+        });
 
         return ({
+            description: mainComment,
             fullComment: (mainComment + '\n' + tagComments.join('\n')).trim(),
-            tags: tagMap,
-            description: mainComment
+            tags: tagMap
         });
     }
 
-    extractDefaultPropsFromComponent(symbol: ts.Symbol, source: ts.SourceFile) {
-        const possibleStatements = source.statements.filter(statement => this.checker.getSymbolAtLocation((statement as ts.ClassDeclaration).name) === symbol);
+    public extractDefaultPropsFromComponent(symbol: ts.Symbol, source: ts.SourceFile) {
+        const possibleStatements = source.statements.filter(
+          (stmt) => this.checker.getSymbolAtLocation((stmt as ts.ClassDeclaration).name) === symbol);
         if (!possibleStatements.length) {
             return {};
         }
         const statement = possibleStatements[0];
         if (statementIsClassDeclaration(statement) && statement.members.length) {
-            const possibleDefaultProps = statement.members.filter(member => member.name && getPropertyName(member.name) === 'defaultProps');
+            const possibleDefaultProps = statement.members.filter(
+              (member) => member.name && getPropertyName(member.name) === 'defaultProps');
             if (!possibleDefaultProps.length) {
                 return {};
             }
@@ -335,14 +338,14 @@ class Parser {
                     acc[getPropertyName(property.name)] = getLiteralValueFromPropertyAssignment(property);
                 }
                 return acc;
-            }, {} as StringIndexedObject<string>)
+            }, {} as StringIndexedObject<string>);
             return propMap;
         }
         return {};
     }
 }
 
-function statementIsClassDeclaration (statement: ts.Statement): statement is ts.ClassDeclaration {
+function statementIsClassDeclaration(statement: ts.Statement): statement is ts.ClassDeclaration {
     return !!(statement as ts.ClassDeclaration).members;
 }
 
@@ -361,7 +364,7 @@ function getPropertyName(name: ts.PropertyName): string | null {
 
 function getLiteralValueFromPropertyAssignment(property: ts.PropertyAssignment): string | null {
     const { initializer } = property;
-    switch(initializer.kind) {
+    switch (initializer.kind) {
         case ts.SyntaxKind.FalseKeyword:
             return 'false';
         case ts.SyntaxKind.TrueKeyword:
@@ -383,7 +386,7 @@ function getLiteralValueFromPropertyAssignment(property: ts.PropertyAssignment):
     }
 }
 
-function formatTag (tag: ts.JSDocTagInfo) {
+function formatTag(tag: ts.JSDocTagInfo) {
     let result = '@' + tag.name;
     if (tag.text) {
         result += ' ' + tag.text;

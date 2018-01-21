@@ -14,15 +14,15 @@ export interface IRowProps {
  * Row description
  */
 export const Row = (props: IRowProps) => {
-    const innerFunc = (props: IRowProps) => {
-        return <span>Inner Func</span>
+    const innerFunc = (rowProps: IRowProps) => {
+        return <span>Inner Func</span>;
     };
-    const innerNonExportedFunc = (props: IRowProps) => {
-        return <span>Inner Func</span>
+    const innerNonExportedFunc = (rowProps: IRowProps) => {
+        return <span>Inner Func</span>;
     };
     return <div>Test</div>;
 };
 
 const nonExportedFunc = (props: IRowProps) => {
-    return <div>No Export</div>
+    return <div>No Export</div>;
 };

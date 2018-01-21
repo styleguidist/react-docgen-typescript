@@ -11,4 +11,4 @@ export interface JumbotronProps {
  */
 export function Jumbotron(props: JumbotronProps) {
     return <div>Test</div>;
-};
+}

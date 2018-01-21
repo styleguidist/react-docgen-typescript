@@ -1,4 +1,4 @@
-import { ParserOptions, PropItem, Component, PropFilter, StaticPropFilter } from './parser';
+import { Component, ParserOptions, PropFilter, PropItem, StaticPropFilter } from './parser';
 
 export function buildFilter(opts: ParserOptions): PropFilter {
   return (prop: PropItem, component: Component) => {

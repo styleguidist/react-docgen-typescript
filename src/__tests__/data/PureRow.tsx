@@ -15,7 +15,7 @@ export interface IRowProps {
  */
 export class Row extends React.PureComponent<IRowProps, {}> {
 
-    render() {
+    public render() {
         return <div>Test</div>;
     }
-};
+}

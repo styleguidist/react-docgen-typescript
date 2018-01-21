@@ -11,6 +11,6 @@ export interface JumbotronProps {
  */
 function Jumbotron(props: JumbotronProps) {
     return <div>Test</div>;
-};
+}
 
 export default Jumbotron;

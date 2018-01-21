@@ -16,12 +16,12 @@ export class Repro extends React.Component<IReproProps, {}> {
         super(props);
     }
 
-    private repro() {
+    repro() {
         let repro;
         repro = 1;
     }
 
-    public render() {
+    render() {
         return(<div/>);
     }
 }

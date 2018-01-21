@@ -5,7 +5,7 @@ import { ExternalPropsComponentProps } from './ExternalPropsComponentProps';
  * ExternalPropsComponent description
  */
 export class ExternalPropsComponent extends React.Component<ExternalPropsComponentProps, {}> {
-    render() {
-        return <div>ExternalPropsComponent</div>
+    public render() {
+        return <div>ExternalPropsComponent</div>;
     }
 }
