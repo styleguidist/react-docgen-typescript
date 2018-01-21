@@ -2,10 +2,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es5",
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": false,
+    "strict": true,
     "sourceMap": true,
     "outDir": "lib",
     "jsx": "react",
