@@ -9,7 +9,9 @@
     "test": "tsc && mocha --timeout 10000 ./lib/**/__tests__/**.js",
     "test:debug": "tsc && mocha --debug ./lib/**/__tests__/**.js",
     "print": "npm run tsc && node ./lib/print.js",
-    "print:sample1": "npm run tsc && node ./lib/print.js ./src/__tests__/data/ColumnHigherOrderComponent.tsx simple"
+    "print:sample1": "npm run tsc && node ./lib/print.js ./src/__tests__/data/ColumnHigherOrderComponent.tsx simple",
+    "lint": "tslint -c tslint.json 'src/**/*.{ts,tsx}'",
+    "lint:fix": "npm run lint -- --fix"
   },
   "license": "MIT",
   "dependencies": {},
