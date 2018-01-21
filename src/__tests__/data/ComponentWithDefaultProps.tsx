@@ -29,15 +29,8 @@ export class ComponentWithDefaultProps extends React.Component<
   static defaultProps: Partial<IComponentWithDefaultPropsProps> = {
     sampleFalse: false,
     sampleNull: null,
-    sampleObject: {
-      a: '1',
-      b: 2,
-      c: true,
-      d: false,
-      e: undefined,
-      f: null,
-      g: { a: '1' }
-    },
+    // prettier-ignore
+    sampleObject: { a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } },
     sampleString: 'hello',
     sampleTrue: true,
     sampleUndefined: undefined
