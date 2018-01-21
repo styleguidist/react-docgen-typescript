@@ -8,7 +8,8 @@
       "member-access": false,
       "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
       "interface-name": false,
-      "quotemark": [true, "single"]
+      "quotemark": [true, "single"],
+      "arrow-parens": false
     },
     "rulesDirectory": []
 }
