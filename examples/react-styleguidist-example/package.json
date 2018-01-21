@@ -7,7 +7,12 @@
     "tsc": "tsc",
     "styleguidist": "styleguidist",
     "start": "tsc && styleguidist server --config styleguide.config.js",
-    "webpack": "webpack"
+    "webpack": "webpack",
+    "lint": "tslint -c tslint.json 'src/**/*.{ts,tsx}'",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier:base": "prettier --parser typescript --single-quote --trailing-comma none",
+    "prettier:check": "npm run prettier:base -- -l \"components/**/*.{ts,tsx}\"",
+    "prettier:write": "npm run prettier:base -- --write \"components/**/*.{ts,tsx}\""
   },
   "author": "pvasek",
   "license": "MIT",
@@ -18,9 +23,13 @@
     "react-dom": "^16.2.0"
   },
   "devDependencies": {
+    "husky": "^0.14.3",
+    "lint-staged": "^6.0.1",
+    "prettier": "^1.10.2",
     "react-docgen-typescript": "^1.2.2",
     "react-styleguidist": "^6.1.0",
     "ts-loader": "^3.3.0",
+    "tslint": "^5.9.1",
     "typescript": "^2.3.3",
     "webpack": "^3.10.0"
   }
