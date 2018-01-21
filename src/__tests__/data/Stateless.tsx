@@ -5,7 +5,6 @@ export interface StatelessProps {
   myProp: string;
 }
 /** Stateless description */
-export const Stateless: React.StatelessComponent<StatelessProps> = (props) =>
-  <div>
-    My Property = {props.myProp}
-  </div>;
+export const Stateless: React.StatelessComponent<StatelessProps> = props => (
+  <div>My Property = {props.myProp}</div>
+);

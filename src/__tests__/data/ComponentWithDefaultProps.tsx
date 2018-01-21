@@ -14,7 +14,7 @@ export interface IComponentWithDefaultPropsProps {
   /** sampleString description */
   sampleString?: string;
   /** sampleObject description */
-  sampleObject?: { [key: string]: any; };
+  sampleObject?: { [key: string]: any };
   /** sampleNull description */
   sampleNull?: null;
   /** sampleUndefined description */
@@ -22,19 +22,28 @@ export interface IComponentWithDefaultPropsProps {
 }
 
 /** ComponentWithDefaultProps description */
-export class ComponentWithDefaultProps extends React.Component<IComponentWithDefaultPropsProps, {}> {
+export class ComponentWithDefaultProps extends React.Component<
+  IComponentWithDefaultPropsProps,
+  {}
+> {
   static defaultProps: Partial<IComponentWithDefaultPropsProps> = {
     sampleFalse: false,
     sampleNull: null,
-    sampleObject: { a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } },
+    sampleObject: {
+      a: '1',
+      b: 2,
+      c: true,
+      d: false,
+      e: undefined,
+      f: null,
+      g: { a: '1' }
+    },
     sampleString: 'hello',
     sampleTrue: true,
     sampleUndefined: undefined
   };
 
   public render() {
-    return (
-      <div>test</div>
-    );
+    return <div>test</div>;
   }
 }
