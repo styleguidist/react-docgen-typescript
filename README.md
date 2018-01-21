@@ -130,17 +130,23 @@ the part it's fixing.
 
 ## Thanks to contributors
 
-@RoystonS Royston Shufflebotham - complete parser rewrite that use typescript parser in much better way and overcome many issues of previous implementation
+**@brettjurgens** *Brett Jurgens* - adding support for default props
 
-@JocD Jacques Dukes - complete support for functional components and much more
+**@diegolanda** *Diego* - support for different kinds of components
 
-@sapegin Artem Sapegin - fix for compatibility with react-styleguidist v5
+**@dotcs** *Fabian Mueller* - introduced parserOptions for skipping undocumented properties
 
-@diegolanda Diego - support for different kinds of components
+**@Havret** *Krzysztof Havret*
 
-@brettjurgens Brett Jurgens - adding support for default props
+**@JakeSidSmith** *Jake*
 
-@dotcs Fabian Mueller - introduced parserOptions for skipping undocumented properties
+**@JocD** *Jacques Dukes* - complete support for functional components and much more
+
+**@jrwebdev** *James Ravenscroft*
+
+**@RoystonS** *Royston Shufflebotham* - complete parser rewrite that use typescript parser in much better way and overcome many issues of previous implementation
+
+**@sapegin** *Artem Sapegin* - fix for compatibility with react-styleguidist v5
 
 ## Thanks to others
 
