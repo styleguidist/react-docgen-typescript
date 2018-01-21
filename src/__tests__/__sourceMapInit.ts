@@ -1,2 +1,2 @@
-import * as sourceMapSupport from "source-map-support";
+import * as sourceMapSupport from 'source-map-support';
 sourceMapSupport.install();

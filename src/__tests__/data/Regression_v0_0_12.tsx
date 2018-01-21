@@ -1,13 +1,16 @@
 import * as React from 'react';
 
-type Coords = { x: number; y: number };
+interface Coords {
+  x: number;
+  y: number;
+}
 
 export interface Props extends React.HTMLAttributes<Element> {
   /**
    * originX description
    */
   originX: number;
-  /** 
+  /**
    * originY description
    */
   originY: number;
@@ -21,11 +24,7 @@ export interface Props extends React.HTMLAttributes<Element> {
    * The zoom change handler for controlled components.
    * It should update the other props in order to reflect the zoom change.
    */
-  onZoom(
-    scale: number,
-    translateX: number,
-    translateY: number,
-  ): void;
+  onZoom(scale: number, translateX: number, translateY: number): void;
 }
 
 type Matrix = string;
@@ -44,12 +43,11 @@ function getCanZoomOut({ minScale = Infinity, scaleFactor }: Props): boolean {
   return scaleFactor > minScale;
 }
 
-/** 
+/**
  * Zoomable description
  */
 export class Zoomable extends React.PureComponent<Props, State> {
-
-  render() {
+  public render() {
     const {
       style,
       className,
@@ -60,12 +58,10 @@ export class Zoomable extends React.PureComponent<Props, State> {
       maxScale,
       originX,
       originY,
-      ...rest,
+      ...rest
     } = this.props;
     const { canZoomIn, canZoomOut } = this.state;
 
-    return (
-      <div />
-    );
+    return <div />;
   }
 }

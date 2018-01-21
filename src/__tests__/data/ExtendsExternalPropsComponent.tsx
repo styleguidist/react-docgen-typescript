@@ -9,8 +9,11 @@ interface ExtendsExternalPropsComponentProps extends ParentProps {
 /**
  * ExtendsExternalPropsComponent description
  */
-export class ExtendsExternalPropsComponent extends React.Component<ExtendsExternalPropsComponentProps, {}> {
-    render() {
-        return <div>ExtendsExternalPropsComponent</div>
-    }
+export class ExtendsExternalPropsComponent extends React.Component<
+  ExtendsExternalPropsComponentProps,
+  {}
+> {
+  public render() {
+    return <div>ExtendsExternalPropsComponent</div>;
+  }
 }

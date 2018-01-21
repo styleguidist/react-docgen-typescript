@@ -4,11 +4,11 @@
 
 ![](https://nodei.co/npm/react-docgen-typescript.png?downloadRank=true&downloads=true)
 
-A simple parser for React properties defined in TypeScript instead of propTypes. 
+A simple parser for React properties defined in TypeScript instead of propTypes.
 
 It can be used with [React Styleguidist](https://github.com/styleguidist/react-styleguidist).
 
-## Installation 
+## Installation
 
 ```
 npm install --save-dev react-docgen-typescript
@@ -29,12 +29,23 @@ propsParser: require('react-docgen-typescript').withCustomConfig('./tsconfig.jso
 ```
 
 ### parserOptions
-- `skipPropsWithName?: string[] | string;`
-- `skipPropsWithoutDoc?: boolean;`
 
-or
+- propFilter:
 
-`(props: PropItem, component: Component) => boolean`
+  ```typescript
+  {
+    skipPropsWithName?: string[] | string;
+    skipPropsWithoutDoc?: boolean;
+  }
+  ```
+
+  or
+
+  ```typescript
+  (props: PropItem, component: Component) => boolean
+  ```
+
+  Note: `children` without a doc comment will not be documented.
 
 ## Example
 
@@ -54,8 +65,8 @@ export interface IColumnProps {
     prop1?: string;
     /** prop2 description */
     prop2: number;
-    /** 
-     * prop3 description 
+    /**
+     * prop3 description
      */
     prop3: () => void;
     /** prop4 description */
@@ -111,25 +122,31 @@ Will generate the following stylesheet:
 ![Stylesheet example](./stylesheet-example-grid.png "Stylesheet example")
 
 ## Contributions
-The typescript is pretty complex and there are many different way how 
-to define components and their props so it's realy hard to support all 
-diferent use cases. That means only one thing, contributions are highly 
-welcome. Just keep in mind that each PR should also include tests for 
+The typescript is pretty complex and there are many different way how
+to define components and their props so it's realy hard to support all
+diferent use cases. That means only one thing, contributions are highly
+welcome. Just keep in mind that each PR should also include tests for
 the part it's fixing.
 
 ## Thanks to contributors
 
-@RoystonS Royston Shufflebotham - complete parser rewrite that use typescript parser in much better way and overcome many issues of previous implementation
+**@brettjurgens** *Brett Jurgens* - adding support for default props
 
-@JocD Jacques Dukes - complete support for functional components and much more
+**@diegolanda** *Diego* - support for different kinds of components
 
-@sapegin Artem Sapegin - fix for compatibility with react-styleguidist v5
+**@dotcs** *Fabian Mueller* - introduced parserOptions for skipping undocumented properties
 
-@diegolanda Diego - support for different kinds of components
+**@Havret** *Krzysztof Havret*
 
-@brettjurgens Brett Jurgens - adding support for default props
+**@JakeSidSmith** *Jake*
 
-@dotcs Fabian Mueller - introduced parserOptions for skipping undocumented properties
+**@JocD** *Jacques Dukes* - complete support for functional components and much more
+
+**@jrwebdev** *James Ravenscroft*
+
+**@RoystonS** *Royston Shufflebotham* - complete parser rewrite that use typescript parser in much better way and overcome many issues of previous implementation
+
+**@sapegin** *Artem Sapegin* - fix for compatibility with react-styleguidist v5
 
 ## Thanks to others
 

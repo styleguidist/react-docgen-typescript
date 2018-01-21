@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 
 export interface StatelessWithDefaultPropsProps {
   /** sampleJSDoc description
@@ -10,10 +10,10 @@ export interface StatelessWithDefaultPropsProps {
 }
 
 /** StatelessWithDefaultProps description */
-export const StatelessWithDefaultProps: React.StatelessComponent<StatelessWithDefaultPropsProps> = props =>
-  <div>test</div>;
+export const StatelessWithDefaultProps: React.StatelessComponent<
+  StatelessWithDefaultPropsProps
+> = props => <div>test</div>;
 
 StatelessWithDefaultProps.defaultProps = {
   sampleProp: 'test'
 };
-

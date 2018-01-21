@@ -1,19 +1,19 @@
 import {
-    parse,
-    withDefaultConfig,
-    withCustomConfig,
-    ComponentDoc,
-    Props,
-    PropItem,
-    PropItemType,
+  ComponentDoc,
+  parse,
+  PropItem,
+  PropItemType,
+  Props,
+  withCustomConfig,
+  withDefaultConfig
 } from './parser';
 
 export {
-    parse,
-    withDefaultConfig,
-    withCustomConfig,
-    ComponentDoc,
-    Props,
-    PropItem,
-    PropItemType,
-}
+  parse,
+  withDefaultConfig,
+  withCustomConfig,
+  ComponentDoc,
+  Props,
+  PropItem,
+  PropItemType
+};

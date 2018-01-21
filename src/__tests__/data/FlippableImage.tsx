@@ -6,17 +6,11 @@ export type Props = React.HTMLAttributes<HTMLImageElement> & {
   isFlippedX?: boolean;
   /** isFlippedY description */
   isFlippedY?: boolean;
-}
+};
 
 /** FlippableImage description */
 export const FlippableImage = (props: Props) => {
-  const {
-    src,
-    isFlippedX = false,
-    isFlippedY = false,
-    style,
-    ...rest,
-  } = props;
+  const { src, isFlippedX = false, isFlippedY = false, style, ...rest } = props;
 
   let transform = '';
   if (isFlippedX) {
@@ -27,10 +21,6 @@ export const FlippableImage = (props: Props) => {
   }
 
   return (
-    <img
-      src={src || undefined}
-      style={{ ...style, transform }}
-      {...rest}
-    />
+    <img src={src || undefined} style={{ ...style, transform }} {...rest} />
   );
 };
