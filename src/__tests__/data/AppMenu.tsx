@@ -18,22 +18,18 @@ export class AppMenu extends React.Component<IAppMenuProps, IAppMenuState> {
       menu: this.props.menu
     };
 
-    this.handleClick  = this.handleClick.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   componentWillReceiveProps(newProps: IAppMenuProps) {
-
+    /* empty on purpose */
   }
 
-  handleClick( info ) {
-
+  handleClick(info) {
+    /* empty on purpose */
   }
 
   render() {
-    return (
-      <div onClick={this.handleClick}>
-        test
-      </div>
-    );
+    return <div onClick={this.handleClick}>test</div>;
   }
 }

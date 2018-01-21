@@ -1,373 +1,460 @@
 import { assert } from 'chai';
-import { check } from "./testUtils";
 import { PropFilter } from '../parser';
+import { check } from './testUtils';
 
 describe('parser', () => {
+  const children = { type: 'ReactNode', required: false, description: '' };
 
-    const children = { type: 'ReactNode', required: false, description: '', };
+  it('should parse simple react class component', () => {
+    check('Column', {
+      Column: {
+        prop1: { type: 'string', required: false },
+        prop2: { type: 'number' },
+        prop3: { type: '() => void' },
+        prop4: { type: '"option1" | "option2" | "option3"' }
+      }
+    });
+  });
 
-    it('should parse simple react class component', function() {
-        check('Column', {
-            Column: {
+  it('should parse simple react class component as default export', () => {
+    check('ColumnWithDefaultExport', {
+      Column: {
+        prop1: { type: 'string', required: false },
+        prop2: { type: 'number' },
+        prop3: { type: '() => void' },
+        prop4: { type: '"option1" | "option2" | "option3"' }
+      }
+    });
+  });
+
+  it('should parse simple react class component as default export only', () => {
+    check('ColumnWithDefaultExportOnly', {
+      ColumnWithDefaultExportOnly: {
+        prop1: { type: 'string', required: false },
+        prop2: { type: 'number' },
+        prop3: { type: '() => void' },
+        prop4: { type: '"option1" | "option2" | "option3"' }
+      }
+    });
+  });
+
+  it('should parse simple react class component as default anonymous export', () => {
+    check('ColumnWithDefaultAnonymousExportOnly', {
+      ColumnWithDefaultAnonymousExportOnly: {
+        prop1: { type: 'string', required: false },
+        prop2: { type: 'number' },
+        prop3: { type: '() => void' },
+        prop4: { type: '"option1" | "option2" | "option3"' }
+      }
+    });
+  });
+
+  it('should parse simple react class component with state', () => {
+    check('AppMenu', {
+      AppMenu: {
+        menu: { type: 'any' }
+      }
+    });
+  });
+
+  it('should parse simple react class component with picked properties', () => {
+    // we are not able to get correct descriptions for prop1,prop2
+    check('ColumnWithPick', {
+      Column: {
+        prop1: { type: 'string', required: false, description: '' },
+        prop2: { type: 'number', description: '' },
+        propx: { type: 'number' }
+      }
+    });
+  });
+
+  it('should parse HOCs', () => {
+    check('ColumnHigherOrderComponent', {
+      ColumnExternalHigherOrderComponent: {
+        prop1: { type: 'string' }
+      },
+      ColumnHigherOrderComponent1: {
+        prop1: { type: 'string' }
+      },
+      ColumnHigherOrderComponent2: {
+        prop1: { type: 'string' }
+      },
+      RowExternalHigherOrderComponent: {
+        prop1: { type: 'string' }
+      },
+      RowHigherOrderComponent1: {
+        prop1: { type: 'string' }
+      },
+      RowHigherOrderComponent2: {
+        prop1: { type: 'string' }
+      }
+    });
+  });
+
+  it('should parse component with inherited properties HtmlAttributes<any>', () => {
+    check(
+      'ColumnWithHtmlAttributes',
+      {
+        Column: {
+          // tslint:disable:object-literal-sort-keys
+          prop1: { type: 'string', required: false },
+          prop2: { type: 'number' },
+          // HtmlAttributes
+          defaultChecked: {
+            type: 'boolean',
+            required: false,
+            description: ''
+          }
+          // ...
+          // tslint:enable:object-literal-sort-keys
+        }
+      },
+      false
+    );
+  });
+
+  it('should parse component without exported props interface', () => {
+    check('ColumnWithoutExportedProps', {
+      Column: {
+        prop1: { type: 'string', required: false },
+        prop2: { type: 'number' }
+      }
+    });
+  });
+
+  it('should parse functional component exported as const', () => {
+    check(
+      'ConstExport',
+      {
+        Row: {
+          prop1: { type: 'string', required: false },
+          prop2: { type: 'number' }
+        },
+        // TODO: this wasn't there before, i would guess that that's correct
+        test: {}
+      },
+      false
+    );
+  });
+
+  it('should parse react component with properties defined in external file', () => {
+    check('ExternalPropsComponent', {
+      ExternalPropsComponent: {
+        prop1: { type: 'string' }
+      }
+    });
+  });
+
+  it('should parse react component with properties extended from an external .tsx file', () => {
+    check('ExtendsExternalPropsComponent', {
+      ExtendsExternalPropsComponent: {
+        prop1: { type: 'number', required: false, description: 'prop1' },
+        prop2: { type: 'string', required: false, description: 'prop2' }
+      }
+    });
+  });
+
+  it('should parse react component with properties defined as type', () => {
+    check(
+      'FlippableImage',
+      {
+        FlippableImage: {
+          isFlippedX: { type: 'boolean', required: false },
+          isFlippedY: { type: 'boolean', required: false }
+        }
+      },
+      false
+    );
+  });
+
+  it('should parse react component with const definitions', () => {
+    check('InlineConst', {
+      MyComponent: {
+        foo: { type: 'any' }
+      }
+    });
+  });
+
+  it('should parse react component with default props', () => {
+    check('ComponentWithDefaultProps', {
+      ComponentWithDefaultProps: {
+        sampleDefaultFromJSDoc: {
+          defaultValue: 'hello',
+          description: 'sample with default value',
+          required: true,
+          type: '"hello" | "goodbye"'
+        },
+        sampleFalse: {
+          defaultValue: 'false',
+          required: false,
+          type: 'boolean'
+        },
+        sampleNull: { type: 'null', required: false, defaultValue: 'null' },
+        sampleObject: {
+          defaultValue: `{ a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } }`,
+          required: false,
+          type: '{ [key: string]: any; }'
+        },
+        sampleString: {
+          defaultValue: 'hello',
+          required: false,
+          type: 'string'
+        },
+        sampleTrue: { type: 'boolean', required: false, defaultValue: 'true' },
+        sampleUndefined: {
+          defaultValue: 'undefined',
+          required: false,
+          type: 'any'
+        }
+      }
+    });
+  });
+
+  it('should parse react PureComponent', () => {
+    check('PureRow', {
+      Row: {
+        prop1: { type: 'string', required: false },
+        prop2: { type: 'number' }
+      }
+    });
+  });
+
+  it('should parse react PureComponent - regression test', () => {
+    check(
+      'Regression_v0_0_12',
+      {
+        Zoomable: {
+          originX: { type: 'number' },
+          originY: { type: 'number' },
+          scaleFactor: { type: 'number' }
+        }
+      },
+      false
+    );
+  });
+
+  it('should parse react functional component', () => {
+    check('Row', {
+      Row: {
+        prop1: { type: 'string', required: false },
+        prop2: { type: 'number' }
+      }
+    });
+  });
+
+  it('should parse react stateless component', () => {
+    check('Stateless', {
+      Stateless: {
+        myProp: { type: 'string' }
+      }
+    });
+  });
+
+  it('should parse react stateless component with default props', () => {
+    check('StatelessWithDefaultProps', {
+      StatelessWithDefaultProps: {
+        sampleJSDoc: { type: 'string', required: false, defaultValue: 'test' },
+        sampleProp: { type: 'string', required: false, defaultValue: 'hello' }
+      }
+    });
+  });
+
+  it('should parse functional component component defined as function', () => {
+    check('FunctionDeclaration', {
+      Jumbotron: {
+        prop1: { type: 'string', required: true }
+      }
+    });
+  });
+
+  it('should parse functional component component defined as const', () => {
+    check('FunctionalComponentAsConst', {
+      Jumbotron: {
+        prop1: { type: 'string', required: true }
+      }
+    });
+  });
+
+  it('should parse functional component component defined as function as default export', () => {
+    check('FunctionDeclarationAsDefaultExport', {
+      Jumbotron: {
+        prop1: { type: 'string', required: true }
+      }
+    });
+  });
+
+  it('should parse functional component component defined as const as default export', () => {
+    check(
+      'FunctionalComponentAsConstAsDefaultExport',
+      {
+        // in this case the component name is taken from the file name
+        FunctionalComponentAsConstAsDefaultExport: {
+          prop1: { type: 'string', required: true }
+        }
+      },
+      true,
+      'Jumbotron description'
+    );
+  });
+
+  it('should parse functional component component defined as const as named export', () => {
+    check(
+      'FunctionalComponentAsConstAsNamedExport',
+      {
+        // in this case the component name is taken from the file name
+        FunctionalComponentAsConstAsNamedExport: {
+          prop1: { type: 'string', required: true }
+        }
+      },
+      true,
+      'Jumbotron description'
+    );
+  });
+
+  describe('Parser options', () => {
+    describe('Property filtering', () => {
+      describe('children', () => {
+        it('should ignore property "children" if not explicitly documented', () => {
+          check(
+            'Column',
+            {
+              Column: {
                 prop1: { type: 'string', required: false },
                 prop2: { type: 'number' },
-                prop3: { type: '() => void'},
-                prop4: { type: '"option1" | "option2" | "option3"' },
-            }
-        });
-    });
-
-    it('should parse simple react class component as default export', function() {
-        check('ColumnWithDefaultExport', {
-            Column: {
-                prop1: { type: 'string', required: false },
-                prop2: { type: 'number' },
-                prop3: { type: '() => void'},
-                prop4: { type: '"option1" | "option2" | "option3"' },
-            }
-        });
-    });
-    
-    it('should parse simple react class component as default export only', function() {
-        check('ColumnWithDefaultExportOnly', {
-            ColumnWithDefaultExportOnly: {
-                prop1: { type: 'string', required: false },
-                prop2: { type: 'number' },
-                prop3: { type: '() => void'},
-                prop4: { type: '"option1" | "option2" | "option3"' },
-            }
-        });
-    });
-
-    it('should parse simple react class component as default anonymous export', function() {
-        check('ColumnWithDefaultAnonymousExportOnly', {
-            ColumnWithDefaultAnonymousExportOnly: {
-                prop1: { type: 'string', required: false },
-                prop2: { type: 'number' },
-                prop3: { type: '() => void'},
-                prop4: { type: '"option1" | "option2" | "option3"' },
-            }
-        });
-    });
-
-    it('should parse simple react class component with state', () => {
-        check('AppMenu', {
-            AppMenu: {
-                menu: { type: 'any' },
-            }
-        });
-    });
-
-    it('should parse simple react class component with picked properties', function() {
-        // we are not able to get correct descriptions for prop1,prop2
-        check('ColumnWithPick', {
-            Column: {
-                prop1: { type: 'string', required: false, description: '' },
-                prop2: { type: 'number', description: '' },
-                propx: { type: 'number' },
-            }
-        });
-    });
-
-    it('should parse HOCs', function() {
-        check('ColumnHigherOrderComponent', {
-            ColumnHigherOrderComponent1: {
-                prop1: { type: 'string' },
+                prop3: { type: '() => void' },
+                prop4: { type: '"option1" | "option2" | "option3"' }
+              }
             },
-            ColumnHigherOrderComponent2: {
-                prop1: { type: 'string' },
-            },
-            RowHigherOrderComponent1: {
-                prop1: { type: 'string' },
-            },
-            RowHigherOrderComponent2: {
-                prop1: { type: 'string' },
-            },
-            ColumnExternalHigherOrderComponent: {
-                prop1: { type: 'string' },
-            },
-            RowExternalHigherOrderComponent: {
-                prop1: { type: 'string' },
-            }
+            true
+          );
         });
-    });
 
-    it('should parse component with inherited properties HtmlAttributes<any>', function(){
-        check('ColumnWithHtmlAttributes', {
-            Column: {
+        it('should not ignore any property that is documented explicitly', () => {
+          check(
+            'ColumnWithAnnotatedChildren',
+            {
+              Column: {
+                children: {
+                  description: 'children description',
+                  required: false,
+                  type: 'ReactNode'
+                },
                 prop1: { type: 'string', required: false },
                 prop2: { type: 'number' },
-                // HtmlAttributes
-                defaultChecked: {
-                    type: 'boolean',
-                    required: false,
-                    description: ''
-                }
-                // ...
-            }
-        }, false);
-    });
-
-    it('should parse component without exported props interface', function(){
-        check('ColumnWithoutExportedProps', {
-            Column: {
-                prop1: { type: 'string', required: false },
-                prop2: { type: 'number' },
-            }
-        });
-    });
-
-    it('should parse functional component exported as const', function(){
-        check('ConstExport', {
-            Row: {
-                prop1: { type: 'string', required: false },
-                prop2: { type: 'number' },
+                prop3: { type: '() => void' },
+                prop4: { type: '"option1" | "option2" | "option3"' }
+              }
             },
-            // TODO: this wasn't there before, i would guess that that's correct
-            test: {
-            }
-        }, false);
-    });
-
-    it('should parse react component with properties defined in external file', function(){
-        check('ExternalPropsComponent', {
-            ExternalPropsComponent: {
-                prop1: { type: 'string' },
-            }
+            true
+          );
         });
-    });
+      });
 
-    it('should parse react component with properties extended from an external .tsx file', function(){
-        check('ExtendsExternalPropsComponent', {
-            ExtendsExternalPropsComponent: {
-                prop1: { type: 'number', required: false, description: 'prop1' },
-                prop2: { type: 'string', required: false, description: 'prop2' },
-            }
-        });
-    });
-
-    it('should parse react component with properties defined as type', function(){
-        check('FlippableImage', {
-            FlippableImage: {
-                isFlippedX: { type: 'boolean', required: false },
-                isFlippedY: { type: 'boolean', required: false },
-            }
-        }, false);
-    });
-
-    it('should parse react component with const definitions', function(){
-        check('InlineConst', {
-            MyComponent: {
-                foo: { type: 'any' },
-            }
-        });
-    });
-
-    it('should parse react component with default props', function(){
-        check('ComponentWithDefaultProps', {
-            ComponentWithDefaultProps: {
-                sampleDefaultFromJSDoc: { type: '"hello" | "goodbye"', required: true, defaultValue: "hello", description: 'sample with default value' },
-                sampleTrue: { type: "boolean", required: false, defaultValue: "true" },
-                sampleFalse: { type: "boolean", required: false, defaultValue: "false" },
-                sampleString: { type: "string", required: false, defaultValue: "hello" },
-                sampleObject: { type: "{ [key: string]: any; }", required: false, defaultValue: "{ a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } }" },
-                sampleNull: { type: "null", required: false, defaultValue: "null" },
-                sampleUndefined: { type: "any", required: false, defaultValue: "undefined" },
-            }
-        });
-    });
-
-    it('should parse react PureComponent', function(){
-        check('PureRow', {
-            Row: {
-                prop1: { type: 'string', required: false },
+      describe('propsFilter method', () => {
+        it('should apply filter function and filter components accordingly', () => {
+          const propFilter: PropFilter = (prop, component) =>
+            prop.name !== 'prop1';
+          check(
+            'Column',
+            {
+              Column: {
                 prop2: { type: 'number' },
-            }
+                prop3: { type: '() => void' },
+                prop4: { type: '"option1" | "option2" | "option3"' }
+              }
+            },
+            true,
+            null,
+            { propFilter }
+          );
         });
-    });
 
-    it('should parse react PureComponent - regression test', function(){
-        check('Regression_v0_0_12', {
-            Zoomable: {
-                originX: { type: 'number' },
-                originY: { type: 'number' },
-                scaleFactor: { type: 'number' }
+        it('should apply filter function and filter components accordingly', () => {
+          const propFilter: PropFilter = (prop, component) => {
+            if (component.name === 'Column') {
+              return prop.name !== 'prop1';
             }
-        }, false);
-    });
-
-    it('should parse react functional component', function(){
-        check('Row', {
-            Row: {
-                prop1: { type: 'string', required: false },
+            return true;
+          };
+          check(
+            'Column',
+            {
+              Column: {
                 prop2: { type: 'number' },
-            }
+                prop3: { type: '() => void' },
+                prop4: { type: '"option1" | "option2" | "option3"' }
+              }
+            },
+            true,
+            null,
+            { propFilter }
+          );
+          check(
+            'AppMenu',
+            {
+              AppMenu: {
+                menu: { type: 'any' }
+              }
+            },
+            true,
+            null,
+            { propFilter }
+          );
         });
-    });
+      });
 
-    it('should parse react stateless component', function(){
-        check('Stateless', {
-            Stateless: {
-                myProp: { type: 'string' },
-            }
-        });
-    });
-
-    it('should parse react stateless component with default props', function(){
-        check('StatelessWithDefaultProps', {
-            StatelessWithDefaultProps: {
-                sampleJSDoc: { type: "string", required: false, defaultValue: "test" },
-                sampleProp: { type: "string", required: false, defaultValue: "hello" },
-            }
-        });
-    });
-
-    it('should parse functional component component defined as function', function(){
-        check('FunctionDeclaration', {
-            Jumbotron: {
-                prop1: { type: "string", required: true },
-            }
-        });
-    });
-
-    it('should parse functional component component defined as const', function(){
-        check('FunctionalComponentAsConst', {
-            Jumbotron: {
-                prop1: { type: "string", required: true },
-            }
-        });
-    });
-
-    it('should parse functional component component defined as function as default export', function(){
-        check('FunctionDeclarationAsDefaultExport', {
-            Jumbotron: {
-                prop1: { type: "string", required: true },
-            }
-        });
-    });
-
-    it('should parse functional component component defined as const as default export', function(){
-        check('FunctionalComponentAsConstAsDefaultExport', {
-            // in this case the component name is taken from the file name
-            FunctionalComponentAsConstAsDefaultExport: {
-                prop1: { type: "string", required: true },
-            }
-        }, true, 'Jumbotron description');
-    });
-
-    it('should parse functional component component defined as const as named export', function(){
-        check('FunctionalComponentAsConstAsNamedExport', {
-            // in this case the component name is taken from the file name
-            FunctionalComponentAsConstAsNamedExport: {
-                prop1: { type: "string", required: true },
-            }
-        }, true, 'Jumbotron description');
-    });    
-
-    describe('Parser options', function() {
-
-        describe('Property filtering', function() {
-
-            describe('children', function() {
-
-                it('should ignore property "children" if not explicitly documented', function() {
-                    check('Column', {
-                        Column: {
-                            prop1: { type: 'string', required: false },
-                            prop2: { type: 'number' },
-                            prop3: { type: '() => void'},
-                            prop4: { type: '"option1" | "option2" | "option3"' },
-                        }
-                    }, true);
-                });
-
-                it('should not ignore any property that is documented explicitly', function() {
-                    check('ColumnWithAnnotatedChildren', {
-                        Column: {
-                            children: { type: 'ReactNode', required: false, description: 'children description'},
-                            prop1: { type: 'string', required: false },
-                            prop2: { type: 'number' },
-                            prop3: { type: '() => void'},
-                            prop4: { type: '"option1" | "option2" | "option3"' }
-                        }
-                    }, true);
-                });
-            });
-
-            describe('propsFilter method', function() {
-
-                it('should apply filter function and filter components accordingly', function() {
-                    const propFilter: PropFilter = (prop, component) => prop.name !== 'prop1';
-                    check('Column', {
-                        Column: {
-                            prop2: { type: 'number' },
-                            prop3: { type: '() => void'},
-                            prop4: { type: '"option1" | "option2" | "option3"' }
-                        }
-                    }, true, null, { propFilter });
-                });
-
-                it('should apply filter function and filter components accordingly', function() {
-                    const propFilter: PropFilter = (prop, component) => {
-                      if (component.name === 'Column') {
-                        return prop.name !== 'prop1';
-                      }
-                      return true;
-                    };
-                    check('Column', {
-                        Column: {
-                            prop2: { type: 'number' },
-                            prop3: { type: '() => void'},
-                            prop4: { type: '"option1" | "option2" | "option3"' }
-                        }
-                    }, true, null, { propFilter });
-                    check('AppMenu', {
-                        AppMenu: {
-                            menu: { type: 'any' },
-                        }
-                    }, true, null, { propFilter });
-                });
-            });
-
-            describe('skipPropsWithName', function() {
-              it('should skip a single property in skipPropsWithName', function() {
-                const propFilter = { skipPropsWithName: 'prop1' };
-                check('Column', {
-                    Column: {
-                        prop2: { type: 'number' },
-                        prop3: { type: '() => void'},
-                        prop4: { type: '"option1" | "option2" | "option3"' }
-                    }
-                }, true, null, { propFilter });
-              });
-
-              it('should skip multiple properties in skipPropsWithName', function() {
-                const propFilter = { skipPropsWithName: ['prop1', 'prop2'] };
-                check('Column', {
-                    Column: {
-                        prop3: { type: '() => void'},
-                        prop4: { type: '"option1" | "option2" | "option3"' }
-                    }
-                }, true, null, { propFilter });
-              });
-            });
-
-            describe('skipPropsWithoutDoc', function() {
-
-              it('should skip a properties without documentation', function() {
-                const propFilter = { skipPropsWithoutDoc: false };
-                check('ColumnWithUndocumentedProps', {
-                    Column: {
-                        prop1: { type: 'string', required: false },
-                        prop2: { type: 'number' }
-                    }
-                }, true, null, { propFilter });
-              });
-
-            });
-
+      describe('skipPropsWithName', () => {
+        it('should skip a single property in skipPropsWithName', () => {
+          const propFilter = { skipPropsWithName: 'prop1' };
+          check(
+            'Column',
+            {
+              Column: {
+                prop2: { type: 'number' },
+                prop3: { type: '() => void' },
+                prop4: { type: '"option1" | "option2" | "option3"' }
+              }
+            },
+            true,
+            null,
+            { propFilter }
+          );
         });
 
-    });
+        it('should skip multiple properties in skipPropsWithName', () => {
+          const propFilter = { skipPropsWithName: ['prop1', 'prop2'] };
+          check(
+            'Column',
+            {
+              Column: {
+                prop3: { type: '() => void' },
+                prop4: { type: '"option1" | "option2" | "option3"' }
+              }
+            },
+            true,
+            null,
+            { propFilter }
+          );
+        });
+      });
 
+      describe('skipPropsWithoutDoc', () => {
+        it('should skip a properties without documentation', () => {
+          const propFilter = { skipPropsWithoutDoc: false };
+          check(
+            'ColumnWithUndocumentedProps',
+            {
+              Column: {
+                prop1: { type: 'string', required: false },
+                prop2: { type: 'number' }
+              }
+            },
+            true,
+            null,
+            { propFilter }
+          );
+        });
+      });
+    });
+  });
 });

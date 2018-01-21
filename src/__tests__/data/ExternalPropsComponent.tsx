@@ -4,8 +4,11 @@ import { ExternalPropsComponentProps } from './ExternalPropsComponentProps';
 /**
  * ExternalPropsComponent description
  */
-export class ExternalPropsComponent extends React.Component<ExternalPropsComponentProps, {}> {
-    render() {
-        return <div>ExternalPropsComponent</div>
-    }
+export class ExternalPropsComponent extends React.Component<
+  ExternalPropsComponentProps,
+  {}
+> {
+  public render() {
+    return <div>ExternalPropsComponent</div>;
+  }
 }

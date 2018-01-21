@@ -1,4 +1,10 @@
-import { ParserOptions, PropItem, Component, PropFilter, StaticPropFilter } from './parser';
+import {
+  Component,
+  ParserOptions,
+  PropFilter,
+  PropItem,
+  StaticPropFilter
+} from './parser';
 
 export function buildFilter(opts: ParserOptions): PropFilter {
   return (prop: PropItem, component: Component) => {
@@ -13,10 +19,19 @@ export function buildFilter(opts: ParserOptions): PropFilter {
         return false;
       }
     } else if (typeof propFilter === 'object') {
-      const { skipPropsWithName, skipPropsWithoutDoc } = propFilter as StaticPropFilter;
-      if (typeof skipPropsWithName === 'string' && skipPropsWithName === prop.name) {
+      const {
+        skipPropsWithName,
+        skipPropsWithoutDoc
+      } = propFilter as StaticPropFilter;
+      if (
+        typeof skipPropsWithName === 'string' &&
+        skipPropsWithName === prop.name
+      ) {
         return false;
-      } else if (Array.isArray(skipPropsWithName) && skipPropsWithName.indexOf(prop.name) > -1) {
+      } else if (
+        Array.isArray(skipPropsWithName) &&
+        skipPropsWithName.indexOf(prop.name) > -1
+      ) {
         return false;
       }
       if (skipPropsWithoutDoc && prop.description.length === 0) {
