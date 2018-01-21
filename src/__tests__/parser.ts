@@ -364,7 +364,7 @@ describe('parser', () => {
               }
             },
             true,
-            null,
+            undefined,
             { propFilter }
           );
         });
@@ -386,7 +386,7 @@ describe('parser', () => {
               }
             },
             true,
-            null,
+            undefined,
             { propFilter }
           );
           check(
@@ -397,7 +397,7 @@ describe('parser', () => {
               }
             },
             true,
-            null,
+            undefined,
             { propFilter }
           );
         });
@@ -416,7 +416,7 @@ describe('parser', () => {
               }
             },
             true,
-            null,
+            undefined,
             { propFilter }
           );
         });
@@ -432,7 +432,7 @@ describe('parser', () => {
               }
             },
             true,
-            null,
+            undefined,
             { propFilter }
           );
         });
@@ -450,7 +450,7 @@ describe('parser', () => {
               }
             },
             true,
-            null,
+            undefined,
             { propFilter }
           );
         });

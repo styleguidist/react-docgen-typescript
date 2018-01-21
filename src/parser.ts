@@ -116,6 +116,9 @@ export function withCompilerOptions(
       const sourceFile = program.getSourceFile(filePath);
 
       const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
+      if (!moduleSymbol) {
+        return [];
+      }
       const exports = checker.getExportsOfModule(moduleSymbol);
 
       const components = exports
@@ -123,15 +126,22 @@ export function withCompilerOptions(
         .filter(comp => comp);
 
       // this should filter out components with the same name as default export
-      const filteredComponents = components.filter((comp, index) => {
-        const isUnique =
-          components
-            .slice(index + 1)
-            .filter(i => i.displayName === comp.displayName).length === 0;
-        return isUnique;
-      });
+      const filteredComponents = components
+        // ensure that component exists
+        .filter(comp => !!comp)
+        .filter((comp, index) => {
+          const isUnique =
+            components
+              // ensure that comp exists
+              .filter(cmp => !!cmp)
+              .slice(index + 1)
+              // it has been checked, that comp and innerComp are not null, so access is safe
+              .filter(innerComp => innerComp!.displayName === comp!.displayName)
+              .length === 0;
+          return isUnique;
+        });
 
-      return filteredComponents;
+      return filteredComponents as ComponentDoc[];
     }
   };
 }
@@ -157,12 +167,21 @@ class Parser {
     this.propFilter = buildFilter(opts);
   }
 
-  public getComponentInfo(exp: ts.Symbol, source: ts.SourceFile): ComponentDoc {
+  public getComponentInfo(
+    exp: ts.Symbol,
+    source: ts.SourceFile
+  ): ComponentDoc | null {
+    if (!!exp.declarations && exp.declarations.length === 0) {
+      return null;
+    }
     const type = this.checker.getTypeOfSymbolAtLocation(
       exp,
-      exp.valueDeclaration || exp.declarations[0]
+      exp.valueDeclaration || exp.declarations![0]
     );
     if (!exp.valueDeclaration) {
+      if (!type.symbol) {
+        return null;
+      }
       exp = type.symbol;
     }
 
@@ -194,7 +213,9 @@ class Parser {
     return null;
   }
 
-  public extractPropsFromTypeIfStatelessComponent(type: ts.Type): ts.Symbol {
+  public extractPropsFromTypeIfStatelessComponent(
+    type: ts.Type
+  ): ts.Symbol | null {
     const callSignatures = type.getCallSignatures();
 
     if (callSignatures.length) {
@@ -218,7 +239,9 @@ class Parser {
     return null;
   }
 
-  public extractPropsFromTypeIfStatefulComponent(type: ts.Type): ts.Symbol {
+  public extractPropsFromTypeIfStatefulComponent(
+    type: ts.Type
+  ): ts.Symbol | null {
     const constructSignatures = type.getConstructSignatures();
 
     if (constructSignatures.length) {
@@ -242,6 +265,9 @@ class Parser {
     propsObj: ts.Symbol,
     defaultProps: StringIndexedObject<string> = {}
   ): Props {
+    if (!propsObj.valueDeclaration) {
+      return {};
+    }
     const propsType = this.checker.getTypeOfSymbolAtLocation(
       propsObj,
       propsObj.valueDeclaration
@@ -256,7 +282,7 @@ class Parser {
       // Find type of prop by looking in context of the props object itself.
       const propType = this.checker.getTypeOfSymbolAtLocation(
         prop,
-        propsObj.valueDeclaration
+        propsObj.valueDeclaration!
       );
 
       const propTypeString = this.checker.typeToString(propType);
@@ -348,11 +374,15 @@ class Parser {
     symbol: ts.Symbol,
     source: ts.SourceFile
   ) {
-    const possibleStatements = source.statements.filter(
-      stmt =>
-        this.checker.getSymbolAtLocation((stmt as ts.ClassDeclaration).name) ===
-        symbol
-    );
+    const possibleStatements = source.statements
+      // ensure, that name property is available
+      .filter(stmt => !!(stmt as ts.ClassDeclaration).name)
+      .filter(
+        stmt =>
+          this.checker.getSymbolAtLocation(
+            (stmt as ts.ClassDeclaration).name!
+          ) === symbol
+      );
     if (!possibleStatements.length) {
       return {};
     }
@@ -372,10 +402,12 @@ class Parser {
       >).reduce(
         (acc, property) => {
           const literalValue = getLiteralValueFromPropertyAssignment(property);
-          if (typeof literalValue === 'string') {
-            acc[
-              getPropertyName(property.name)
-            ] = getLiteralValueFromPropertyAssignment(property);
+          const propertyName = getPropertyName(property.name);
+          if (typeof literalValue === 'string' && propertyName !== null) {
+            const value = getLiteralValueFromPropertyAssignment(property);
+            if (value !== null) {
+              acc[propertyName] = value;
+            }
           }
           return acc;
         },
