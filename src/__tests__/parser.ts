@@ -190,6 +190,7 @@ describe('parser', () => {
           type: 'boolean'
         },
         sampleNull: { type: 'null', required: false, defaultValue: 'null' },
+        sampleNumber: { type: 'number', required: false, defaultValue: '-1' },
         sampleObject: {
           defaultValue: `{ a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } }`,
           required: false,

@@ -449,6 +449,8 @@ function getLiteralValueFromPropertyAssignment(
       return 'true';
     case ts.SyntaxKind.StringLiteral:
       return (initializer as ts.StringLiteral).text.trim();
+    case ts.SyntaxKind.PrefixUnaryExpression:
+      return initializer.getFullText().trim();
     case ts.SyntaxKind.NumericLiteral:
       return `${(initializer as ts.NumericLiteral).text}`;
     case ts.SyntaxKind.NullKeyword:
