@@ -26,7 +26,7 @@ export function check(
   component: string,
   expected: ExpectedComponents,
   exactProperties: boolean = true,
-  description: string = null,
+  description?: string,
   parserOpts?: ParserOptions
 ) {
   const fileName = path.join(
@@ -42,7 +42,7 @@ export function checkComponent(
   actual: ComponentDoc[],
   expected: ExpectedComponents,
   exactProperties: boolean = true,
-  description: string = null
+  description?: string
 ) {
   const expectedComponentNames = Object.getOwnPropertyNames(expected);
   assert.equal(
