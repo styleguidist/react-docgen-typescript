@@ -14,7 +14,6 @@
     "prettier:check": "npm run prettier:base -- -l \"components/**/*.{ts,tsx}\"",
     "prettier:write": "npm run prettier:base -- --write \"components/**/*.{ts,tsx}\""
   },
-  "author": "pvasek",
   "license": "MIT",
   "dependencies": {
     "@types/react": "^16.0.34",
