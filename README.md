@@ -136,6 +136,8 @@ the part it's fixing.
 
 **@dotcs** *Fabian Mueller* - introduced parserOptions for skipping undocumented properties
 
+**@eps1lon** *Sebastian Silbermann*
+
 **@Havret** *Krzysztof Havret*
 
 **@JakeSidSmith** *Jake*
