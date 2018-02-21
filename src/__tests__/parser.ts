@@ -1,5 +1,6 @@
 import { assert } from 'chai';
-import { PropFilter } from '../parser';
+import * as path from 'path';
+import { PropFilter, withCustomConfig } from '../parser';
 import { check } from './testUtils';
 
 describe('parser', () => {
@@ -456,6 +457,19 @@ describe('parser', () => {
           );
         });
       });
+    });
+  });
+
+  describe('withCustomConfig', () => {
+    it('should accept tsconfigs that typescript accepts', () => {
+      assert.ok(
+        withCustomConfig(
+          // need to navigate to root because tests run on compiled tests
+          // and tsc does not include json files
+          path.join(__dirname, '../../src/__tests__/data/tsconfig.json'),
+          {}
+        )
+      );
     });
   });
 });
