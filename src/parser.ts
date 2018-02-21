@@ -83,8 +83,15 @@ export function withCustomConfig(
   tsconfigPath: string,
   parserOpts: ParserOptions
 ): FileParser {
-  const configJson = JSON.parse(fs.readFileSync(tsconfigPath, 'utf8'));
   const basePath = path.dirname(tsconfigPath);
+  const { config: configJson, error } = ts.readConfigFile(
+    tsconfigPath,
+    filename => fs.readFileSync(filename, 'utf8')
+  );
+
+  if (error !== undefined) {
+    throw error;
+  }
 
   const { options, errors } = ts.convertCompilerOptionsFromJson(
     configJson.compilerOptions,
