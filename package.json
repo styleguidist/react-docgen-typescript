@@ -6,7 +6,7 @@
   "scripts": {
     "precommit": "lint-staged",
     "tsc": "tsc",
-    "prepublish": "tsc -d",
+    "prepublishOnly": "tsc -d",
     "test": "tsc && mocha --timeout 10000 ./lib/**/__tests__/**.js",
     "test:debug": "tsc && mocha --debug ./lib/**/__tests__/**.js",
     "print": "npm run tsc && node ./lib/print.js",
