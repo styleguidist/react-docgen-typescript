@@ -185,11 +185,17 @@ class Parser {
       exp,
       exp.valueDeclaration || exp.declarations![0]
     );
+    let commentSource = exp;
     if (!exp.valueDeclaration) {
       if (!type.symbol) {
         return null;
       }
       exp = type.symbol;
+      if (type.symbol.getName() === 'StatelessComponent') {
+        commentSource = this.checker.getAliasedSymbol(commentSource);
+      } else {
+        commentSource = exp;
+      }
     }
 
     let propsType = this.extractPropsFromTypeIfStatelessComponent(type);
@@ -211,7 +217,7 @@ class Parser {
       }
 
       return {
-        description: this.findDocComment(exp).fullComment,
+        description: this.findDocComment(commentSource).fullComment,
         displayName: componentName,
         props
       };
@@ -486,7 +492,11 @@ function formatTag(tag: ts.JSDocTagInfo) {
 function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
   const exportName = exp.getName();
 
-  if (exportName === 'default' || exportName === '__function') {
+  if (
+    exportName === 'default' ||
+    exportName === '__function' ||
+    exportName === 'StatelessComponent'
+  ) {
     // Default export for a file: named after file
     return path.basename(source.fileName, path.extname(source.fileName));
   } else {

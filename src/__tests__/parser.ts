@@ -277,6 +277,14 @@ describe('parser', () => {
     });
   });
 
+  it('should parse React.SFC component defined as const', () => {
+    check('ReactSFCAsConst', {
+      Jumbotron: {
+        prop1: { type: 'string', required: true }
+      }
+    });
+  });
+
   it('should parse functional component component defined as function as default export', () => {
     check('FunctionDeclarationAsDefaultExport', {
       Jumbotron: {
@@ -299,12 +307,40 @@ describe('parser', () => {
     );
   });
 
+  it('should parse React.SFC component defined as const as default export', () => {
+    check(
+      'ReactSFCAsConstAsDefaultExport',
+      {
+        // in this case the component name is taken from the file name
+        ReactSFCAsConstAsDefaultExport: {
+          prop1: { type: 'string', required: true }
+        }
+      },
+      true,
+      'Jumbotron description'
+    );
+  });
+
   it('should parse functional component component defined as const as named export', () => {
     check(
       'FunctionalComponentAsConstAsNamedExport',
       {
         // in this case the component name is taken from the file name
         FunctionalComponentAsConstAsNamedExport: {
+          prop1: { type: 'string', required: true }
+        }
+      },
+      true,
+      'Jumbotron description'
+    );
+  });
+
+  it('should parse React.SFC component defined as const as named export', () => {
+    check(
+      'ReactSFCAsConstAsNamedExport',
+      {
+        // in this case the component name is taken from the file name
+        ReactSFCAsConstAsNamedExport: {
           prop1: { type: 'string', required: true }
         }
       },
