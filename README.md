@@ -150,6 +150,8 @@ the part it's fixing.
 
 **@sapegin** *Artem Sapegin* - fix for compatibility with react-styleguidist v5
 
+**@skeate** *Jonathan Skeate*
+
 ## Thanks to others
 
 The integration with React Styleguidist wouldn't be possible without [Vyacheslav Slinko](https://github.com/vslinko) pull request [#118](https://github.com/styleguidist/react-styleguidist/pull/118) at React Styleguidist.
