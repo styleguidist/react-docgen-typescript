@@ -130,6 +130,8 @@ the part it's fixing.
 
 ## Thanks to contributors
 
+**@basarat** *Basarat Ali Syed*
+
 **@brettjurgens** *Brett Jurgens* - adding support for default props
 
 **@diegolanda** *Diego* - support for different kinds of components
