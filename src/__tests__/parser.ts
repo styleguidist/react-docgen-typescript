@@ -256,7 +256,7 @@ describe('parser', () => {
     check('StatelessWithDefaultProps', {
       StatelessWithDefaultProps: {
         sampleJSDoc: { type: 'string', required: false, defaultValue: 'test' },
-        sampleProp: { type: 'string', required: false, defaultValue: 'hello' }
+        sampleProp: { type: 'string', required: false, defaultValue: 'test' }
       }
     });
   });

@@ -387,8 +387,8 @@ class Parser {
     symbol: ts.Symbol,
     source: ts.SourceFile
   ) {
-    const possibleStatements = source.statements
-      // ensure, that name property is available
+    let possibleStatements = source.statements
+      // ensure that name property is available
       .filter(stmt => !!(stmt as ts.ClassDeclaration).name)
       .filter(
         stmt =>
@@ -396,6 +396,15 @@ class Parser {
             (stmt as ts.ClassDeclaration).name!
           ) === symbol
       );
+
+    if (!possibleStatements.length) {
+      // if no class declaration is found, try to find a
+      // expression statement used in a React.StatelessComponent
+      possibleStatements = source.statements.filter(stmt =>
+        ts.isExpressionStatement(stmt)
+      );
+    }
+
     if (!possibleStatements.length) {
       return {};
     }
@@ -410,22 +419,21 @@ class Parser {
       const defaultProps = possibleDefaultProps[0];
       const { initializer } = defaultProps as ts.PropertyDeclaration;
       const { properties } = initializer as ts.ObjectLiteralExpression;
-      const propMap = (properties as ts.NodeArray<
+      const propMap = getPropMap(properties as ts.NodeArray<
         ts.PropertyAssignment
-      >).reduce(
-        (acc, property) => {
-          const literalValue = getLiteralValueFromPropertyAssignment(property);
-          const propertyName = getPropertyName(property.name);
-          if (typeof literalValue === 'string' && propertyName !== null) {
-            const value = getLiteralValueFromPropertyAssignment(property);
-            if (value !== null) {
-              acc[propertyName] = value;
-            }
-          }
-          return acc;
-        },
-        {} as StringIndexedObject<string>
-      );
+      >);
+      return propMap;
+    } else if (statementIsStateless(statement)) {
+      let propMap = {};
+      (statement as ts.ExpressionStatement).getChildren().forEach(child => {
+        const { right } = child as ts.BinaryExpression;
+        if (right) {
+          const { properties } = right as ts.ObjectLiteralExpression;
+          propMap = getPropMap(properties as ts.NodeArray<
+            ts.PropertyAssignment
+          >);
+        }
+      });
       return propMap;
     }
     return {};
@@ -436,6 +444,40 @@ function statementIsClassDeclaration(
   statement: ts.Statement
 ): statement is ts.ClassDeclaration {
   return !!(statement as ts.ClassDeclaration).members;
+}
+
+function statementIsStateless(statement: ts.Statement): boolean {
+  const children = (statement as ts.ExpressionStatement).getChildren();
+  for (const child of children) {
+    const { left } = child as ts.BinaryExpression;
+    if (left) {
+      const { name } = left as ts.PropertyAccessExpression;
+      if (name.escapedText === 'defaultProps') {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function getPropMap(
+  properties: ts.NodeArray<ts.PropertyAssignment>
+): StringIndexedObject<string> {
+  const propMap = properties.reduce(
+    (acc, property) => {
+      const literalValue = getLiteralValueFromPropertyAssignment(property);
+      const propertyName = getPropertyName(property.name);
+      if (typeof literalValue === 'string' && propertyName !== null) {
+        const value = getLiteralValueFromPropertyAssignment(property);
+        if (value !== null) {
+          acc[propertyName] = value;
+        }
+      }
+      return acc;
+    },
+    {} as StringIndexedObject<string>
+  );
+  return propMap;
 }
 
 function getPropertyName(name: ts.PropertyName): string | null {
