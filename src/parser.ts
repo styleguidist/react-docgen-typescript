@@ -408,20 +408,41 @@ class Parser {
     if (!possibleStatements.length) {
       return {};
     }
+
     const statement = possibleStatements[0];
+
     if (statementIsClassDeclaration(statement) && statement.members.length) {
       const possibleDefaultProps = statement.members.filter(
         member => member.name && getPropertyName(member.name) === 'defaultProps'
       );
+
       if (!possibleDefaultProps.length) {
         return {};
       }
+
       const defaultProps = possibleDefaultProps[0];
-      const { initializer } = defaultProps as ts.PropertyDeclaration;
-      const { properties } = initializer as ts.ObjectLiteralExpression;
+      let initializer = (defaultProps as ts.PropertyDeclaration).initializer;
+      let properties = (initializer as ts.ObjectLiteralExpression).properties;
+
+      while (ts.isIdentifier(initializer as ts.Identifier)) {
+        const defaultPropsReference = this.checker.getSymbolAtLocation(
+          initializer as ts.Node
+        );
+        if (defaultPropsReference) {
+          const declarations = defaultPropsReference.getDeclarations();
+
+          if (declarations) {
+            initializer = (declarations[0] as ts.VariableDeclaration)
+              .initializer;
+            properties = (initializer as ts.ObjectLiteralExpression).properties;
+          }
+        }
+      }
+
       const propMap = getPropMap(properties as ts.NodeArray<
         ts.PropertyAssignment
       >);
+
       return propMap;
     } else if (statementIsStateless(statement)) {
       let propMap = {};
