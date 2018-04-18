@@ -176,8 +176,8 @@ describe('parser', () => {
     });
   });
 
-  it('should parse react component with default props', () => {
-    check('ComponentWithDefaultProps', {
+  describe.only('component with default props', () => {
+    const expectation = {
       ComponentWithDefaultProps: {
         sampleDefaultFromJSDoc: {
           defaultValue: 'hello',
@@ -209,6 +209,14 @@ describe('parser', () => {
           type: 'any'
         }
       }
+    };
+
+    it('should parse defined props', () => {
+      check('ComponentWithDefaultProps', expectation);
+    });
+
+    it('should parse referenced props', () => {
+      check('ComponentWithReferencedDefaultProps', expectation);
     });
   });
 
