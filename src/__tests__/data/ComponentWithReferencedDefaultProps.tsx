@@ -34,12 +34,16 @@ const defaultProps: Partial<IComponentWithDefaultPropsProps> = {
   sampleUndefined: undefined
 };
 
+const defaultPropsReference = defaultProps;
+
 /** ComponentWithDefaultProps description */
 export class ComponentWithDefaultProps extends React.Component<
   IComponentWithDefaultPropsProps,
   {}
 > {
-  static defaultProps: Partial<IComponentWithDefaultPropsProps> = defaultProps;
+  static defaultProps: Partial<
+    IComponentWithDefaultPropsProps
+  > = defaultPropsReference;
 
   public render() {
     return <div>test</div>;

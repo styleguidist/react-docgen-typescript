@@ -176,7 +176,7 @@ describe('parser', () => {
     });
   });
 
-  describe.only('component with default props', () => {
+  describe('component with default props', () => {
     const expectation = {
       ComponentWithDefaultProps: {
         sampleDefaultFromJSDoc: {
