@@ -130,6 +130,8 @@ the part it's fixing.
 
 ## Thanks to contributors
 
+**@argshook** *Arijus Šukys*
+
 **@asilgag** *Alberto Silva*
 
 **@basarat** *Basarat Ali Syed*
