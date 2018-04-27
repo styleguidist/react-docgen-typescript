@@ -260,12 +260,47 @@ describe('parser', () => {
     });
   });
 
-  it('should parse react stateless component with default props', () => {
-    check('StatelessWithDefaultProps', {
+  describe('stateless component with default props', () => {
+    const expectation = {
       StatelessWithDefaultProps: {
-        sampleJSDoc: { type: 'string', required: false, defaultValue: 'test' },
-        sampleProp: { type: 'string', required: false, defaultValue: 'test' }
+        sampleDefaultFromJSDoc: {
+          defaultValue: 'hello',
+          description: 'sample with default value',
+          required: true,
+          type: '"hello" | "goodbye"'
+        },
+        sampleFalse: {
+          defaultValue: 'false',
+          required: false,
+          type: 'boolean'
+        },
+        sampleNull: { type: 'null', required: false, defaultValue: 'null' },
+        sampleNumber: { type: 'number', required: false, defaultValue: '-1' },
+        sampleObject: {
+          defaultValue: `{ a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } }`,
+          required: false,
+          type: '{ [key: string]: any; }'
+        },
+        sampleString: {
+          defaultValue: 'hello',
+          required: false,
+          type: 'string'
+        },
+        sampleTrue: { type: 'boolean', required: false, defaultValue: 'true' },
+        sampleUndefined: {
+          defaultValue: 'undefined',
+          required: false,
+          type: 'any'
+        }
       }
+    };
+
+    it('should parse defined props', () => {
+      check('StatelessWithDefaultProps', expectation);
+    });
+
+    it('should parse referenced props', () => {
+      check('StatelessWithReferencedDefaultProps', expectation);
     });
   });
 
