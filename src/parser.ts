@@ -122,6 +122,10 @@ export function withCompilerOptions(
       const checker = program.getTypeChecker();
       const sourceFile = program.getSourceFile(filePath);
 
+      if (!sourceFile) {
+        return [];
+      }
+
       const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
       if (!moduleSymbol) {
         return [];
@@ -439,9 +443,13 @@ class Parser {
         }
       }
 
-      const propMap = getPropMap(properties as ts.NodeArray<
-        ts.PropertyAssignment
-      >);
+      let propMap = {};
+
+      if (properties) {
+        propMap = getPropMap(properties as ts.NodeArray<
+          ts.PropertyAssignment
+        >);
+      }
 
       return propMap;
     } else if (statementIsStateless(statement)) {
@@ -450,9 +458,11 @@ class Parser {
         const { right } = child as ts.BinaryExpression;
         if (right) {
           const { properties } = right as ts.ObjectLiteralExpression;
-          propMap = getPropMap(properties as ts.NodeArray<
-            ts.PropertyAssignment
-          >);
+          if (properties) {
+            propMap = getPropMap(properties as ts.NodeArray<
+              ts.PropertyAssignment
+            >);
+          }
         }
       });
       return propMap;

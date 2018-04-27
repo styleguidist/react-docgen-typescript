@@ -23,12 +23,7 @@ export interface StatelessWithDefaultPropsProps {
   sampleNumber?: number;
 }
 
-/** StatelessWithDefaultProps description */
-export const StatelessWithDefaultProps: React.StatelessComponent<
-StatelessWithDefaultPropsProps
-> = props => <div>test</div>;
-
-StatelessWithDefaultProps.defaultProps = {
+const defaultProps: Partial<StatelessWithDefaultPropsProps> = {
   sampleFalse: false,
   sampleNull: null,
   sampleNumber: -1,
@@ -38,3 +33,12 @@ StatelessWithDefaultProps.defaultProps = {
   sampleTrue: true,
   sampleUndefined: undefined
 };
+
+const defaultPropsReference = defaultProps;
+
+/** StatelessWithDefaultProps description */
+export const StatelessWithDefaultProps: React.StatelessComponent<
+StatelessWithDefaultPropsProps
+> = props => <div>test</div>;
+
+StatelessWithDefaultProps.defaultProps = defaultProps;
