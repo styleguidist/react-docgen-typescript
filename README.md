@@ -138,6 +138,8 @@ the part it's fixing.
 
 **@brettjurgens** *Brett Jurgens* - adding support for default props
 
+**@chrisalbert** *Chris Albert*
+
 **@diegolanda** *Diego* - support for different kinds of components
 
 **@dotcs** *Fabian Mueller* - introduced parserOptions for skipping undocumented properties
@@ -153,6 +155,8 @@ the part it's fixing.
 **@jrwebdev** *James Ravenscroft*
 
 **@RoystonS** *Royston Shufflebotham* - complete parser rewrite that use typescript parser in much better way and overcome many issues of previous implementation
+
+**@yoiang** *Ian G*
 
 **@sapegin** *Artem Sapegin* - fix for compatibility with react-styleguidist v5
 
