@@ -22,19 +22,26 @@ export interface ExpectedProp {
   defaultValue?: string;
 }
 
+export function fixturePath(componentName: string) {
+  return path.join(
+    __dirname,
+    '..',
+    '..',
+    'src',
+    '__tests__',
+    'data',
+    `${componentName}.tsx`
+  ); // it's running in ./temp
+}
+
 export function check(
-  component: string,
+  componentName: string,
   expected: ExpectedComponents,
   exactProperties: boolean = true,
   description?: string,
   parserOpts?: ParserOptions
 ) {
-  const fileName = path.join(
-    __dirname,
-    '../../src/__tests__/data',
-    `${component}.tsx`
-  ); // it's running in ./temp
-  const result = parse(fileName, parserOpts);
+  const result = parse(fixturePath(componentName), parserOpts);
   checkComponent(result, expected, exactProperties, description);
 }
 
