@@ -581,17 +581,19 @@ function getTextValueOfClassMember(
   return textValue || '';
 }
 
-function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
-  const exportName = exp.getName();
-
-  const [statelessDisplayName] = source.statements
+function getTextValueOfFunctionProperty(
+  exp: ts.Symbol,
+  source: ts.SourceFile,
+  propertyName: string
+) {
+  const [textValue] = source.statements
     .filter(statement => ts.isExpressionStatement(statement))
     .filter(statement => {
       const expr = (statement as ts.ExpressionStatement)
         .expression as ts.BinaryExpression;
       return (
         (expr.left as ts.PropertyAccessExpression).name.escapedText ===
-        'displayName'
+        propertyName
       );
     })
     .filter(statement => {
@@ -613,6 +615,18 @@ function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
       return (((statement as ts.ExpressionStatement)
         .expression as ts.BinaryExpression).right as ts.Identifier).text;
     });
+
+  return textValue || '';
+}
+
+function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
+  const exportName = exp.getName();
+
+  const statelessDisplayName = getTextValueOfFunctionProperty(
+    exp,
+    source,
+    'displayName'
+  );
 
   let statefulDisplayName;
   if (exp.valueDeclaration && ts.isClassDeclaration(exp.valueDeclaration)) {
