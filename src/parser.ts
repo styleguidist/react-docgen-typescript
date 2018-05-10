@@ -561,24 +561,71 @@ function formatTag(tag: ts.JSDocTagInfo) {
   return result;
 }
 
+function getTextValueOfClassMember(
+  classDeclaration: ts.ClassDeclaration,
+  memberName: string
+): string {
+  const [textValue] = classDeclaration.members
+    .filter(member => ts.isPropertyDeclaration(member))
+    .filter(member => {
+      const name = ts.getNameOfDeclaration(member) as ts.Identifier;
+      return name && name.text === memberName;
+    })
+    .map(member => {
+      const property = member as ts.PropertyDeclaration;
+      return (
+        property.initializer && (property.initializer as ts.Identifier).text
+      );
+    });
+
+  return textValue || '';
+}
+
 function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
   const exportName = exp.getName();
 
-  const [displayName] = source.statements
+  const [statelessDisplayName] = source.statements
     .filter(statement => ts.isExpressionStatement(statement))
     .filter(statement => {
       const expr = (statement as ts.ExpressionStatement)
         .expression as ts.BinaryExpression;
-      return (expr.left as ts.Identifier).name.escapedText === 'displayName';
+      return (
+        (expr.left as ts.PropertyAccessExpression).name.escapedText ===
+        'displayName'
+      );
     })
-    .filter(
-      statement =>
-        statement.expression.left.expression.escapedText === exp.getName()
-    )
-    .filter(statement => statement.expression.right.kind === 9)
-    .map(statement => statement.expression.right.text);
+    .filter(statement => {
+      const expr = (statement as ts.ExpressionStatement)
+        .expression as ts.BinaryExpression;
 
-  console.log(displayName, 'this is the display name');
+      return (
+        ((expr.left as ts.PropertyAccessExpression).expression as ts.Identifier)
+          .escapedText === exp.getName()
+      );
+    })
+    .filter(statement => {
+      return ts.isStringLiteral(
+        ((statement as ts.ExpressionStatement)
+          .expression as ts.BinaryExpression).right
+      );
+    })
+    .map(statement => {
+      return (((statement as ts.ExpressionStatement)
+        .expression as ts.BinaryExpression).right as ts.Identifier).text;
+    });
+
+  let statefulDisplayName;
+  if (exp.valueDeclaration && ts.isClassDeclaration(exp.valueDeclaration)) {
+    statefulDisplayName = getTextValueOfClassMember(
+      exp.valueDeclaration,
+      'displayName'
+    );
+  }
+
+  if (statelessDisplayName || statefulDisplayName) {
+    return statelessDisplayName || statefulDisplayName || '';
+  }
+
   if (
     exportName === 'default' ||
     exportName === '__function' ||
