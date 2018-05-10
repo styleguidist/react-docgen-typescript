@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import * as path from 'path';
-import { PropFilter, withCustomConfig } from '../parser';
-import { check } from './testUtils';
+import { parse, PropFilter, withCustomConfig } from '../parser';
+import { check, fixturePath } from './testUtils';
 
 describe('parser', () => {
   const children = { type: 'ReactNode', required: false, description: '' };
@@ -390,6 +390,20 @@ describe('parser', () => {
       true,
       'Jumbotron description'
     );
+  });
+
+  describe.only('displayName', () => {
+    it('should be taken from stateless component `displayName` property', () => {
+      const [parsed] = parse(fixturePath('StatelessDisplayName'));
+      console.log(parsed);
+      assert.equal(parsed.displayName, 'i am stateless displayName');
+    });
+
+    it('should be taken from stateful component `displayName` property', () => {
+      const [parsed] = parse(fixturePath('StatefulDisplayName'));
+      console.log(parsed);
+      assert.equal(parsed.displayName, 'i am stateless displayName');
+    });
   });
 
   describe('Parser options', () => {

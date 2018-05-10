@@ -84,16 +84,21 @@ export function withCustomConfig(
   parserOpts: ParserOptions
 ): FileParser {
   const basePath = path.dirname(tsconfigPath);
-  const { config, error } = ts.readConfigFile(
-    tsconfigPath,
-    filename => fs.readFileSync(filename, 'utf8')
+  const { config, error } = ts.readConfigFile(tsconfigPath, filename =>
+    fs.readFileSync(filename, 'utf8')
   );
 
   if (error !== undefined) {
     throw error;
   }
 
-  const { options, errors } = ts.parseJsonConfigFileContent(config, ts.sys, basePath, {}, tsconfigPath);
+  const { options, errors } = ts.parseJsonConfigFileContent(
+    config,
+    ts.sys,
+    basePath,
+    {},
+    tsconfigPath
+  );
 
   if (errors && errors.length) {
     throw errors[0];
@@ -442,9 +447,7 @@ class Parser {
       let propMap = {};
 
       if (properties) {
-        propMap = getPropMap(properties as ts.NodeArray<
-          ts.PropertyAssignment
-        >);
+        propMap = getPropMap(properties as ts.NodeArray<ts.PropertyAssignment>);
       }
 
       return propMap;
@@ -561,6 +564,21 @@ function formatTag(tag: ts.JSDocTagInfo) {
 function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
   const exportName = exp.getName();
 
+  const [displayName] = source.statements
+    .filter(statement => ts.isExpressionStatement(statement))
+    .filter(statement => {
+      const expr = (statement as ts.ExpressionStatement)
+        .expression as ts.BinaryExpression;
+      return (expr.left as ts.Identifier).name.escapedText === 'displayName';
+    })
+    .filter(
+      statement =>
+        statement.expression.left.expression.escapedText === exp.getName()
+    )
+    .filter(statement => statement.expression.right.kind === 9)
+    .map(statement => statement.expression.right.text);
+
+  console.log(displayName, 'this is the display name');
   if (
     exportName === 'default' ||
     exportName === '__function' ||
