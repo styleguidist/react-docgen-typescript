@@ -302,6 +302,10 @@ describe('parser', () => {
     it('should parse referenced props', () => {
       check('StatelessWithReferencedDefaultProps', expectation);
     });
+
+    it('supports spread props', () => {
+      check('StatelessWithSpreadDefaultProps', expectation);
+    });
   });
 
   it('should parse functional component component defined as function', () => {
