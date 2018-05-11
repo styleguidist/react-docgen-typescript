@@ -6,8 +6,10 @@ export interface StatelessProps {
 }
 
 /** Stateless description */
-export const Stateless: React.StatelessComponent<StatelessProps> = props => (
+const Stateless: React.SFC<StatelessProps> = props => (
   <div>My Property = {props.myProp}</div>
 );
 
-Stateless.displayName = 'StatelessDisplayName';
+Stateless.displayName = 'StatelessDisplayNameDefaultExport';
+
+export default Stateless;

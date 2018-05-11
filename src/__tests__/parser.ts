@@ -393,14 +393,34 @@ describe('parser', () => {
   });
 
   describe('displayName', () => {
-    it('should be taken from stateless component `displayName` property', () => {
+    it('should be taken from stateless component `displayName` property (using named export)', () => {
       const [parsed] = parse(fixturePath('StatelessDisplayName'));
-      assert.equal(parsed.displayName, 'i am stateless displayName');
+      assert.equal(parsed.displayName, 'StatelessDisplayName');
     });
 
-    it('should be taken from stateful component `displayName` property', () => {
+    it('should be taken from stateful component `displayName` property (using named export)', () => {
       const [parsed] = parse(fixturePath('StatefulDisplayName'));
-      assert.equal(parsed.displayName, 'i am stateful displayName');
+      assert.equal(parsed.displayName, 'StatefulDisplayName');
+    });
+
+    it('should be taken from stateless component `displayName` property (using default export)', () => {
+      const [parsed] = parse(fixturePath('StatelessDisplayNameDefaultExport'));
+      assert.equal(parsed.displayName, 'StatelessDisplayNameDefaultExport');
+    });
+
+    it('should be taken from stateful component `displayName` property (using default export)', () => {
+      const [parsed] = parse(fixturePath('StatefulDisplayNameDefaultExport'));
+      assert.equal(parsed.displayName, 'StatefulDisplayNameDefaultExport');
+    });
+
+    it('should be taken from named export when default export is an HOC', () => {
+      const [parsed] = parse(fixturePath('StatelessDisplayNameHOC'));
+      assert.equal(parsed.displayName, 'StatelessDisplayName');
+    });
+
+    it('should be taken from named export when default export is an HOC', () => {
+      const [parsed] = parse(fixturePath('StatefulDisplayNameHOC'));
+      assert.equal(parsed.displayName, 'StatefulDisplayName');
     });
 
     it('should be taken from stateless component folder name if file name is "index"', () => {

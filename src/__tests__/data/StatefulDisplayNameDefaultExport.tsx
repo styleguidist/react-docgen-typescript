@@ -6,8 +6,8 @@ export interface StatefulProps {
 }
 
 /** Statefull description */
-export class Stateful extends React.Component<StatefulProps> {
-  static displayName = 'StatefulDisplayName';
+export default class Stateful extends React.Component<StatefulProps> {
+  static displayName = 'StatefulDisplayNameDefaultExport';
 
   render() {
     return <div>My Property = {this.props.myProp}</div>;

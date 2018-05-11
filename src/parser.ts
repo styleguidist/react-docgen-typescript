@@ -196,17 +196,16 @@ class Parser {
         return null;
       }
       exp = type.symbol;
-      if (type.symbol.getName() === 'StatelessComponent') {
+      if (exp.getName() === 'StatelessComponent') {
         commentSource = this.checker.getAliasedSymbol(commentSource);
       } else {
         commentSource = exp;
       }
     }
 
-    let propsType = this.extractPropsFromTypeIfStatelessComponent(type);
-    if (!propsType) {
-      propsType = this.extractPropsFromTypeIfStatefulComponent(type);
-    }
+    const propsType =
+      this.extractPropsFromTypeIfStatelessComponent(type) ||
+      this.extractPropsFromTypeIfStatefulComponent(type);
 
     if (propsType) {
       const componentName = computeComponentName(exp, source);
