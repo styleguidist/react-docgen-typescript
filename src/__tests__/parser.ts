@@ -402,6 +402,16 @@ describe('parser', () => {
       const [parsed] = parse(fixturePath('StatefulDisplayName'));
       assert.equal(parsed.displayName, 'i am stateful displayName');
     });
+
+    it('should be taken from stateless component folder name if file name is "index"', () => {
+      const [parsed] = parse(fixturePath('StatelessDisplayNameFolder/index'));
+      assert.equal(parsed.displayName, 'StatelessDisplayNameFolder');
+    });
+
+    it('should be taken from stateful component folder name if file name is "index"', () => {
+      const [parsed] = parse(fixturePath('StatefulDisplayNameFolder/index'));
+      assert.equal(parsed.displayName, 'StatefulDisplayNameFolder');
+    });
   });
 
   describe('Parser options', () => {
