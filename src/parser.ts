@@ -628,13 +628,10 @@ function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
     'displayName'
   );
 
-  let statefulDisplayName;
-  if (exp.valueDeclaration && ts.isClassDeclaration(exp.valueDeclaration)) {
-    statefulDisplayName = getTextValueOfClassMember(
-      exp.valueDeclaration,
-      'displayName'
-    );
-  }
+  const statefulDisplayName =
+    exp.valueDeclaration &&
+    ts.isClassDeclaration(exp.valueDeclaration) &&
+    getTextValueOfClassMember(exp.valueDeclaration, 'displayName');
 
   if (statelessDisplayName || statefulDisplayName) {
     return statelessDisplayName || statefulDisplayName || '';
@@ -646,7 +643,11 @@ function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
     exportName === 'StatelessComponent'
   ) {
     // Default export for a file: named after file
-    return path.basename(source.fileName, path.extname(source.fileName));
+    const name = path.basename(source.fileName, path.extname(source.fileName));
+
+    return name === 'index'
+      ? path.basename(path.dirname(source.fileName))
+      : name;
   } else {
     return exportName;
   }
