@@ -5,6 +5,17 @@ export interface StatefulProps {
   myProp: string;
 }
 
+function hoc() {
+  return (Component: React.ComponentType<any>) => {
+    class HOC extends React.Component<{}> {
+      render() {
+        return <Component {...this.props} />;
+      }
+    }
+    return HOC;
+  };
+}
+
 /** Statefull description */
 export class Stateful extends React.Component<StatefulProps> {
   static displayName = 'StatefulDisplayName';
@@ -13,3 +24,5 @@ export class Stateful extends React.Component<StatefulProps> {
     return <div>My Property = {this.props.myProp}</div>;
   }
 }
+
+export default hoc()(Stateful);
