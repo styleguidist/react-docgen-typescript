@@ -446,7 +446,10 @@ class Parser {
       let propMap = {};
 
       if (properties) {
-        propMap = getPropMap(properties as ts.NodeArray<ts.PropertyAssignment>);
+        propMap = getPropMap(
+          properties as ts.NodeArray<ts.PropertyAssignment>,
+          source
+        );
       }
 
       return propMap;
@@ -457,9 +460,10 @@ class Parser {
         if (right) {
           const { properties } = right as ts.ObjectLiteralExpression;
           if (properties) {
-            propMap = getPropMap(properties as ts.NodeArray<
-              ts.PropertyAssignment
-            >);
+            propMap = getPropMap(
+              properties as ts.NodeArray<ts.PropertyAssignment>,
+              source
+            );
           }
         }
       });
@@ -489,19 +493,75 @@ function statementIsStateless(statement: ts.Statement): boolean {
   return false;
 }
 
+function findStatementInSource(
+  source: ts.SourceFile,
+  kind: ts.SyntaxKind
+): ts.Statement[] {
+  return source.statements.filter(
+    statement => statement.kind && statement.kind === kind
+  );
+}
+
 function getPropMap(
-  properties: ts.NodeArray<ts.PropertyAssignment>
+  properties: ts.NodeArray<ts.PropertyAssignment>,
+  source: ts.SourceFile
 ): StringIndexedObject<string> {
   const propMap = properties.reduce(
     (acc, property) => {
+      if (ts.isSpreadAssignment(property)) {
+        const spread = property as ts.SpreadAssignment;
+
+        // TODO support and reference objects that are imported
+        const refStatement = findStatementInSource(
+          source,
+          ts.SyntaxKind.VariableStatement
+        ).filter(statement => {
+          const list = (statement as ts.VariableStatement).declarationList;
+
+          if (
+            !list ||
+            !list.declarations[0] ||
+            !ts.isVariableDeclaration(list.declarations[0])
+          ) {
+            return false;
+          }
+
+          const decl = list.declarations[0];
+
+          return (
+            // Matches name
+            decl.name.getText() === spread.expression.getText() &&
+            // Is an object
+            decl.initializer &&
+            ts.isObjectLiteralExpression(decl.initializer)
+          );
+        }) as ts.VariableStatement[];
+
+        if (refStatement.length === 0) {
+          return acc;
+        }
+
+        const refObject = refStatement[0].declarationList.declarations[0]
+          .initializer! as ts.ObjectLiteralExpression;
+
+        return getPropMap(
+          refObject.properties as ts.NodeArray<ts.PropertyAssignment>,
+          source
+        );
+      }
+
+      // Unknown???
+      if (!property.name) {
+        return acc;
+      }
+
       const literalValue = getLiteralValueFromPropertyAssignment(property);
       const propertyName = getPropertyName(property.name);
+
       if (typeof literalValue === 'string' && propertyName !== null) {
-        const value = getLiteralValueFromPropertyAssignment(property);
-        if (value !== null) {
-          acc[propertyName] = value;
-        }
+        acc[propertyName] = literalValue;
       }
+
       return acc;
     },
     {} as StringIndexedObject<string>
