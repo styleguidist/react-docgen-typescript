@@ -446,10 +446,7 @@ class Parser {
       let propMap = {};
 
       if (properties) {
-        propMap = getPropMap(
-          properties as ts.NodeArray<ts.PropertyAssignment>,
-          source
-        );
+        propMap = getPropMap(properties as ts.NodeArray<ts.PropertyAssignment>);
       }
 
       return propMap;
@@ -460,10 +457,9 @@ class Parser {
         if (right) {
           const { properties } = right as ts.ObjectLiteralExpression;
           if (properties) {
-            propMap = getPropMap(
-              properties as ts.NodeArray<ts.PropertyAssignment>,
-              source
-            );
+            propMap = getPropMap(properties as ts.NodeArray<
+              ts.PropertyAssignment
+            >);
           }
         }
       });
@@ -494,8 +490,7 @@ function statementIsStateless(statement: ts.Statement): boolean {
 }
 
 function getPropMap(
-  properties: ts.NodeArray<ts.PropertyAssignment>,
-  source: ts.SourceFile
+  properties: ts.NodeArray<ts.PropertyAssignment>
 ): StringIndexedObject<string> {
   const propMap = properties.reduce(
     (acc, property) => {
