@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import * as path from 'path';
 import { parse, PropFilter, withCustomConfig } from '../parser';
-import { check, fixturePath } from './testUtils';
+import { check, checkComponent, fixturePath } from './testUtils';
 
 describe('parser', () => {
   const children = { type: 'ReactNode', required: false, description: '' };
@@ -26,6 +26,22 @@ describe('parser', () => {
         prop4: { type: '"option1" | "option2" | "option3"' }
       }
     });
+  });
+
+  it('should parse mulitple files', () => {
+    const result = parse([
+      fixturePath('Column'),
+      fixturePath('ColumnWithDefaultExportOnly')
+    ]);
+
+    checkComponent(
+      result,
+      {
+        Column: {},
+        ColumnWithDefaultExportOnly: {}
+      },
+      false
+    );
   });
 
   it('should parse simple react class component as default export only', () => {
