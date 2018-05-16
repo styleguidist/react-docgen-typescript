@@ -47,7 +47,7 @@ export interface StaticPropFilter {
 export const defaultParserOpts: ParserOptions = {};
 
 export interface FileParser {
-  parse(filePath: string): ComponentDoc[];
+  parse(filePathOrPaths: string | string[]): ComponentDoc[];
 }
 
 const defaultOptions: ts.CompilerOptions = {
@@ -61,10 +61,10 @@ const defaultOptions: ts.CompilerOptions = {
  * @param filePath component file that should be parsed
  */
 export function parse(
-  filePath: string,
+  filePathOrPaths: string | string[],
   parserOpts: ParserOptions = defaultParserOpts
 ) {
-  return withCompilerOptions(defaultOptions, parserOpts).parse(filePath);
+  return withCompilerOptions(defaultOptions, parserOpts).parse(filePathOrPaths);
 }
 
 /**
@@ -115,45 +115,46 @@ export function withCompilerOptions(
   parserOpts: ParserOptions = defaultParserOpts
 ): FileParser {
   return {
-    parse(filePath: string): ComponentDoc[] {
-      const program = ts.createProgram([filePath], compilerOptions);
+    parse(filePathOrPaths: string | string[]): ComponentDoc[] {
+      const filePaths = Array.isArray(filePathOrPaths)
+        ? filePathOrPaths
+        : [filePathOrPaths];
+      const program = ts.createProgram(filePaths, compilerOptions);
 
       const parser = new Parser(program, parserOpts);
 
       const checker = program.getTypeChecker();
-      const sourceFile = program.getSourceFile(filePath);
 
-      if (!sourceFile) {
-        return [];
-      }
+      return filePaths
+        .map(filePath => program.getSourceFile(filePath))
+        .filter(
+          (sourceFile): sourceFile is ts.SourceFile =>
+            typeof sourceFile !== 'undefined'
+        )
+        .reduce<ComponentDoc[]>((docs, sourceFile) => {
+          const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
 
-      const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
-      if (!moduleSymbol) {
-        return [];
-      }
-      const exports = checker.getExportsOfModule(moduleSymbol);
+          if (!moduleSymbol) {
+            return docs;
+          }
 
-      const components = exports
-        .map(exp => parser.getComponentInfo(exp, sourceFile))
-        .filter(comp => comp);
+          Array.prototype.push.apply(
+            docs,
+            checker
+              .getExportsOfModule(moduleSymbol)
+              .map(exp => parser.getComponentInfo(exp, sourceFile))
+              .filter((comp): comp is ComponentDoc => comp !== null)
+              .filter((comp, index, comps) =>
+                comps
+                  .slice(index + 1)
+                  .every(
+                    innerComp => innerComp!.displayName !== comp!.displayName
+                  )
+              )
+          );
 
-      // this should filter out components with the same name as default export
-      const filteredComponents = components
-        // ensure that component exists
-        .filter(comp => !!comp)
-        .filter((comp, index) => {
-          const isUnique =
-            components
-              // ensure that comp exists
-              .filter(cmp => !!cmp)
-              .slice(index + 1)
-              // it has been checked, that comp and innerComp are not null, so access is safe
-              .filter(innerComp => innerComp!.displayName === comp!.displayName)
-              .length === 0;
-          return isUnique;
-        });
-
-      return filteredComponents as ComponentDoc[];
+          return docs;
+        }, []);
     }
   };
 }
