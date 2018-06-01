@@ -276,6 +276,51 @@ describe('parser', () => {
     });
   });
 
+  it('should parse react stateless component with intersection props', () => {
+    check('StatelessIntersectionProps', {
+      StatelessIntersectionProps: {
+        moreProp: { type: 'number' },
+        myProp: { type: 'string' }
+      }
+    });
+  });
+
+  it('should parse react stateless component with external intersection props', () => {
+    check('StatelessIntersectionExternalProps', {
+      StatelessIntersectionExternalProps: {
+        myProp: { type: 'string' },
+        prop1: { type: 'string', required: false }
+      }
+    });
+  });
+
+  it('should parse react stateful component with intersection props', () => {
+    check('StatefulIntersectionProps', {
+      StatefulIntersectionProps: {
+        moreProp: { type: 'number' },
+        myProp: { type: 'string' }
+      }
+    });
+  });
+
+  it('should parse react stateful component with external intersection props', () => {
+    check('StatefulIntersectionExternalProps', {
+      StatefulIntersectionExternalProps: {
+        myProp: { type: 'string' },
+        prop1: { type: 'string', required: false }
+      }
+    });
+  });
+
+  it('should parse react stateful component (wrapped in HOC) with intersection props', () => {
+    check('HOCIntersectionProps', {
+      HOCIntersectionProps: {
+        injected: { type: 'boolean' },
+        myProp: { type: 'string' }
+      }
+    });
+  });
+
   describe('stateless component with default props', () => {
     const expectation = {
       StatelessWithDefaultProps: {
