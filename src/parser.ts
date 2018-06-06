@@ -361,7 +361,7 @@ class Parser {
     }
 
     const mainComment = ts.displayPartsToString(
-      symbol.getDocumentationComment()
+      symbol.getDocumentationComment(this.checker)
     );
 
     const tags = symbol.getJsDocTags() || [];
