@@ -19,7 +19,7 @@ export interface ExpectedProp {
   type: string;
   required?: boolean;
   description?: string;
-  defaultValue?: string;
+  defaultValue?: string | null;
 }
 
 export function fixturePath(componentName: string) {
