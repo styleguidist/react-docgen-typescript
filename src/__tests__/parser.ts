@@ -364,9 +364,34 @@ describe('parser', () => {
       check('StatelessWithReferencedDefaultProps', expectation);
     });
 
-    // it('supports spread props', () => {
-    //   check('StatelessWithSpreadDefaultProps', expectation);
-    // });
+    it('should parse props with shorthands', () => {
+      check('StatelessShorthandDefaultProps', {
+        StatelessShorthandDefaultProps: {
+          onCallback: {
+            defaultValue: null,
+            description: 'onCallback description',
+            required: false,
+            type: '() => void'
+          },
+          regularProp: {
+            defaultValue: 'foo',
+            description: 'regularProp description',
+            required: true,
+            type: 'string'
+          },
+          shorthandProp: {
+            defaultValue: '123',
+            description: 'shorthandProp description',
+            required: false,
+            type: 'number'
+          }
+        }
+      });
+    });
+
+    it('supports spread props', () => {
+      check('StatelessWithSpreadDefaultProps', expectation);
+    });
   });
 
   it('should parse functional component component defined as function', () => {

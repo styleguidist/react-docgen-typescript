@@ -447,7 +447,9 @@ class Parser {
       let propMap = {};
 
       if (properties) {
-        propMap = getPropMap(properties as ts.NodeArray<ts.PropertyAssignment>);
+        propMap = this.getPropMap(properties as ts.NodeArray<
+          ts.PropertyAssignment
+        >);
       }
 
       return propMap;
@@ -458,7 +460,7 @@ class Parser {
         if (right) {
           const { properties } = right as ts.ObjectLiteralExpression;
           if (properties) {
-            propMap = getPropMap(properties as ts.NodeArray<
+            propMap = this.getPropMap(properties as ts.NodeArray<
               ts.PropertyAssignment
             >);
           }
@@ -467,6 +469,80 @@ class Parser {
       return propMap;
     }
     return {};
+  }
+
+  public getLiteralValueFromPropertyAssignment(
+    property: ts.PropertyAssignment
+  ): string | null {
+    let { initializer } = property;
+
+    // Shorthand properties, so inflect their actual value
+    if (!initializer) {
+      if (ts.isShorthandPropertyAssignment(property)) {
+        const symbol = this.checker.getShorthandAssignmentValueSymbol(property);
+        const decl =
+          symbol && (symbol.valueDeclaration as ts.VariableDeclaration);
+
+        if (decl && decl.initializer) {
+          initializer = decl.initializer!;
+        }
+      }
+    }
+
+    if (!initializer) {
+      return null;
+    }
+
+    // Literal values
+    switch (initializer.kind) {
+      case ts.SyntaxKind.FalseKeyword:
+        return 'false';
+      case ts.SyntaxKind.TrueKeyword:
+        return 'true';
+      case ts.SyntaxKind.StringLiteral:
+        return (initializer as ts.StringLiteral).text.trim();
+      case ts.SyntaxKind.PrefixUnaryExpression:
+        return initializer.getFullText().trim();
+      case ts.SyntaxKind.NumericLiteral:
+        return `${(initializer as ts.NumericLiteral).text}`;
+      case ts.SyntaxKind.NullKeyword:
+        return 'null';
+      case ts.SyntaxKind.Identifier:
+        // can potentially find other identifiers in the source and map those in the future
+        return (initializer as ts.Identifier).text === 'undefined'
+          ? 'undefined'
+          : null;
+      case ts.SyntaxKind.ObjectLiteralExpression:
+        // return the source text for an object literal
+        return (initializer as ts.ObjectLiteralExpression).getText();
+      default:
+        return null;
+    }
+  }
+
+  public getPropMap(
+    properties: ts.NodeArray<ts.PropertyAssignment>
+  ): StringIndexedObject<string> {
+    const propMap = properties.reduce(
+      (acc, property) => {
+        if (ts.isSpreadAssignment(property) || !property.name) {
+          return acc;
+        }
+
+        const literalValue = this.getLiteralValueFromPropertyAssignment(
+          property
+        );
+        const propertyName = getPropertyName(property.name);
+
+        if (typeof literalValue === 'string' && propertyName !== null) {
+          acc[propertyName] = literalValue;
+        }
+
+        return acc;
+      },
+      {} as StringIndexedObject<string>
+    );
+    return propMap;
   }
 }
 
@@ -490,29 +566,6 @@ function statementIsStateless(statement: ts.Statement): boolean {
   return false;
 }
 
-function getPropMap(
-  properties: ts.NodeArray<ts.PropertyAssignment>
-): StringIndexedObject<string> {
-  const propMap = properties.reduce(
-    (acc, property) => {
-      if (ts.isSpreadAssignment(property) || !property.name) {
-        return acc;
-      }
-
-      const literalValue = getLiteralValueFromPropertyAssignment(property);
-      const propertyName = getPropertyName(property.name);
-
-      if (typeof literalValue === 'string' && propertyName !== null) {
-        acc[propertyName] = literalValue;
-      }
-
-      return acc;
-    },
-    {} as StringIndexedObject<string>
-  );
-  return propMap;
-}
-
 function getPropertyName(name: ts.PropertyName): string | null {
   switch (name.kind) {
     case ts.SyntaxKind.NumericLiteral:
@@ -521,36 +574,6 @@ function getPropertyName(name: ts.PropertyName): string | null {
       return name.text;
     case ts.SyntaxKind.ComputedPropertyName:
       return name.getText();
-    default:
-      return null;
-  }
-}
-
-function getLiteralValueFromPropertyAssignment(
-  property: ts.PropertyAssignment
-): string | null {
-  const { initializer } = property;
-  switch (initializer.kind) {
-    case ts.SyntaxKind.FalseKeyword:
-      return 'false';
-    case ts.SyntaxKind.TrueKeyword:
-      return 'true';
-    case ts.SyntaxKind.StringLiteral:
-      return (initializer as ts.StringLiteral).text.trim();
-    case ts.SyntaxKind.PrefixUnaryExpression:
-      return initializer.getFullText().trim();
-    case ts.SyntaxKind.NumericLiteral:
-      return `${(initializer as ts.NumericLiteral).text}`;
-    case ts.SyntaxKind.NullKeyword:
-      return 'null';
-    case ts.SyntaxKind.Identifier:
-      // can potentially find other identifiers in the source and map those in the future
-      return (initializer as ts.Identifier).text === 'undefined'
-        ? 'undefined'
-        : null;
-    case ts.SyntaxKind.ObjectLiteralExpression:
-      // return the source text for an object literal
-      return (initializer as ts.ObjectLiteralExpression).getText();
     default:
       return null;
   }
