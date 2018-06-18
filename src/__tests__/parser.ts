@@ -6,6 +6,14 @@ import { check, checkComponent, fixturePath } from './testUtils';
 describe('parser', () => {
   const children = { type: 'ReactNode', required: false, description: '' };
 
+  it('should parse a react class component using synthetic default export', () => {
+    check('SyntheticDefaultComponent', {
+      SyntheticDefaultComponent: {
+        prop1: { type: 'boolean' },
+        prop2: { type: 'string' }
+      }
+    });
+  });
   it('should parse simple react class component', () => {
     check('Column', {
       Column: {
