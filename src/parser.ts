@@ -187,11 +187,13 @@ class Parser {
     if (!!exp.declarations && exp.declarations.length === 0) {
       return null;
     }
+
     const type = this.checker.getTypeOfSymbolAtLocation(
       exp,
       exp.valueDeclaration || exp.declarations![0]
     );
     let commentSource = exp;
+
     if (!exp.valueDeclaration) {
       if (!type.symbol) {
         return null;
@@ -202,6 +204,15 @@ class Parser {
       } else {
         commentSource = exp;
       }
+    }
+
+    // Skip over PropTypes that are exported
+    if (
+      type.symbol &&
+      (type.symbol.getEscapedName() === 'Requireable' ||
+        type.symbol.getEscapedName() === 'Validator')
+    ) {
+      return null;
     }
 
     const propsType =

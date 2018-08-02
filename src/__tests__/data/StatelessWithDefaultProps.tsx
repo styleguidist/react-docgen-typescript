@@ -25,7 +25,7 @@ export interface StatelessWithDefaultPropsProps {
 
 /** StatelessWithDefaultProps description */
 export const StatelessWithDefaultProps: React.StatelessComponent<
-StatelessWithDefaultPropsProps
+  StatelessWithDefaultPropsProps
 > = props => <div>test</div>;
 
 StatelessWithDefaultProps.defaultProps = {
