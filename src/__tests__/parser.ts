@@ -192,6 +192,22 @@ describe('parser', () => {
     });
   });
 
+  it('should parse react component that exports a prop type const', () => {
+    check('ExportsPropTypeShape', {
+      ExportsPropTypes: {
+        foo: { type: 'any' }
+      }
+    });
+  });
+
+  it('should parse react component that exports a prop type thats imported', () => {
+    check('ExportsPropTypeImport', {
+      ExportsPropTypes: {
+        foo: { type: 'any' }
+      }
+    });
+  });
+
   describe('component with default props', () => {
     const expectation = {
       ComponentWithDefaultProps: {

@@ -38,7 +38,7 @@ const defaultPropsReference = defaultProps;
 
 /** StatelessWithDefaultProps description */
 export const StatelessWithDefaultProps: React.StatelessComponent<
-StatelessWithDefaultPropsProps
+  StatelessWithDefaultPropsProps
 > = props => <div>test</div>;
 
 StatelessWithDefaultProps.defaultProps = defaultProps;
