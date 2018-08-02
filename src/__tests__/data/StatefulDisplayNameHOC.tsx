@@ -1,3 +1,5 @@
+/* tslint:disable:max-classes-per-file */
+
 import * as React from 'react';
 
 export interface StatefulProps {

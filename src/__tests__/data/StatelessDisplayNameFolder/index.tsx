@@ -1,6 +1,8 @@
 import * as React from 'react';
 
-interface StatelessProps {}
+interface StatelessProps {
+  foo?: string;
+}
 
 const Stateless: React.SFC<StatelessProps> = props => <div />;
 
