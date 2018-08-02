@@ -19,5 +19,7 @@ const shorthandProp = 123;
 StatelessShorthandDefaultProps.defaultProps = {
   regularProp: 'foo',
   shorthandProp,
-  onCallback() {}
+  onCallback() {
+    return null;
+  }
 };
