@@ -630,6 +630,32 @@ describe('parser', () => {
             { propFilter }
           );
         });
+
+        it('should allow filtering by parent interface', () => {
+          const propFilter: PropFilter = (prop, component) => {
+            if (prop.parent == null) {
+              return true;
+            }
+
+            return (
+              prop.parent.fileName.indexOf('@types/react') < 0 &&
+              prop.parent.name !== 'HTMLAttributes'
+            );
+          };
+
+          check(
+            'ColumnWithHtmlAttributes',
+            {
+              Column: {
+                prop1: { type: 'string', required: false },
+                prop2: { type: 'number' }
+              }
+            },
+            true,
+            undefined,
+            { propFilter }
+          );
+        });
       });
 
       describe('skipPropsWithName', () => {

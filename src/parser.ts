@@ -22,6 +22,7 @@ export interface PropItem {
   type: PropItemType;
   description: string;
   defaultValue: any;
+  parent?: ParentType;
 }
 
 export interface Component {
@@ -31,6 +32,11 @@ export interface Component {
 export interface PropItemType {
   name: string;
   value?: any;
+}
+
+export interface ParentType {
+  name: string;
+  fileName: string;
 }
 
 export type PropFilter = (props: PropItem, component: Component) => boolean;
@@ -329,10 +335,13 @@ class Parser {
         defaultValue = { value: jsDocComment.tags.default };
       }
 
+      const parent = getParentType(prop);
+
       result[propName] = {
         defaultValue,
         description: jsDocComment.fullComment,
         name: propName,
+        parent,
         required: !isOptional,
         type: { name: propTypeString }
       };
@@ -688,4 +697,36 @@ function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
   } else {
     return exportName;
   }
+}
+
+function getParentType(prop: ts.Symbol): ParentType | undefined {
+  const decalarations = prop.getDeclarations();
+
+  if (decalarations == null || decalarations.length === 0) {
+    return undefined;
+  }
+
+  // Props can be declared only in one place
+  const { parent } = decalarations[0];
+
+  if (!isInterfaceOrTypeAliasDeclaration(parent)) {
+    return undefined;
+  }
+
+  const parentName = parent.name.text;
+  const { fileName } = parent.getSourceFile();
+
+  return {
+    fileName,
+    name: parentName
+  };
+}
+
+function isInterfaceOrTypeAliasDeclaration(
+  node: ts.Node
+): node is ts.InterfaceDeclaration | ts.TypeAliasDeclaration {
+  return (
+    node.kind === ts.SyntaxKind.InterfaceDeclaration ||
+    node.kind === ts.SyntaxKind.TypeAliasDeclaration
+  );
 }
