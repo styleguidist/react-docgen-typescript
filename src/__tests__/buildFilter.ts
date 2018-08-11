@@ -1,18 +1,20 @@
 import { assert, expect } from 'chai';
 import { buildFilter } from '../buildFilter';
-import { ParserOptions, PropItem, Props } from '../parser';
+import { ParentType, ParserOptions, PropItem } from '../parser';
 
 function createProp(
   name: string,
   required: boolean = false,
   defaultValue?: any,
   description: string = '',
-  type = { name: 'string' }
+  type = { name: 'string' },
+  parent?: ParentType
 ): PropItem {
   return {
     defaultValue,
     description,
     name,
+    parent,
     required,
     type
   };
@@ -162,6 +164,57 @@ describe('buildFilter', () => {
       expect(
         [prop1, prop2, prop3].filter(prop =>
           filterFn(prop, { name: prop.name.toUpperCase() })
+        )
+      ).to.eql([prop1]);
+    });
+
+    it('should be possible to filter by interface in which prop was declared.', () => {
+      const stringType = { name: 'string' };
+      const htmlAttributesInterface = {
+        fileName: 'node_modules/@types/react/index.d.ts',
+        name: 'HTMLAttributes'
+      };
+      const excludedType = { name: 'ExcludedType', fileName: 'src/types.ts' };
+      const prop1 = createProp(
+        'foo',
+        false,
+        undefined,
+        'foo description',
+        stringType
+      );
+      const prop2 = createProp(
+        'bar',
+        false,
+        undefined,
+        'bar description',
+        stringType,
+        excludedType
+      );
+      const prop3 = createProp(
+        'onFocus',
+        false,
+        undefined,
+        'onFocus description',
+        stringType,
+        htmlAttributesInterface
+      );
+      const opts: ParserOptions = {
+        propFilter: (prop, component) => {
+          if (prop.parent == null) {
+            return true;
+          }
+
+          if (prop.parent.fileName.indexOf('@types/react/index.d.ts') > -1) {
+            return false;
+          }
+
+          return prop.parent.name !== 'ExcludedType';
+        }
+      };
+      const filterFn = buildFilter(opts);
+      expect(
+        [prop1, prop2, prop3].filter(prop =>
+          filterFn(prop, { name: 'SomeComponent' })
         )
       ).to.eql([prop1]);
     });
