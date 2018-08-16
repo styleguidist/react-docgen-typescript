@@ -19,7 +19,10 @@ export interface IColumnProps {
 /**
  * ColumnWithDefaultExportOnly description
  */
-export default class Column extends React.Component<IColumnProps, {}> {
+export default class ColumnWithDefaultExportOnly extends React.Component<
+  IColumnProps,
+  {}
+> {
   public static defaultProps: Partial<IColumnProps> = {
     prop1: 'prop1'
   };
