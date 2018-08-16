@@ -674,6 +674,16 @@ function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
     return statelessDisplayName || statefulDisplayName || '';
   }
 
+  if (exportName === 'default') {
+    const declarations = exp.getDeclarations();
+    if (declarations && declarations.length === 1) {
+      const potentialClass = declarations[0];
+      if (ts.isClassDeclaration(potentialClass) && potentialClass.name) {
+        return potentialClass.name.getText();
+      }
+    }
+  }
+
   if (
     exportName === 'default' ||
     exportName === '__function' ||
