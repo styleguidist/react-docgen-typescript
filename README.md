@@ -160,6 +160,8 @@ the part it's fixing.
 
 **@milesj** *Miles Johnson*
 
+**@rkostrzewski** *Rafał Kostrzewski*
+
 **@RoystonS** *Royston Shufflebotham* - complete parser rewrite that use typescript parser in much better way and overcome many issues of previous implementation
 
 **@yoiang** *Ian G*
