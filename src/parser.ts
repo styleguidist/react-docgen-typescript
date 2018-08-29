@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { getTypeScriptInstance } from './instance';
+import { getTypeScriptInstance } from './service-host/instance';
 
 import { buildFilter } from './buildFilter';
 
@@ -131,8 +131,7 @@ export function withCompilerOptions(
       const filePaths = Array.isArray(filePathOrPaths)
         ? filePathOrPaths
         : [filePathOrPaths];
-
-      const program = instance.languageService!.getProgram()!;
+      const program = instance!.languageService!.getProgram()!;
       // const program = ts.createProgram(filePaths, compilerOptions);
 
       const parser = new Parser(program, parserOpts);
