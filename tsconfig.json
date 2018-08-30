@@ -2,6 +2,9 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es5",
+    "lib": [
+      "es2016"
+    ],
     "strict": true,
     "sourceMap": true,
     "outDir": "lib",
