@@ -1,6 +1,13 @@
 import { assert } from 'chai';
+import * as fs from 'fs';
 import * as path from 'path';
-import { parse, PropFilter, withCustomConfig } from '../parser';
+import * as ts from 'typescript';
+import {
+  parse,
+  PropFilter,
+  withCustomConfig,
+  withDefaultConfig
+} from '../parser';
 import { check, checkComponent, fixturePath } from './testUtils';
 
 describe('parser', () => {
@@ -723,6 +730,55 @@ describe('parser', () => {
           {}
         )
       );
+    });
+  });
+
+  describe('parseWithProgramProvider', () => {
+    it('should accept existing ts.Program instance', () => {
+      let programProviderInvoked = false;
+
+      // mimic a third party library providing a ts.Program instance.
+      const programProvider = () => {
+        // need to navigate to root because tests run on compiled tests
+        // and tsc does not include json files
+        const tsconfigPath = path.join(
+          __dirname,
+          '../../src/__tests__/data/tsconfig.json'
+        );
+        const basePath = path.dirname(tsconfigPath);
+
+        const { config, error } = ts.readConfigFile(tsconfigPath, filename =>
+          fs.readFileSync(filename, 'utf8')
+        );
+        assert.isUndefined(error);
+
+        const { options, errors } = ts.parseJsonConfigFileContent(
+          config,
+          ts.sys,
+          basePath,
+          {},
+          tsconfigPath
+        );
+        assert.lengthOf(errors, 0);
+
+        programProviderInvoked = true;
+
+        return ts.createProgram([fixturePath('Column')], options);
+      };
+
+      const result = withDefaultConfig().parse(
+        [fixturePath('Column')],
+        programProvider
+      );
+
+      checkComponent(
+        result,
+        {
+          Column: {}
+        },
+        false
+      );
+      assert.isTrue(programProviderInvoked);
     });
   });
 });
