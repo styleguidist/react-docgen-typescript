@@ -53,7 +53,10 @@ export interface StaticPropFilter {
 export const defaultParserOpts: ParserOptions = {};
 
 export interface FileParser {
-  parse(filePathOrPaths: string | string[]): ComponentDoc[];
+  parse(
+    filePathOrPaths: string | string[],
+    programProvider?: () => ts.Program
+  ): ComponentDoc[];
 }
 
 const defaultOptions: ts.CompilerOptions = {
@@ -121,11 +124,17 @@ export function withCompilerOptions(
   parserOpts: ParserOptions = defaultParserOpts
 ): FileParser {
   return {
-    parse(filePathOrPaths: string | string[]): ComponentDoc[] {
+    parse(
+      filePathOrPaths: string | string[],
+      programProvider?: () => ts.Program
+    ): ComponentDoc[] {
       const filePaths = Array.isArray(filePathOrPaths)
         ? filePathOrPaths
         : [filePathOrPaths];
-      const program = ts.createProgram(filePaths, compilerOptions);
+
+      const program = programProvider
+        ? programProvider()
+        : ts.createProgram(filePaths, compilerOptions);
 
       const parser = new Parser(program, parserOpts);
 
