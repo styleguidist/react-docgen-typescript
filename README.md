@@ -170,6 +170,8 @@ the part it's fixing.
 
 **@skeate** *Jonathan Skeate*
 
+**@strothj** *Jason Strothmann*
+
 ## Thanks to others
 
 The integration with React Styleguidist wouldn't be possible without [Vyacheslav Slinko](https://github.com/vslinko) pull request [#118](https://github.com/styleguidist/react-styleguidist/pull/118) at React Styleguidist.
