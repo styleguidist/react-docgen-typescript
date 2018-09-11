@@ -54,6 +54,9 @@ export const defaultParserOpts: ParserOptions = {};
 
 export interface FileParser {
   parse(
+    filePathOrPaths: string | string[]
+  ): ComponentDoc[];
+  parseWithProgramProvider(
     filePathOrPaths: string | string[],
     programProvider?: () => ts.Program
   ): ComponentDoc[];
@@ -125,6 +128,11 @@ export function withCompilerOptions(
 ): FileParser {
   return {
     parse(
+      filePathOrPaths: string | string[]
+    ): ComponentDoc[] {
+      return this.parseWithProgramProvider(filePathOrPaths)
+  },
+    parseWithProgramProvider(
       filePathOrPaths: string | string[],
       programProvider?: () => ts.Program
     ): ComponentDoc[] {
@@ -647,7 +655,7 @@ function getTextValueOfFunctionProperty(
       const expr = (statement as ts.ExpressionStatement)
         .expression as ts.BinaryExpression;
       return (
-        (expr.left as ts.PropertyAccessExpression).name.escapedText ===
+        expr.left && (expr.left as ts.PropertyAccessExpression).name.escapedText ===
         propertyName
       );
     })
