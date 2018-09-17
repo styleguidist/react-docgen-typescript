@@ -665,6 +665,7 @@ function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
   if (
     exportName === 'default' ||
     exportName === '__function' ||
+    exportName === 'StyledComponentClass' ||
     exportName === 'StatelessComponent'
   ) {
     // Default export for a file: named after file
