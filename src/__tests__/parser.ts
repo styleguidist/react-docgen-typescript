@@ -532,6 +532,13 @@ describe('parser', () => {
       assert.equal(parsed.displayName, 'StatelessDisplayNameDefaultExport');
     });
 
+    it('should be taken from filename for styled components', () => {
+      const [parsed] = parse(
+        fixturePath('StatelessDisplayNameStyledComponent')
+      );
+      assert.equal(parsed.displayName, 'StatelessDisplayNameStyledComponent');
+    });
+
     it('should be taken from stateful component `displayName` property (using default export)', () => {
       const [parsed] = parse(fixturePath('StatefulDisplayNameDefaultExport'));
       assert.equal(parsed.displayName, 'StatefulDisplayNameDefaultExport');
