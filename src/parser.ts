@@ -53,9 +53,7 @@ export interface StaticPropFilter {
 export const defaultParserOpts: ParserOptions = {};
 
 export interface FileParser {
-  parse(
-    filePathOrPaths: string | string[]
-  ): ComponentDoc[];
+  parse(filePathOrPaths: string | string[]): ComponentDoc[];
   parseWithProgramProvider(
     filePathOrPaths: string | string[],
     programProvider?: () => ts.Program
@@ -127,57 +125,20 @@ export function withCompilerOptions(
   parserOpts: ParserOptions = defaultParserOpts
 ): FileParser {
   return {
-    parse(
-      filePathOrPaths: string | string[]
-    ): ComponentDoc[] {
-      return this.parseWithProgramProvider(filePathOrPaths)
-  },
-    parseWithProgramProvider(
-      filePathOrPaths: string | string[],
-      programProvider?: () => ts.Program
-    ): ComponentDoc[] {
-      const filePaths = Array.isArray(filePathOrPaths)
-        ? filePathOrPaths
-        : [filePathOrPaths];
-
-      const program = programProvider
-        ? programProvider()
-        : ts.createProgram(filePaths, compilerOptions);
-
-      const parser = new Parser(program, parserOpts);
-
-      const checker = program.getTypeChecker();
-
-      return filePaths
-        .map(filePath => program.getSourceFile(filePath))
-        .filter(
-          (sourceFile): sourceFile is ts.SourceFile =>
-            typeof sourceFile !== 'undefined'
-        )
-        .reduce<ComponentDoc[]>((docs, sourceFile) => {
-          const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
-
-          if (!moduleSymbol) {
-            return docs;
-          }
-
-          Array.prototype.push.apply(
-            docs,
-            checker
-              .getExportsOfModule(moduleSymbol)
-              .map(exp => parser.getComponentInfo(exp, sourceFile))
-              .filter((comp): comp is ComponentDoc => comp !== null)
-              .filter((comp, index, comps) =>
-                comps
-                  .slice(index + 1)
-                  .every(
-                    innerComp => innerComp!.displayName !== comp!.displayName
-                  )
-              )
-          );
-
-          return docs;
-        }, []);
+    parse(filePathOrPaths: string | string[]): ComponentDoc[] {
+      return parseWithProgramProvider(
+        filePathOrPaths,
+        compilerOptions,
+        parserOpts
+      );
+    },
+    parseWithProgramProvider(filePathOrPaths, programProvider) {
+      return parseWithProgramProvider(
+        filePathOrPaths,
+        compilerOptions,
+        parserOpts,
+        programProvider
+      );
     }
   };
 }
@@ -655,8 +616,9 @@ function getTextValueOfFunctionProperty(
       const expr = (statement as ts.ExpressionStatement)
         .expression as ts.BinaryExpression;
       return (
-        expr.left && (expr.left as ts.PropertyAccessExpression).name.escapedText ===
-        propertyName
+        expr.left &&
+        (expr.left as ts.PropertyAccessExpression).name.escapedText ===
+          propertyName
       );
     })
     .filter(statement => {
@@ -746,4 +708,52 @@ function isInterfaceOrTypeAliasDeclaration(
     node.kind === ts.SyntaxKind.InterfaceDeclaration ||
     node.kind === ts.SyntaxKind.TypeAliasDeclaration
   );
+}
+
+function parseWithProgramProvider(
+  filePathOrPaths: string | string[],
+  compilerOptions: ts.CompilerOptions,
+  parserOpts: ParserOptions,
+  programProvider?: () => ts.Program
+): ComponentDoc[] {
+  const filePaths = Array.isArray(filePathOrPaths)
+    ? filePathOrPaths
+    : [filePathOrPaths];
+
+  const program = programProvider
+    ? programProvider()
+    : ts.createProgram(filePaths, compilerOptions);
+
+  const parser = new Parser(program, parserOpts);
+
+  const checker = program.getTypeChecker();
+
+  return filePaths
+    .map(filePath => program.getSourceFile(filePath))
+    .filter(
+      (sourceFile): sourceFile is ts.SourceFile =>
+        typeof sourceFile !== 'undefined'
+    )
+    .reduce<ComponentDoc[]>((docs, sourceFile) => {
+      const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
+
+      if (!moduleSymbol) {
+        return docs;
+      }
+
+      Array.prototype.push.apply(
+        docs,
+        checker
+          .getExportsOfModule(moduleSymbol)
+          .map(exp => parser.getComponentInfo(exp, sourceFile))
+          .filter((comp): comp is ComponentDoc => comp !== null)
+          .filter((comp, index, comps) =>
+            comps
+              .slice(index + 1)
+              .every(innerComp => innerComp!.displayName !== comp!.displayName)
+          )
+      );
+
+      return docs;
+    }, []);
 }
