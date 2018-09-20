@@ -41,8 +41,11 @@ export interface ParentType {
 
 export type PropFilter = (props: PropItem, component: Component) => boolean;
 
+export type ComponentNameResolver = (exp: ts.Symbol, source: ts.SourceFile) => string | undefined | null | false;
+
 export interface ParserOptions {
   propFilter?: StaticPropFilter | PropFilter;
+  componentNameResolver?: ComponentNameResolver;
 }
 
 export interface StaticPropFilter {
@@ -166,7 +169,8 @@ class Parser {
 
   public getComponentInfo(
     exp: ts.Symbol,
-    source: ts.SourceFile
+    source: ts.SourceFile,
+    componentNameResolver: ComponentNameResolver = () => undefined
   ): ComponentDoc | null {
     if (!!exp.declarations && exp.declarations.length === 0) {
       return null;
@@ -204,7 +208,8 @@ class Parser {
       this.extractPropsFromTypeIfStatefulComponent(type);
 
     if (propsType) {
-      const componentName = computeComponentName(exp, source);
+      const resolvedComponentName = componentNameResolver(exp, source);
+      const componentName = resolvedComponentName || computeComponentName(exp, source);
       const defaultProps = this.extractDefaultPropsFromComponent(exp, source);
       const props = this.getPropsInfo(propsType, defaultProps);
 
@@ -665,18 +670,21 @@ function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
   if (
     exportName === 'default' ||
     exportName === '__function' ||
-    exportName === 'StyledComponentClass' ||
     exportName === 'StatelessComponent'
   ) {
-    // Default export for a file: named after file
+    return  getDefaultExportForFile(source);
+  } else {
+    return exportName;
+  }
+}
+
+// Default export for a file: named after file
+export function getDefaultExportForFile(source: ts.SourceFile) {
     const name = path.basename(source.fileName, path.extname(source.fileName));
 
     return name === 'index'
       ? path.basename(path.dirname(source.fileName))
       : name;
-  } else {
-    return exportName;
-  }
 }
 
 function getParentType(prop: ts.Symbol): ParentType | undefined {
@@ -746,7 +754,7 @@ function parseWithProgramProvider(
         docs,
         checker
           .getExportsOfModule(moduleSymbol)
-          .map(exp => parser.getComponentInfo(exp, sourceFile))
+          .map(exp => parser.getComponentInfo(exp, sourceFile, parserOpts.componentNameResolver))
           .filter((comp): comp is ComponentDoc => comp !== null)
           .filter((comp, index, comps) =>
             comps
