@@ -47,6 +47,22 @@ propsParser: require('react-docgen-typescript').withCustomConfig('./tsconfig.jso
 
   Note: `children` without a doc comment will not be documented.
 
+- componentNameResolver:
+
+  ```typescript
+  (exp: ts.Symbol, source: ts.SourceFile) => string | undefined | null | false
+  ```
+
+  If a string is returned, then the component will use that name. Else it will fallback to the default logic of parser.
+
+**Styled components example:**
+
+```typescript
+componentNameResolver: (exp, source) => exp.getName() === 'StyledComponentClass' && getDefaultExportForFile(source);
+```
+
+> The parser exports `getDefaultExportForFile` helper through its public API.
+
 ## Example
 
 In the example folder you can see React Styleguidist integration.

@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
 import {
+  getDefaultExportForFile,
   parse,
   PropFilter,
   withCustomConfig,
@@ -532,13 +533,6 @@ describe('parser', () => {
       assert.equal(parsed.displayName, 'StatelessDisplayNameDefaultExport');
     });
 
-    it('should be taken from filename for styled components', () => {
-      const [parsed] = parse(
-        fixturePath('StatelessDisplayNameStyledComponent')
-      );
-      assert.equal(parsed.displayName, 'StatelessDisplayNameStyledComponent');
-    });
-
     it('should be taken from stateful component `displayName` property (using default export)', () => {
       const [parsed] = parse(fixturePath('StatefulDisplayNameDefaultExport'));
       assert.equal(parsed.displayName, 'StatefulDisplayNameDefaultExport');
@@ -797,6 +791,31 @@ describe('parser', () => {
         false
       );
       assert.isTrue(programProviderInvoked);
+    });
+  });
+
+  describe('componentNameResolver', () => {
+    it('should override default behavior', () => {
+      const [parsed] = parse(
+        fixturePath('StatelessDisplayNameStyledComponent'),
+        {
+          componentNameResolver: (exp, source) => (
+            exp.getName() === 'StyledComponentClass' &&
+            getDefaultExportForFile(source)
+          )
+        }
+      );
+      assert.equal(parsed.displayName, 'StatelessDisplayNameStyledComponent');
+    });
+
+    it('should fallback to default behavior without a match', () => {
+      const [parsed] = parse(
+        fixturePath('StatelessDisplayNameStyledComponent'),
+        {
+          componentNameResolver: () => false
+        }
+      );
+      assert.equal(parsed.displayName, 'StatelessDisplayNameStyledComponent');
     });
   });
 });
