@@ -1,6 +1,7 @@
 import {
   ComponentDoc,
   FileParser,
+  getDefaultExportForFile,
   parse,
   ParserOptions,
   PropItem,
@@ -13,6 +14,7 @@ import {
 
 export {
   parse,
+  getDefaultExportForFile,
   withCompilerOptions,
   withDefaultConfig,
   withCustomConfig,
