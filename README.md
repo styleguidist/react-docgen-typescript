@@ -152,6 +152,8 @@ the part it's fixing.
 
 **@basarat** *Basarat Ali Syed*
 
+**@bebraw** *Juho Vepsäläinen*
+
 **@brettjurgens** *Brett Jurgens* - adding support for default props
 
 **@chrisalbert** *Chris Albert*
