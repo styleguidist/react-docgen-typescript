@@ -363,9 +363,13 @@ class Parser {
       return defaultJSDoc;
     }
 
-    const mainComment = ts.displayPartsToString(
+    let mainComment = ts.displayPartsToString(
       symbol.getDocumentationComment(this.checker)
     );
+    
+    if (mainComment) {
+      mainComment = mainComment.replace('\r\n', '\n');
+    }
 
     const tags = symbol.getJsDocTags() || [];
 
