@@ -692,14 +692,14 @@ export function getDefaultExportForFile(source: ts.SourceFile) {
 }
 
 function getParentType(prop: ts.Symbol): ParentType | undefined {
-  const decalarations = prop.getDeclarations();
+  const declarations = prop.getDeclarations();
 
-  if (decalarations == null || decalarations.length === 0) {
+  if (declarations == null || declarations.length === 0) {
     return undefined;
   }
 
   // Props can be declared only in one place
-  const { parent } = decalarations[0];
+  const { parent } = declarations[0];
 
   if (!isInterfaceOrTypeAliasDeclaration(parent)) {
     return undefined;
