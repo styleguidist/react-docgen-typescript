@@ -227,6 +227,26 @@ describe('parser', () => {
     });
   });
 
+  // see issue #132 (https://github.com/styleguidist/react-docgen-typescript/issues/132)
+  it('should determine the parent fileName relative to the project directory', () => {
+    check(
+      'ExportsPropTypeImport',
+      {
+        ExportsPropTypes: {
+          foo: {
+            parent: {
+              fileName:
+                'react-docgen-typescript/src/__tests__/data/ExportsPropTypeImport.tsx',
+              name: 'ExportsPropTypesProps'
+            },
+            type: 'any'
+          } as any
+        }
+      },
+      true
+    );
+  });
+
   describe('component with default props', () => {
     const expectation = {
       ComponentWithDefaultProps: {
@@ -804,10 +824,9 @@ describe('parser', () => {
       const [parsed] = parse(
         fixturePath('StatelessDisplayNameStyledComponent'),
         {
-          componentNameResolver: (exp, source) => (
+          componentNameResolver: (exp, source) =>
             exp.getName() === 'StyledComponentClass' &&
             getDefaultExportForFile(source)
-          )
         }
       );
       assert.equal(parsed.displayName, 'StatelessDisplayNameStyledComponent');

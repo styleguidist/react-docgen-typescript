@@ -4,6 +4,11 @@ import * as ts from 'typescript';
 
 import { buildFilter } from './buildFilter';
 
+// We'll use the currentDirectoryName to trim parent fileNames
+const currentDirectoryPath = process.cwd();
+const currentDirectoryParts = currentDirectoryPath.split('/');
+const currentDirectoryName =
+  currentDirectoryParts[currentDirectoryParts.length - 1];
 export interface StringIndexedObject<T> {
   [key: string]: T;
 }
@@ -41,7 +46,10 @@ export interface ParentType {
 
 export type PropFilter = (props: PropItem, component: Component) => boolean;
 
-export type ComponentNameResolver = (exp: ts.Symbol, source: ts.SourceFile) => string | undefined | null | false;
+export type ComponentNameResolver = (
+  exp: ts.Symbol,
+  source: ts.SourceFile
+) => string | undefined | null | false;
 
 export interface ParserOptions {
   propFilter?: StaticPropFilter | PropFilter;
@@ -209,7 +217,8 @@ class Parser {
 
     if (propsType) {
       const resolvedComponentName = componentNameResolver(exp, source);
-      const componentName = resolvedComponentName || computeComponentName(exp, source);
+      const componentName =
+        resolvedComponentName || computeComponentName(exp, source);
       const defaultProps = this.extractDefaultPropsFromComponent(exp, source);
       const props = this.getPropsInfo(propsType, defaultProps);
 
@@ -678,7 +687,7 @@ function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
     exportName === '__function' ||
     exportName === 'StatelessComponent'
   ) {
-    return  getDefaultExportForFile(source);
+    return getDefaultExportForFile(source);
   } else {
     return exportName;
   }
@@ -686,11 +695,9 @@ function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
 
 // Default export for a file: named after file
 export function getDefaultExportForFile(source: ts.SourceFile) {
-    const name = path.basename(source.fileName, path.extname(source.fileName));
+  const name = path.basename(source.fileName, path.extname(source.fileName));
 
-    return name === 'index'
-      ? path.basename(path.dirname(source.fileName))
-      : name;
+  return name === 'index' ? path.basename(path.dirname(source.fileName)) : name;
 }
 
 function getParentType(prop: ts.Symbol): ParentType | undefined {
@@ -710,8 +717,24 @@ function getParentType(prop: ts.Symbol): ParentType | undefined {
   const parentName = parent.name.text;
   const { fileName } = parent.getSourceFile();
 
+  const fileNameParts = fileName.split('/');
+  const trimmedFileNameParts = fileNameParts.slice();
+
+  while (trimmedFileNameParts.length) {
+    if (trimmedFileNameParts[0] === currentDirectoryName) {
+      break;
+    }
+    trimmedFileNameParts.splice(0, 1);
+  }
+  let trimmedFileName;
+  if (trimmedFileNameParts.length) {
+    trimmedFileName = trimmedFileNameParts.join('/');
+  } else {
+    trimmedFileName = fileName;
+  }
+
   return {
-    fileName,
+    fileName: trimmedFileName,
     name: parentName
   };
 }
@@ -760,7 +783,13 @@ function parseWithProgramProvider(
         docs,
         checker
           .getExportsOfModule(moduleSymbol)
-          .map(exp => parser.getComponentInfo(exp, sourceFile, parserOpts.componentNameResolver))
+          .map(exp =>
+            parser.getComponentInfo(
+              exp,
+              sourceFile,
+              parserOpts.componentNameResolver
+            )
+          )
           .filter((comp): comp is ComponentDoc => comp !== null)
           .filter((comp, index, comps) =>
             comps
