@@ -502,6 +502,8 @@ class Parser {
 
     // Literal values
     switch (initializer.kind) {
+      case ts.SyntaxKind.PropertyAccessExpression:
+        return initializer.getText();
       case ts.SyntaxKind.FalseKeyword:
         return 'false';
       case ts.SyntaxKind.TrueKeyword:

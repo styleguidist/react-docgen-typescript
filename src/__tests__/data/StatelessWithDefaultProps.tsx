@@ -1,5 +1,10 @@
 import * as React from 'react';
 
+export enum enumSample {
+  HELLO = 'hi',
+  BYE = 'bye'
+}
+
 /** StatelessWithDefaultProps props */
 export interface StatelessWithDefaultPropsProps {
   /**
@@ -11,6 +16,8 @@ export interface StatelessWithDefaultPropsProps {
   sampleTrue?: boolean;
   /** sampleFalse description */
   sampleFalse?: boolean;
+  /** sampleEnum description */
+  sampleEnum?: enumSample;
   /** sampleString description */
   sampleString?: string;
   /** sampleObject description */
@@ -29,6 +36,7 @@ export const StatelessWithDefaultProps: React.StatelessComponent<
 > = props => <div>test</div>;
 
 StatelessWithDefaultProps.defaultProps = {
+  sampleEnum: enumSample.HELLO,
   sampleFalse: false,
   sampleNull: null,
   sampleNumber: -1,

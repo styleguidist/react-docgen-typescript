@@ -365,6 +365,11 @@ describe('parser', () => {
           required: true,
           type: '"hello" | "goodbye"'
         },
+        sampleEnum: {
+          defaultValue: 'enumSample.HELLO',
+          required: false,
+          type: 'enumSample'
+        },
         sampleFalse: {
           defaultValue: 'false',
           required: false,
