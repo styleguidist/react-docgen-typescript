@@ -6,7 +6,7 @@ import { buildFilter } from './buildFilter';
 
 // We'll use the currentDirectoryName to trim parent fileNames
 const currentDirectoryPath = process.cwd();
-const currentDirectoryParts = currentDirectoryPath.split('/');
+const currentDirectoryParts = currentDirectoryPath.split(path.sep);
 const currentDirectoryName =
   currentDirectoryParts[currentDirectoryParts.length - 1];
 export interface StringIndexedObject<T> {
@@ -717,7 +717,7 @@ function getParentType(prop: ts.Symbol): ParentType | undefined {
   const parentName = parent.name.text;
   const { fileName } = parent.getSourceFile();
 
-  const fileNameParts = fileName.split('/');
+  const fileNameParts = fileName.split(path.sep);
   const trimmedFileNameParts = fileNameParts.slice();
 
   while (trimmedFileNameParts.length) {
@@ -728,7 +728,7 @@ function getParentType(prop: ts.Symbol): ParentType | undefined {
   }
   let trimmedFileName;
   if (trimmedFileNameParts.length) {
-    trimmedFileName = trimmedFileNameParts.join('/');
+    trimmedFileName = trimmedFileNameParts.join(path.sep);
   } else {
     trimmedFileName = fileName;
   }
