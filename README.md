@@ -168,6 +168,8 @@ the part it's fixing.
 
 **@JakeSidSmith** *Jake*
 
+**@JoaoMosmann** *João Mosmann*
+
 **@JocD** *Jacques Dukes* - complete support for functional components and much more
 
 **@jrwebdev** *James Ravenscroft*
@@ -177,6 +179,8 @@ the part it's fixing.
 **@marionebl** *Mario Nebl*
 
 **@milesj** *Miles Johnson*
+
+**@mutsys** *Mike Rose*
 
 **@rkostrzewski** *Rafał Kostrzewski*
 
@@ -189,6 +193,11 @@ the part it's fixing.
 **@skeate** *Jonathan Skeate*
 
 **@strothj** *Jason Strothmann*
+
+**@thomascmost** *Thomas Constantine Moore*
+
+**@veiko** *Veronica Carrillo-Marquez*
+
 
 ## Thanks to others
 
