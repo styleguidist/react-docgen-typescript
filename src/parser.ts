@@ -166,7 +166,7 @@ const defaultJSDoc: JSDoc = {
   tags: {}
 };
 
-class Parser {
+export class Parser {
   private checker: ts.TypeChecker;
   private propFilter: PropFilter;
 
