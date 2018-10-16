@@ -215,25 +215,33 @@ export class Parser {
       this.extractPropsFromTypeIfStatelessComponent(type) ||
       this.extractPropsFromTypeIfStatefulComponent(type);
 
+    const resolvedComponentName = componentNameResolver(exp, source);
+    const displayName =
+      resolvedComponentName || computeComponentName(exp, source);
+    const description = this.findDocComment(commentSource).fullComment;
+
     if (propsType) {
-      const resolvedComponentName = componentNameResolver(exp, source);
-      const componentName =
-        resolvedComponentName || computeComponentName(exp, source);
       const defaultProps = this.extractDefaultPropsFromComponent(exp, source);
       const props = this.getPropsInfo(propsType, defaultProps);
 
       for (const propName of Object.keys(props)) {
         const prop = props[propName];
-        const component: Component = { name: componentName };
+        const component: Component = { name: displayName };
         if (!this.propFilter(prop, component)) {
           delete props[propName];
         }
       }
 
       return {
-        description: this.findDocComment(commentSource).fullComment,
-        displayName: componentName,
+        description,
+        displayName,
         props
+      };
+    } else if (description && displayName) {
+      return {
+        description,
+        displayName,
+        props: {}
       };
     }
 
@@ -375,7 +383,7 @@ export class Parser {
     let mainComment = ts.displayPartsToString(
       symbol.getDocumentationComment(this.checker)
     );
-    
+
     if (mainComment) {
       mainComment = mainComment.replace('\r\n', '\n');
     }
