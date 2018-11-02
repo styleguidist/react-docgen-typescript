@@ -35,7 +35,7 @@ export interface Method {
   name: string;
   docblock: string;
   modifiers: string[];
-  params: Array<{ name: string, description?: string }>;
+  params: Array<{ name: string, description?: string|null }>;
   returns?: {
     description?: string|null;
     type?: string;
@@ -232,8 +232,8 @@ export class Parser {
     const displayName =
       resolvedComponentName || computeComponentName(exp, source);
     const description = this.findDocComment(commentSource).fullComment;
+    const methods = this.getMethodsInfo(type);
 
-    // here
     if (propsType) {
       const defaultProps = this.extractDefaultPropsFromComponent(exp, source);
       const props = this.getPropsInfo(propsType, defaultProps);
@@ -246,7 +246,6 @@ export class Parser {
         }
       }
 
-      const methods = this.getMethodsInfo(type);
       return {
         description,
         displayName,
@@ -257,7 +256,7 @@ export class Parser {
       return {
         description,
         displayName,
-        methods: [],
+        methods,
         props: {}
       };
     }
@@ -327,7 +326,7 @@ export class Parser {
       }
     });
 
-    if (type.symbol.members) {
+    if (type.symbol && type.symbol.members) {
       type.symbol.members.forEach((member) => {
         methodSymbols.push(member);
       });
@@ -384,7 +383,7 @@ export class Parser {
   public getParameterInfo(callSignature: ts.Signature) {
     return callSignature.parameters.map((param) => {
       return {
-        description: ts.displayPartsToString(param.getDocumentationComment(this.checker)),
+        description: ts.displayPartsToString(param.getDocumentationComment(this.checker)) || null,
         name: param.getName()
       };
     });

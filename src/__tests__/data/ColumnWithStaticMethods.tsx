@@ -25,29 +25,13 @@ export class Column extends React.Component<IColumnProps, {}> {
   };
 
   /**
-   * My super cool method
+   * My super cool static method
    * @param myParam Documentation for parameter 1
    * @public
    * @returns The answer to the universe
    */
-  myCoolMethod(myParam: number, mySecondParam: string): number {
+  static myStaticMethod(myParam: number, mySecondParam: string): number {
     return 42;
-  }
-
-  /**
-   * @public
-   */
-  myBasicMethod() {
-    return null;
-  }
-
-  /**
-   * @public
-   */
-  myArrowFunction = () => 23;
-
-  myPrivateFunction() {
-    return 99;
   }
 
   public render() {
