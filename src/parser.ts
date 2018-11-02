@@ -17,6 +17,7 @@ export interface ComponentDoc {
   displayName: string;
   description: string;
   props: Props;
+  methods: Method[];
 }
 
 export interface Props extends StringIndexedObject<PropItem> {}
@@ -28,6 +29,18 @@ export interface PropItem {
   description: string;
   defaultValue: any;
   parent?: ParentType;
+}
+
+export interface Method {
+  name: string;
+  docblock: string;
+  modifiers: string[];
+  params: Array<{ name: string, description?: string }>;
+  returns?: {
+    description?: string|null;
+    type?: string;
+  } | null;
+  description: string;
 }
 
 export interface Component {
@@ -220,6 +233,7 @@ export class Parser {
       resolvedComponentName || computeComponentName(exp, source);
     const description = this.findDocComment(commentSource).fullComment;
 
+    // here
     if (propsType) {
       const defaultProps = this.extractDefaultPropsFromComponent(exp, source);
       const props = this.getPropsInfo(propsType, defaultProps);
@@ -232,15 +246,18 @@ export class Parser {
         }
       }
 
+      const methods = this.getMethodsInfo(type);
       return {
         description,
         displayName,
+        methods,
         props
       };
     } else if (description && displayName) {
       return {
         description,
         displayName,
+        methods: [],
         props: {}
       };
     }
@@ -294,6 +311,108 @@ export class Parser {
     }
 
     return null;
+  }
+
+  public extractMembersFromType(type: ts.Type): ts.Symbol[] {
+    const methodSymbols: ts.Symbol[] = [];
+
+    /**
+     * Need to loop over properties first so we capture any
+     * static methods. static methods aren't captured in type.symbol.members
+     */
+    type.getProperties().forEach((property) => {
+      // Only add members, don't add non-member properties
+      if (this.getCallSignature(property)) {
+        methodSymbols.push(property);
+      }
+    });
+
+    if (type.symbol.members) {
+      type.symbol.members.forEach((member) => {
+        methodSymbols.push(member);
+      });
+    }
+
+    return methodSymbols;
+  }
+
+  public getMethodsInfo(type: ts.Type): Method[] {
+    const members = this.extractMembersFromType(type);
+    const methods: Method[] = [];
+    members.forEach((member) => {
+      if (!this.isTaggedPublic(member)) {
+        return;
+      }
+
+      const name = member.getName();
+      const docblock = this.getFullJsDocComment(member).fullComment;
+      const callSignature = this.getCallSignature(member);
+      const params = this.getParameterInfo(callSignature);
+      const description = ts.displayPartsToString(member.getDocumentationComment(this.checker));
+      const returnType = this.checker.typeToString(callSignature.getReturnType());
+      const returnDescription = this.getReturnDescription(member);
+      const modifiers = this.getModifiers(member);
+
+      methods.push({
+        description,
+        docblock,
+        modifiers,
+        name,
+        params,
+        returns: returnDescription ? {
+          description: returnDescription,
+          type: returnType
+        } : null
+      });
+    });
+
+    return methods;
+  }
+
+  public getModifiers(member: ts.Symbol) {
+    const modifiers: string[] = [];
+    const flags = ts.getCombinedModifierFlags(member.valueDeclaration);
+    const isStatic = (flags & ts.ModifierFlags.Static) !== 0; // tslint:disable-line no-bitwise
+
+    if (isStatic) {
+      modifiers.push('static');
+    }
+
+    return modifiers;
+  }
+
+  public getParameterInfo(callSignature: ts.Signature) {
+    return callSignature.parameters.map((param) => {
+      return {
+        description: ts.displayPartsToString(param.getDocumentationComment(this.checker)),
+        name: param.getName()
+      };
+    });
+  }
+
+  public getCallSignature(symbol: ts.Symbol) {
+    const symbolType = this.checker.getTypeOfSymbolAtLocation(
+      symbol,
+      symbol.valueDeclaration!
+    );
+
+    return symbolType.getCallSignatures()[0];
+  }
+
+  public isTaggedPublic(symbol: ts.Symbol) {
+    const jsDocTags = symbol.getJsDocTags();
+    const isPulbic = Boolean(jsDocTags.find((tag) => tag.name === 'public'));
+    return isPulbic;
+  }
+
+  public getReturnDescription(symbol: ts.Symbol) {
+    const tags = symbol.getJsDocTags();
+    const returnTag = tags.find((tag) => tag.name === 'returns');
+    if (!returnTag) {
+      return null;
+    }
+
+    return returnTag.text || null;
   }
 
   public getPropsInfo(
