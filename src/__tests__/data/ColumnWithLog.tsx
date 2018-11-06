@@ -16,7 +16,7 @@ export interface IColumnProps {
   prop4: 'option1' | 'option2' | 'option3';
 }
 
-console.log("test");
+console.log('test');
 
 /**
  * Column description

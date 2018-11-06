@@ -850,7 +850,10 @@ describe('parser', () => {
       const myCoolMethod = methods[0];
 
       assert.equal(myCoolMethod.description, 'My super cool method');
-      assert.equal(myCoolMethod.docblock, 'My super cool method\n@param myParam Documentation for parameter 1\n@public\n@returns The answer to the universe'); // tslint:disable-line max-line-length
+      assert.equal(
+        myCoolMethod.docblock,
+        'My super cool method\n@param myParam Documentation for parameter 1\n@public\n@returns The answer to the universe'
+      ); // tslint:disable-line max-line-length
       assert.deepEqual(myCoolMethod.modifiers, []);
       assert.equal(myCoolMethod.name, 'myCoolMethod');
       assert.deepEqual(myCoolMethod.params, [
@@ -892,7 +895,10 @@ describe('parser', () => {
     it('should not parse functions not marked with @public', () => {
       const [parsed] = parse(fixturePath('ColumnWithMethods'));
       const methods = parsed.methods;
-      assert.equal(Boolean(methods.find((method => method.name === 'myPrivateFunction'))), false);
+      assert.equal(
+        Boolean(methods.find(method => method.name === 'myPrivateFunction')),
+        false
+      );
     });
   });
 });
