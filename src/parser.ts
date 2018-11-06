@@ -252,7 +252,7 @@ export class Parser {
         methods,
         props
       };
-    } else if (description && displayName) {
+    } else if (displayName) {
       return {
         description,
         displayName,
