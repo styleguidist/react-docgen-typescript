@@ -20,6 +20,10 @@ export interface ExpectedProp {
   required?: boolean;
   description?: string;
   defaultValue?: string | null;
+  parent?: {
+    name: string;
+    fileName: string;
+  };
 }
 
 export function fixturePath(componentName: string) {
@@ -125,6 +129,21 @@ export function checkComponent(
             // tslint:disable-next-line:max-line-length
             `Property '${compName}.${expectedPropName}' description is different - expected: ${expectedDescription}, actual: ${
               prop.description
+            }`
+          );
+        }
+        const expectedParentFileName = expectedProp.parent
+          ? expectedProp.parent.fileName
+          : undefined;
+        if (
+          expectedParentFileName &&
+          prop.parent &&
+          expectedParentFileName !== prop.parent.fileName
+        ) {
+          errors.push(
+            // tslint:disable-next-line:max-line-length
+            `Property '${compName}.${expectedPropName}' parent fileName is different - expected: ${expectedParentFileName}, actual: ${
+              prop.parent.fileName
             }`
           );
         }

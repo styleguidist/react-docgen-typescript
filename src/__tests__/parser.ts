@@ -227,6 +227,26 @@ describe('parser', () => {
     });
   });
 
+  // see issue #132 (https://github.com/styleguidist/react-docgen-typescript/issues/132)
+  it('should determine the parent fileName relative to the project directory', () => {
+    check(
+      'ExportsPropTypeImport',
+      {
+        ExportsPropTypes: {
+          foo: {
+            parent: {
+              fileName:
+                'react-docgen-typescript/src/__tests__/data/ExportsPropTypeImport.tsx',
+              name: 'ExportsPropTypesProps'
+            },
+            type: 'any'
+          } as any
+        }
+      },
+      true
+    );
+  });
+
   describe('component with default props', () => {
     const expectation = {
       ComponentWithDefaultProps: {
@@ -364,6 +384,11 @@ describe('parser', () => {
           description: 'sample with default value',
           required: true,
           type: '"hello" | "goodbye"'
+        },
+        sampleEnum: {
+          defaultValue: 'enumSample.HELLO',
+          required: false,
+          type: 'enumSample'
         },
         sampleFalse: {
           defaultValue: 'false',
@@ -799,10 +824,9 @@ describe('parser', () => {
       const [parsed] = parse(
         fixturePath('StatelessDisplayNameStyledComponent'),
         {
-          componentNameResolver: (exp, source) => (
+          componentNameResolver: (exp, source) =>
             exp.getName() === 'StyledComponentClass' &&
             getDefaultExportForFile(source)
-          )
         }
       );
       assert.equal(parsed.displayName, 'StatelessDisplayNameStyledComponent');
@@ -816,6 +840,59 @@ describe('parser', () => {
         }
       );
       assert.equal(parsed.displayName, 'StatelessDisplayNameStyledComponent');
+    });
+  });
+
+  describe('methods', () => {
+    it('should properly parse methods', () => {
+      const [parsed] = parse(fixturePath('ColumnWithMethods'));
+      const methods = parsed.methods;
+      const myCoolMethod = methods[0];
+
+      assert.equal(myCoolMethod.description, 'My super cool method');
+      assert.equal(myCoolMethod.docblock, 'My super cool method\n@param myParam Documentation for parameter 1\n@public\n@returns The answer to the universe'); // tslint:disable-line max-line-length
+      assert.deepEqual(myCoolMethod.modifiers, []);
+      assert.equal(myCoolMethod.name, 'myCoolMethod');
+      assert.deepEqual(myCoolMethod.params, [
+        {
+          description: 'Documentation for parameter 1',
+          name: 'myParam'
+        },
+        {
+          description: null,
+          name: 'mySecondParam'
+        }
+      ]);
+      assert.deepEqual(myCoolMethod.returns, {
+        description: 'The answer to the universe',
+        type: 'number'
+      });
+    });
+
+    it('should properly parse static methods', () => {
+      const [parsed] = parse(fixturePath('ColumnWithStaticMethods'));
+      const methods = parsed.methods;
+
+      assert.equal(methods[0].name, 'myStaticMethod');
+      assert.deepEqual(methods[0].modifiers, ['static']);
+    });
+
+    it('should handle method with no information', () => {
+      const [parsed] = parse(fixturePath('ColumnWithMethods'));
+      const methods = parsed.methods;
+      assert.equal(methods[1].name, 'myBasicMethod');
+    });
+
+    it('should handle arrow function', () => {
+      const [parsed] = parse(fixturePath('ColumnWithMethods'));
+      const methods = parsed.methods;
+      assert.equal(methods[2].name, 'myArrowFunction');
+    });
+
+    it('should not parse functions not marked with @public', () => {
+      const [parsed] = parse(fixturePath('ColumnWithMethods'));
+      const methods = parsed.methods;
+      assert.equal(Boolean(methods.find((method => method.name === 'myPrivateFunction'))), false);
     });
   });
 });

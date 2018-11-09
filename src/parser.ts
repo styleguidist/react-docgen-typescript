@@ -4,6 +4,11 @@ import * as ts from 'typescript';
 
 import { buildFilter } from './buildFilter';
 
+// We'll use the currentDirectoryName to trim parent fileNames
+const currentDirectoryPath = process.cwd();
+const currentDirectoryParts = currentDirectoryPath.split(path.sep);
+const currentDirectoryName =
+  currentDirectoryParts[currentDirectoryParts.length - 1];
 export interface StringIndexedObject<T> {
   [key: string]: T;
 }
@@ -12,6 +17,7 @@ export interface ComponentDoc {
   displayName: string;
   description: string;
   props: Props;
+  methods: Method[];
 }
 
 export interface Props extends StringIndexedObject<PropItem> {}
@@ -23,6 +29,18 @@ export interface PropItem {
   description: string;
   defaultValue: any;
   parent?: ParentType;
+}
+
+export interface Method {
+  name: string;
+  docblock: string;
+  modifiers: string[];
+  params: Array<{ name: string, description?: string|null }>;
+  returns?: {
+    description?: string|null;
+    type?: string;
+  } | null;
+  description: string;
 }
 
 export interface Component {
@@ -161,7 +179,7 @@ const defaultJSDoc: JSDoc = {
   tags: {}
 };
 
-class Parser {
+export class Parser {
   private checker: ts.TypeChecker;
   private propFilter: PropFilter;
 
@@ -210,25 +228,36 @@ class Parser {
       this.extractPropsFromTypeIfStatelessComponent(type) ||
       this.extractPropsFromTypeIfStatefulComponent(type);
 
+    const resolvedComponentName = componentNameResolver(exp, source);
+    const displayName =
+      resolvedComponentName || computeComponentName(exp, source);
+    const description = this.findDocComment(commentSource).fullComment;
+    const methods = this.getMethodsInfo(type);
+
     if (propsType) {
-      const resolvedComponentName = componentNameResolver(exp, source);
-      const componentName =
-        resolvedComponentName || computeComponentName(exp, source);
       const defaultProps = this.extractDefaultPropsFromComponent(exp, source);
       const props = this.getPropsInfo(propsType, defaultProps);
 
       for (const propName of Object.keys(props)) {
         const prop = props[propName];
-        const component: Component = { name: componentName };
+        const component: Component = { name: displayName };
         if (!this.propFilter(prop, component)) {
           delete props[propName];
         }
       }
 
       return {
-        description: this.findDocComment(commentSource).fullComment,
-        displayName: componentName,
+        description,
+        displayName,
+        methods,
         props
+      };
+    } else if (description && displayName) {
+      return {
+        description,
+        displayName,
+        methods,
+        props: {}
       };
     }
 
@@ -281,6 +310,108 @@ class Parser {
     }
 
     return null;
+  }
+
+  public extractMembersFromType(type: ts.Type): ts.Symbol[] {
+    const methodSymbols: ts.Symbol[] = [];
+
+    /**
+     * Need to loop over properties first so we capture any
+     * static methods. static methods aren't captured in type.symbol.members
+     */
+    type.getProperties().forEach((property) => {
+      // Only add members, don't add non-member properties
+      if (this.getCallSignature(property)) {
+        methodSymbols.push(property);
+      }
+    });
+
+    if (type.symbol && type.symbol.members) {
+      type.symbol.members.forEach((member) => {
+        methodSymbols.push(member);
+      });
+    }
+
+    return methodSymbols;
+  }
+
+  public getMethodsInfo(type: ts.Type): Method[] {
+    const members = this.extractMembersFromType(type);
+    const methods: Method[] = [];
+    members.forEach((member) => {
+      if (!this.isTaggedPublic(member)) {
+        return;
+      }
+
+      const name = member.getName();
+      const docblock = this.getFullJsDocComment(member).fullComment;
+      const callSignature = this.getCallSignature(member);
+      const params = this.getParameterInfo(callSignature);
+      const description = ts.displayPartsToString(member.getDocumentationComment(this.checker));
+      const returnType = this.checker.typeToString(callSignature.getReturnType());
+      const returnDescription = this.getReturnDescription(member);
+      const modifiers = this.getModifiers(member);
+
+      methods.push({
+        description,
+        docblock,
+        modifiers,
+        name,
+        params,
+        returns: returnDescription ? {
+          description: returnDescription,
+          type: returnType
+        } : null
+      });
+    });
+
+    return methods;
+  }
+
+  public getModifiers(member: ts.Symbol) {
+    const modifiers: string[] = [];
+    const flags = ts.getCombinedModifierFlags(member.valueDeclaration);
+    const isStatic = (flags & ts.ModifierFlags.Static) !== 0; // tslint:disable-line no-bitwise
+
+    if (isStatic) {
+      modifiers.push('static');
+    }
+
+    return modifiers;
+  }
+
+  public getParameterInfo(callSignature: ts.Signature) {
+    return callSignature.parameters.map((param) => {
+      return {
+        description: ts.displayPartsToString(param.getDocumentationComment(this.checker)) || null,
+        name: param.getName()
+      };
+    });
+  }
+
+  public getCallSignature(symbol: ts.Symbol) {
+    const symbolType = this.checker.getTypeOfSymbolAtLocation(
+      symbol,
+      symbol.valueDeclaration!
+    );
+
+    return symbolType.getCallSignatures()[0];
+  }
+
+  public isTaggedPublic(symbol: ts.Symbol) {
+    const jsDocTags = symbol.getJsDocTags();
+    const isPulbic = Boolean(jsDocTags.find((tag) => tag.name === 'public'));
+    return isPulbic;
+  }
+
+  public getReturnDescription(symbol: ts.Symbol) {
+    const tags = symbol.getJsDocTags();
+    const returnTag = tags.find((tag) => tag.name === 'returns');
+    if (!returnTag) {
+      return null;
+    }
+
+    return returnTag.text || null;
   }
 
   public getPropsInfo(
@@ -367,9 +498,13 @@ class Parser {
       return defaultJSDoc;
     }
 
-    const mainComment = ts.displayPartsToString(
+    let mainComment = ts.displayPartsToString(
       symbol.getDocumentationComment(this.checker)
     );
+
+    if (mainComment) {
+      mainComment = mainComment.replace('\r\n', '\n');
+    }
 
     const tags = symbol.getJsDocTags() || [];
 
@@ -502,6 +637,8 @@ class Parser {
 
     // Literal values
     switch (initializer.kind) {
+      case ts.SyntaxKind.PropertyAccessExpression:
+        return initializer.getText();
       case ts.SyntaxKind.FalseKeyword:
         return 'false';
       case ts.SyntaxKind.TrueKeyword:
@@ -694,14 +831,14 @@ export function getDefaultExportForFile(source: ts.SourceFile) {
 }
 
 function getParentType(prop: ts.Symbol): ParentType | undefined {
-  const decalarations = prop.getDeclarations();
+  const declarations = prop.getDeclarations();
 
-  if (decalarations == null || decalarations.length === 0) {
+  if (declarations == null || declarations.length === 0) {
     return undefined;
   }
 
   // Props can be declared only in one place
-  const { parent } = decalarations[0];
+  const { parent } = declarations[0];
 
   if (!isInterfaceOrTypeAliasDeclaration(parent)) {
     return undefined;
@@ -710,8 +847,24 @@ function getParentType(prop: ts.Symbol): ParentType | undefined {
   const parentName = parent.name.text;
   const { fileName } = parent.getSourceFile();
 
+  const fileNameParts = fileName.split(path.sep);
+  const trimmedFileNameParts = fileNameParts.slice();
+
+  while (trimmedFileNameParts.length) {
+    if (trimmedFileNameParts[0] === currentDirectoryName) {
+      break;
+    }
+    trimmedFileNameParts.splice(0, 1);
+  }
+  let trimmedFileName;
+  if (trimmedFileNameParts.length) {
+    trimmedFileName = trimmedFileNameParts.join(path.sep);
+  } else {
+    trimmedFileName = fileName;
+  }
+
   return {
-    fileName,
+    fileName: trimmedFileName,
     name: parentName
   };
 }
