@@ -41,7 +41,10 @@ export interface ParentType {
 
 export type PropFilter = (props: PropItem, component: Component) => boolean;
 
-export type ComponentNameResolver = (exp: ts.Symbol, source: ts.SourceFile) => string | undefined | null | false;
+export type ComponentNameResolver = (
+  exp: ts.Symbol,
+  source: ts.SourceFile
+) => string | undefined | null | false;
 
 export interface ParserOptions {
   propFilter?: StaticPropFilter | PropFilter;
@@ -209,7 +212,8 @@ class Parser {
 
     if (propsType) {
       const resolvedComponentName = componentNameResolver(exp, source);
-      const componentName = resolvedComponentName || computeComponentName(exp, source);
+      const componentName =
+        resolvedComponentName || computeComponentName(exp, source);
       const defaultProps = this.extractDefaultPropsFromComponent(exp, source);
       const props = this.getPropsInfo(propsType, defaultProps);
 
@@ -672,7 +676,7 @@ function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
     exportName === '__function' ||
     exportName === 'StatelessComponent'
   ) {
-    return  getDefaultExportForFile(source);
+    return getDefaultExportForFile(source);
   } else {
     return exportName;
   }
@@ -680,11 +684,13 @@ function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
 
 // Default export for a file: named after file
 export function getDefaultExportForFile(source: ts.SourceFile) {
-    const name = path.basename(source.fileName, path.extname(source.fileName));
+  const name = path.basename(source.fileName, path.extname(source.fileName));
 
-    return name === 'index'
-      ? path.basename(path.dirname(source.fileName))
-      : name;
+  const fileName =
+    name === 'index' ? path.basename(path.dirname(source.fileName)) : name;
+  return fileName
+    .replace(/^[a-z]/, g => g.toUpperCase())
+    .replace(/\-\w/g, g => g[1].toUpperCase());
 }
 
 function getParentType(prop: ts.Symbol): ParentType | undefined {
@@ -754,7 +760,13 @@ function parseWithProgramProvider(
         docs,
         checker
           .getExportsOfModule(moduleSymbol)
-          .map(exp => parser.getComponentInfo(exp, sourceFile, parserOpts.componentNameResolver))
+          .map(exp =>
+            parser.getComponentInfo(
+              exp,
+              sourceFile,
+              parserOpts.componentNameResolver
+            )
+          )
           .filter((comp): comp is ComponentDoc => comp !== null)
           .filter((comp, index, comps) =>
             comps
