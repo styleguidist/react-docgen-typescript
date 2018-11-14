@@ -35,9 +35,9 @@ export interface Method {
   name: string;
   docblock: string;
   modifiers: string[];
-  params: Array<{ name: string, description?: string|null }>;
+  params: Array<{ name: string; description?: string | null }>;
   returns?: {
-    description?: string|null;
+    description?: string | null;
     type?: string;
   } | null;
   description: string;
@@ -208,7 +208,13 @@ export class Parser {
         return null;
       }
       exp = type.symbol;
-      if (exp.getName() === 'StatelessComponent') {
+      const expName = exp.getName();
+      if (
+        expName === 'StatelessComponent' ||
+        expName === 'Stateless' ||
+        expName === 'StyledComponentClass' ||
+        expName === 'FunctionComponent'
+      ) {
         commentSource = this.checker.getAliasedSymbol(commentSource);
       } else {
         commentSource = exp;
@@ -319,7 +325,7 @@ export class Parser {
      * Need to loop over properties first so we capture any
      * static methods. static methods aren't captured in type.symbol.members
      */
-    type.getProperties().forEach((property) => {
+    type.getProperties().forEach(property => {
       // Only add members, don't add non-member properties
       if (this.getCallSignature(property)) {
         methodSymbols.push(property);
@@ -327,7 +333,7 @@ export class Parser {
     });
 
     if (type.symbol && type.symbol.members) {
-      type.symbol.members.forEach((member) => {
+      type.symbol.members.forEach(member => {
         methodSymbols.push(member);
       });
     }
@@ -338,7 +344,7 @@ export class Parser {
   public getMethodsInfo(type: ts.Type): Method[] {
     const members = this.extractMembersFromType(type);
     const methods: Method[] = [];
-    members.forEach((member) => {
+    members.forEach(member => {
       if (!this.isTaggedPublic(member)) {
         return;
       }
@@ -347,8 +353,12 @@ export class Parser {
       const docblock = this.getFullJsDocComment(member).fullComment;
       const callSignature = this.getCallSignature(member);
       const params = this.getParameterInfo(callSignature);
-      const description = ts.displayPartsToString(member.getDocumentationComment(this.checker));
-      const returnType = this.checker.typeToString(callSignature.getReturnType());
+      const description = ts.displayPartsToString(
+        member.getDocumentationComment(this.checker)
+      );
+      const returnType = this.checker.typeToString(
+        callSignature.getReturnType()
+      );
       const returnDescription = this.getReturnDescription(member);
       const modifiers = this.getModifiers(member);
 
@@ -358,10 +368,12 @@ export class Parser {
         modifiers,
         name,
         params,
-        returns: returnDescription ? {
-          description: returnDescription,
-          type: returnType
-        } : null
+        returns: returnDescription
+          ? {
+              description: returnDescription,
+              type: returnType
+            }
+          : null
       });
     });
 
@@ -381,9 +393,12 @@ export class Parser {
   }
 
   public getParameterInfo(callSignature: ts.Signature) {
-    return callSignature.parameters.map((param) => {
+    return callSignature.parameters.map(param => {
       return {
-        description: ts.displayPartsToString(param.getDocumentationComment(this.checker)) || null,
+        description:
+          ts.displayPartsToString(
+            param.getDocumentationComment(this.checker)
+          ) || null,
         name: param.getName()
       };
     });
@@ -400,13 +415,13 @@ export class Parser {
 
   public isTaggedPublic(symbol: ts.Symbol) {
     const jsDocTags = symbol.getJsDocTags();
-    const isPulbic = Boolean(jsDocTags.find((tag) => tag.name === 'public'));
+    const isPulbic = Boolean(jsDocTags.find(tag => tag.name === 'public'));
     return isPulbic;
   }
 
   public getReturnDescription(symbol: ts.Symbol) {
     const tags = symbol.getJsDocTags();
-    const returnTag = tags.find((tag) => tag.name === 'returns');
+    const returnTag = tags.find(tag => tag.name === 'returns');
     if (!returnTag) {
       return null;
     }
