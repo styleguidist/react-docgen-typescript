@@ -145,8 +145,8 @@ welcome. Just keep in mind that each PR should also include tests for
 the part it's fixing.
 
 Thanks to all contributors without their help there wouldn't be a single 
-bug fixed or feature implemented. Check the *contributors* tab to find out
-more. All those people supported this project. *THANK YOU!*
+bug fixed or feature implemented. Check the [**contributors**](https://github.com/styleguidist/react-docgen-typescript/graphs/contributors) tab to find out
+more. All those people supported this project. **THANK YOU!**
 
 ## Thanks to others
 
