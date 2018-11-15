@@ -138,66 +138,15 @@ Will generate the following stylesheet:
 ![Stylesheet example](./stylesheet-example-grid.png "Stylesheet example")
 
 ## Contributions
-The typescript is pretty complex and there are many different way how
+The typescript is pretty complex and there are many different ways how
 to define components and their props so it's realy hard to support all
-diferent use cases. That means only one thing, contributions are highly
+these use cases. That means only one thing, contributions are highly
 welcome. Just keep in mind that each PR should also include tests for
 the part it's fixing.
 
-## Thanks to contributors
-
-**@argshook** *Arijus Šukys*
-
-**@asilgag** *Alberto Silva*
-
-**@basarat** *Basarat Ali Syed*
-
-**@bebraw** *Juho Vepsäläinen*
-
-**@brettjurgens** *Brett Jurgens* - adding support for default props
-
-**@chrisalbert** *Chris Albert*
-
-**@diegolanda** *Diego* - support for different kinds of components
-
-**@dotcs** *Fabian Mueller* - introduced parserOptions for skipping undocumented properties
-
-**@eps1lon** *Sebastian Silbermann*
-
-**@Havret** *Krzysztof Havret*
-
-**@JakeSidSmith** *Jake*
-
-**@JoaoMosmann** *João Mosmann*
-
-**@JocD** *Jacques Dukes* - complete support for functional components and much more
-
-**@jrwebdev** *James Ravenscroft*
-
-**@kbukum** *Kamil BUKUM*
-
-**@marionebl** *Mario Nebl*
-
-**@milesj** *Miles Johnson*
-
-**@mutsys** *Mike Rose*
-
-**@rkostrzewski** *Rafał Kostrzewski*
-
-**@RoystonS** *Royston Shufflebotham* - complete parser rewrite that use typescript parser in much better way and overcome many issues of previous implementation
-
-**@yoiang** *Ian G*
-
-**@sapegin** *Artem Sapegin* - fix for compatibility with react-styleguidist v5
-
-**@skeate** *Jonathan Skeate*
-
-**@strothj** *Jason Strothmann*
-
-**@thomascmost** *Thomas Constantine Moore*
-
-**@veiko** *Veronica Carrillo-Marquez*
-
+Thanks to all contributors without their help there wouldn't be a single 
+bug fixed or feature implemented. Check the *contributors* tab to find out
+more. All those people supported this project. *THANK YOU!*
 
 ## Thanks to others
 
