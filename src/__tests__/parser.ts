@@ -895,4 +895,24 @@ describe('parser', () => {
       assert.equal(Boolean(methods.find((method => method.name === 'myPrivateFunction'))), false);
     });
   });
+
+  describe('getDefaultExportForFile', () => {
+    it('should filter out forbidden symbols', () => {
+      // @ts-ignore
+      const result = getDefaultExportForFile({ fileName: 'a-b' })
+      assert.equal(result, 'ab');
+    });
+
+    it('should remove leading non-letters', () => {
+      // @ts-ignore
+      const result = getDefaultExportForFile({ fileName: '---123aba' })
+      assert.equal(result, 'aba');
+    });
+
+    it('should not return empty string', () => {
+      // @ts-ignore
+      const result = getDefaultExportForFile({ fileName: '---123' })
+      assert.equal(result.length > 0, true);
+    });
+  });
 });
