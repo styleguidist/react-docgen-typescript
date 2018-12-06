@@ -779,6 +779,7 @@ function getTextValueOfFunctionProperty(
         .expression as ts.BinaryExpression;
       return (
         expr.left &&
+        (expr.left as ts.PropertyAccessExpression).name &&
         (expr.left as ts.PropertyAccessExpression).name.escapedText ===
           propertyName
       );
