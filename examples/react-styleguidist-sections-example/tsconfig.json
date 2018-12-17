@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "lib": ["es5", "es6", "dom"],
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "outDir": "lib",
+    "jsx": "react"
+  }
+}
