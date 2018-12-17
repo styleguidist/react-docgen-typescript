@@ -1,0 +1,36 @@
+{
+  "name": "react-docgen-typescript-example",
+  "version": "0.0.1",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "tsc": "tsc",
+    "styleguidist": "styleguidist",
+    "start": "tsc && styleguidist server --config styleguide.config.js",
+    "webpack": "webpack",
+    "lint": "tslint -c tslint.json 'src/**/*.{ts,tsx}'",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier:base": "prettier --parser typescript --single-quote --trailing-comma none",
+    "prettier:check": "npm run prettier:base -- -l \"components/**/*.{ts,tsx}\"",
+    "prettier:write": "npm run prettier:base -- --write \"components/**/*.{ts,tsx}\""
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@types/react": "^16.4.14",
+    "@types/react-dom": "^16.0.7",
+    "react": "^16.5.0",
+    "react-codemirror2": "^5.1.0",
+    "react-dom": "^16.5.0"
+  },
+  "devDependencies": {
+    "husky": "^0.14.3",
+    "lint-staged": "^7.2.2",
+    "prettier": "^1.14.2",
+    "react-docgen-typescript": "^1.9.0",
+    "react-styleguidist": "^7.3.7",
+    "ts-loader": "^5.1.0",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.3",
+    "webpack": "^4.18.0"
+  }
+}
