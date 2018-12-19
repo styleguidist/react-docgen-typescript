@@ -898,20 +898,30 @@ describe('parser', () => {
 
   describe('getDefaultExportForFile', () => {
     it('should filter out forbidden symbols', () => {
-      // @ts-ignore
-      const result = getDefaultExportForFile({ fileName: 'a-b' })
+      const result = getDefaultExportForFile({
+        fileName: 'a-b'
+      } as ts.SourceFile);
       assert.equal(result, 'ab');
     });
 
     it('should remove leading non-letters', () => {
-      // @ts-ignore
-      const result = getDefaultExportForFile({ fileName: '---123aba' })
+      const result = getDefaultExportForFile({
+        fileName: '---123aba'
+      } as ts.SourceFile);
       assert.equal(result, 'aba');
     });
 
+    it('should preserve numbers in the middle', () => {
+      const result = getDefaultExportForFile({
+        fileName: '1Body2Text3'
+      } as ts.SourceFile);
+      assert.equal(result, 'Body2Text3');
+    });
+
     it('should not return empty string', () => {
-      // @ts-ignore
-      const result = getDefaultExportForFile({ fileName: '---123' })
+      const result = getDefaultExportForFile({
+        fileName: '---123'
+      } as ts.SourceFile);
       assert.equal(result.length > 0, true);
     });
   });
