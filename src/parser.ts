@@ -846,9 +846,11 @@ export function getDefaultExportForFile(source: ts.SourceFile) {
 
   // JS identifiers must starts with a letter, and contain letters and/or numbers
   // So, you could not take filename as is
-  const identifier = filename.replace(/[^A-Za-z]*|[^0-9.]*/g, '')
+  const identifier = filename
+    .replace(/^[^A-Z]*/gi, '')
+    .replace(/[^A-Z0-9]*/gi, '');
 
-  return identifier.length ? identifier : 'DefaultName'
+  return identifier.length ? identifier : 'DefaultName';
 }
 
 function getParentType(prop: ts.Symbol): ParentType | undefined {
