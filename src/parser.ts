@@ -35,7 +35,7 @@ export interface Method {
   name: string;
   docblock: string;
   modifiers: string[];
-  params: Array<{ name: string; description?: string | null }>;
+  params: Array<{ name: string; description?: string | null, type: { name: string, required: boolean } }>;
   returns?: {
     description?: string | null;
     type?: string;
@@ -393,14 +393,24 @@ export class Parser {
     return modifiers;
   }
 
-  public getParameterInfo(callSignature: ts.Signature) {
+  public getParameterInfo(callSignature: ts.Signature): Method['params'] {
     return callSignature.parameters.map(param => {
+      const paramType = this.checker.getTypeOfSymbolAtLocation(
+        param,
+        param.valueDeclaration
+      );
+      const optionalParam = !!this.checker.symbolToParameterDeclaration(param)!.questionToken;
+
       return {
         description:
           ts.displayPartsToString(
             param.getDocumentationComment(this.checker)
           ) || null,
-        name: param.getName()
+        name: param.getName(),
+        type: {
+          name: this.checker.typeToString(paramType),
+          required: !optionalParam
+        }
       };
     });
   }
@@ -416,8 +426,8 @@ export class Parser {
 
   public isTaggedPublic(symbol: ts.Symbol) {
     const jsDocTags = symbol.getJsDocTags();
-    const isPulbic = Boolean(jsDocTags.find(tag => tag.name === 'public'));
-    return isPulbic;
+    const isPublic = Boolean(jsDocTags.find(tag => tag.name === 'public'));
+    return isPublic;
   }
 
   public getReturnDescription(symbol: ts.Symbol) {
