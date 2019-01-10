@@ -47,7 +47,6 @@ export interface MethodParameter {
   name: string;
   description?: string | null;
   type: MethodParameterType;
-  required: boolean;
 }
 
 export interface MethodParameterType {
@@ -411,16 +410,15 @@ export class Parser {
         param.valueDeclaration
       );
       const paramDeclaration = this.checker.symbolToParameterDeclaration(param);
-      const optionalParam = !!(paramDeclaration && paramDeclaration.questionToken);
+      const isOptionalParam: boolean = !!(paramDeclaration && paramDeclaration.questionToken);
 
       return {
         description:
           ts.displayPartsToString(
             param.getDocumentationComment(this.checker)
           ) || null,
-        name: param.getName(),
-        type: { name: this.checker.typeToString(paramType) },
-        required: !optionalParam
+        name: param.getName() + (isOptionalParam ? '?' : ''),
+        type: { name: this.checker.typeToString(paramType) }
       };
     });
   }
