@@ -35,12 +35,23 @@ export interface Method {
   name: string;
   docblock: string;
   modifiers: string[];
-  params: Array<{ name: string; description?: string | null, type: { name: string, required: boolean } }>;
+  params: Array<MethodParameter>;
   returns?: {
     description?: string | null;
     type?: string;
   } | null;
   description: string;
+}
+
+export interface MethodParameter {
+  name: string;
+  description?: string | null;
+  type: MethodParameterType;
+  required: boolean;
+}
+
+export interface MethodParameterType {
+  name: string;
 }
 
 export interface Component {
@@ -393,13 +404,14 @@ export class Parser {
     return modifiers;
   }
 
-  public getParameterInfo(callSignature: ts.Signature): Method['params'] {
+  public getParameterInfo(callSignature: ts.Signature): Array<MethodParameter> {
     return callSignature.parameters.map(param => {
       const paramType = this.checker.getTypeOfSymbolAtLocation(
         param,
         param.valueDeclaration
       );
-      const optionalParam = !!this.checker.symbolToParameterDeclaration(param)!.questionToken;
+      const paramDeclaration = this.checker.symbolToParameterDeclaration(param);
+      const optionalParam = !!(paramDeclaration && paramDeclaration.questionToken);
 
       return {
         description:
@@ -407,10 +419,8 @@ export class Parser {
             param.getDocumentationComment(this.checker)
           ) || null,
         name: param.getName(),
-        type: {
-          name: this.checker.typeToString(paramType),
-          required: !optionalParam
-        }
+        type: { name: this.checker.typeToString(paramType) },
+        required: !optionalParam
       };
     });
   }
