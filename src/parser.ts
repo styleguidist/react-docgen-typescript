@@ -35,12 +35,22 @@ export interface Method {
   name: string;
   docblock: string;
   modifiers: string[];
-  params: Array<{ name: string; description?: string | null }>;
+  params: Array<MethodParameter>;
   returns?: {
     description?: string | null;
     type?: string;
   } | null;
   description: string;
+}
+
+export interface MethodParameter {
+  name: string;
+  description?: string | null;
+  type: MethodParameterType;
+}
+
+export interface MethodParameterType {
+  name: string;
 }
 
 export interface Component {
@@ -393,14 +403,22 @@ export class Parser {
     return modifiers;
   }
 
-  public getParameterInfo(callSignature: ts.Signature) {
+  public getParameterInfo(callSignature: ts.Signature): Array<MethodParameter> {
     return callSignature.parameters.map(param => {
+      const paramType = this.checker.getTypeOfSymbolAtLocation(
+        param,
+        param.valueDeclaration
+      );
+      const paramDeclaration = this.checker.symbolToParameterDeclaration(param);
+      const isOptionalParam: boolean = !!(paramDeclaration && paramDeclaration.questionToken);
+
       return {
         description:
           ts.displayPartsToString(
             param.getDocumentationComment(this.checker)
           ) || null,
-        name: param.getName()
+        name: param.getName() + (isOptionalParam ? '?' : ''),
+        type: { name: this.checker.typeToString(paramType) }
       };
     });
   }
@@ -416,8 +434,8 @@ export class Parser {
 
   public isTaggedPublic(symbol: ts.Symbol) {
     const jsDocTags = symbol.getJsDocTags();
-    const isPulbic = Boolean(jsDocTags.find(tag => tag.name === 'public'));
-    return isPulbic;
+    const isPublic = Boolean(jsDocTags.find(tag => tag.name === 'public'));
+    return isPublic;
   }
 
   public getReturnDescription(symbol: ts.Symbol) {

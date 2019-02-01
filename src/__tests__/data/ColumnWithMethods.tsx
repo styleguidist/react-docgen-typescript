@@ -30,7 +30,7 @@ export class Column extends React.Component<IColumnProps, {}> {
    * @public
    * @returns The answer to the universe
    */
-  myCoolMethod(myParam: number, mySecondParam: string): number {
+  myCoolMethod(myParam: number, mySecondParam?: string): number {
     return 42;
   }
 

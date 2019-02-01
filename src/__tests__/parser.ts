@@ -856,11 +856,13 @@ describe('parser', () => {
       assert.deepEqual(myCoolMethod.params, [
         {
           description: 'Documentation for parameter 1',
-          name: 'myParam'
+          name: 'myParam',
+          type: { name: 'number' },
         },
         {
           description: null,
-          name: 'mySecondParam'
+          name: 'mySecondParam?',
+          type: { name: 'string' },
         }
       ]);
       assert.deepEqual(myCoolMethod.returns, {
