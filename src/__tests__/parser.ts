@@ -85,6 +85,15 @@ describe('parser', () => {
     });
   });
 
+  it('should parse react components with intersection props', () => {
+    check('IntersectionProps', {
+      IntersectionPropsComponent: {
+        foo: { type: 'string' },
+        bar: { type: 'string' }
+      }
+    });
+  })
+
   it('should parse simple react class component with state', () => {
     check('AppMenu', {
       AppMenu: {
