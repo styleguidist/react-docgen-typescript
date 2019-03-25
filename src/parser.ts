@@ -223,7 +223,7 @@ export class Parser {
       if (
         expName === 'StatelessComponent' ||
         expName === 'Stateless' ||
-        expName === 'StyledComponentClass' ||
+        expName === 'StyledComponent' ||
         expName === 'FunctionComponent'
       ) {
         commentSource = this.checker.getAliasedSymbol(commentSource);
@@ -847,7 +847,7 @@ function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
     exportName === 'default' ||
     exportName === '__function' ||
     exportName === 'Stateless' ||
-    exportName === 'StyledComponentClass' ||
+    exportName === 'StyledComponent' ||
     exportName === 'FunctionComponent' ||
     exportName === 'StatelessComponent'
   ) {
