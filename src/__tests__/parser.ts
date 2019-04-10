@@ -104,6 +104,16 @@ describe('parser', () => {
     });
   });
 
+  it.only('should parse component with props with external type', () => {
+    check('ColumnWithPropsWithExternalType', {
+      ColumnWithPropsWithExternalType: {
+        prop1: { type: 'string', required: false },
+        prop2: { type: 'number' },
+        prop3: { type: 'MyExternalType' }
+      }
+    });
+  });
+
   it('should parse HOCs', () => {
     check('ColumnHigherOrderComponent', {
       ColumnExternalHigherOrderComponent: {
