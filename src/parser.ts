@@ -848,6 +848,7 @@ function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
     exportName === '__function' ||
     exportName === 'Stateless' ||
     exportName === 'StyledComponentClass' ||
+    exportName === 'StyledComponent' ||
     exportName === 'FunctionComponent' ||
     exportName === 'StatelessComponent'
   ) {
