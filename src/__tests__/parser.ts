@@ -104,7 +104,7 @@ describe('parser', () => {
     });
   });
 
-  it.only('should parse component with props with external type', () => {
+  it('should parse component with props with external type', () => {
     check('ColumnWithPropsWithExternalType', {
       ColumnWithPropsWithExternalType: {
         prop1: { type: 'string', required: false },
