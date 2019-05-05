@@ -41,5 +41,10 @@
   "files": [
     "lib",
     "README.md"
-  ]
+  ],
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/styleguidist/react-docgen-typescript"
+  },
+  "homepage": "https://github.com/styleguidist/react-docgen-typescript"
 }
