@@ -81,7 +81,7 @@ export function checkComponent(
     const compName = componentDoc.displayName;
 
     let expectedComponentDescription = `${compName} description`;
-    if (description === undefined || description === '') {
+    if (description !== undefined) {
       expectedComponentDescription = description || '';
     }
 
