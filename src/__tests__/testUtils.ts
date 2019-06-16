@@ -42,7 +42,7 @@ export function check(
   componentName: string,
   expected: ExpectedComponents,
   exactProperties: boolean = true,
-  description?: string,
+  description?: string | null,
   parserOpts?: ParserOptions
 ) {
   const result = parse(fixturePath(componentName), parserOpts);
@@ -53,7 +53,7 @@ export function checkComponent(
   actual: ComponentDoc[],
   expected: ExpectedComponents,
   exactProperties: boolean = true,
-  description?: string
+  description?: string | null
 ) {
   const expectedComponentNames = Object.getOwnPropertyNames(expected);
   assert.equal(
@@ -80,13 +80,15 @@ export function checkComponent(
     const propNames = Object.getOwnPropertyNames(componentDoc.props);
     const compName = componentDoc.displayName;
 
-    const expectedComponentDescription =
-      description || `${compName} description`;
+    let expectedComponentDescription = `${compName} description`;
+    if (description === undefined || description === '') {
+      expectedComponentDescription = description || '';
+    }
 
     if (componentDoc.description !== expectedComponentDescription) {
       // tslint:disable-next-line:max-line-length
       errors.push(
-        `${compName} description is different - expected: '${compName} description', actual: '${
+        `${compName} description is different - expected: '${expectedComponentDescription}', actual: '${
           componentDoc.description
         }'`
       );
