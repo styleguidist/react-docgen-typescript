@@ -1,7 +1,9 @@
 {
   "name": "react-docgen-typescript",
-  "version": "1.12.4",
+  "version": "1.12.5",
   "description": "",
+  "homepage": "https://github.com/styleguidist/react-docgen-typescript/",
+  "bugs": "https://github.com/styleguidist/react-docgen-typescript/issues",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -43,8 +45,7 @@
     "README.md"
   ],
   "repository": {
-      "type": "git",
-      "url": "https://github.com/styleguidist/react-docgen-typescript"
-  },
-  "homepage": "https://github.com/styleguidist/react-docgen-typescript"
+    "type": "git",
+    "url": "https://github.com/styleguidist/react-docgen-typescript.git"    
+  }
 }

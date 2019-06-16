@@ -101,7 +101,7 @@ export class Column extends Component<IColumnProps, {}> {
 
 Will generate the following stylesheet:
 
-![Stylesheet example](./stylesheet-example-column.png "Stylesheet example")
+![Stylesheet example](https://github.com/styleguidist/react-docgen-typescript/raw/master/stylesheet-example-column.png "Stylesheet example")
 
 The functional component [`Grid.tsx`](./examples/react-styleguidist-example/components/Grid.tsx)
 
@@ -135,7 +135,7 @@ export const Grid = (props: IGridProps) => {
 
 Will generate the following stylesheet:
 
-![Stylesheet example](./stylesheet-example-grid.png "Stylesheet example")
+![Stylesheet example](https://github.com/styleguidist/react-docgen-typescript/raw/master/stylesheet-example-grid.png "Stylesheet example")
 
 ## Contributions
 The typescript is pretty complex and there are many different ways how

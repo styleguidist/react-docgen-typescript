@@ -937,4 +937,14 @@ describe('parser', () => {
       assert.equal(result.length > 0, true);
     });
   });
+
+  describe('issues tests', () => {
+    it('188', () => {
+      check('Issue188', {
+        Header: {
+          content: { type: 'string', required: true, description: '' },
+        },       
+      }, true, '');
+    });
+  })
 });
