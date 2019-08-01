@@ -45,6 +45,19 @@ propsParser: require('react-docgen-typescript').withCustomConfig('./tsconfig.jso
   (props: PropItem, component: Component) => boolean
   ```
 
+  In case you do not want to print out all the HTML props, because your component is typed like this:
+  ```typescript
+  const MyComponent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ()...
+  ```
+  you can use this workaround inside `propFilter`:
+  ```typescript
+  if (prop.parent) {
+    return !prop.parent.fileName.includes('node_modules')
+  }
+
+  return true
+  ```
+
   Note: `children` without a doc comment will not be documented.
 
 - componentNameResolver:
