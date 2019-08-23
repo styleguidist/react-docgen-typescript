@@ -430,10 +430,6 @@ describe('parser', () => {
       check('StatelessWithDefaultProps', expectation);
     });
 
-    it('should parse referenced props', () => {
-      check('StatelessWithReferencedDefaultProps', expectation);
-    });
-
     it('should parse props with shorthands', () => {
       check('StatelessShorthandDefaultProps', {
         StatelessShorthandDefaultProps: {
@@ -459,8 +455,12 @@ describe('parser', () => {
       });
     });
 
-    it('supports spread props', () => {
-      check('StatelessWithSpreadDefaultProps', expectation);
+    it('supports destructuring', () => {
+      check('StatelessWithDestructuredProps', expectation);
+    });
+
+    it('supports destructuring for arrow functions', () => {
+      check('StatelessWithDestructuredPropsArrow', expectation);
     });
   });
 
@@ -860,19 +860,22 @@ describe('parser', () => {
       const myCoolMethod = methods[0];
 
       assert.equal(myCoolMethod.description, 'My super cool method');
-      assert.equal(myCoolMethod.docblock, 'My super cool method\n@param myParam Documentation for parameter 1\n@public\n@returns The answer to the universe'); // tslint:disable-line max-line-length
+      assert.equal(
+        myCoolMethod.docblock,
+        'My super cool method\n@param myParam Documentation for parameter 1\n@public\n@returns The answer to the universe'
+      ); // tslint:disable-line max-line-length
       assert.deepEqual(myCoolMethod.modifiers, []);
       assert.equal(myCoolMethod.name, 'myCoolMethod');
       assert.deepEqual(myCoolMethod.params, [
         {
           description: 'Documentation for parameter 1',
           name: 'myParam',
-          type: { name: 'number' },
+          type: { name: 'number' }
         },
         {
           description: null,
           name: 'mySecondParam?',
-          type: { name: 'string' },
+          type: { name: 'string' }
         }
       ]);
       assert.deepEqual(myCoolMethod.returns, {
@@ -904,7 +907,10 @@ describe('parser', () => {
     it('should not parse functions not marked with @public', () => {
       const [parsed] = parse(fixturePath('ColumnWithMethods'));
       const methods = parsed.methods;
-      assert.equal(Boolean(methods.find((method => method.name === 'myPrivateFunction'))), false);
+      assert.equal(
+        Boolean(methods.find(method => method.name === 'myPrivateFunction')),
+        false
+      );
     });
   });
 
@@ -940,11 +946,16 @@ describe('parser', () => {
 
   describe('issues tests', () => {
     it('188', () => {
-      check('Issue188', {
-        Header: {
-          content: { type: 'string', required: true, description: '' },
-        },       
-      }, true, '');
+      check(
+        'Issue188',
+        {
+          Header: {
+            content: { type: 'string', required: true, description: '' }
+          }
+        },
+        true,
+        ''
+      );
     });
-  })
+  });
 });
