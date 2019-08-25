@@ -30,23 +30,17 @@ export interface StatelessWithDefaultPropsProps {
   sampleNumber?: number;
 }
 
-const defaultProps: Partial<StatelessWithDefaultPropsProps> = {
-  sampleEnum: enumSample.HELLO,
-  sampleFalse: false,
-  sampleNull: null,
-  sampleNumber: -1,
-  // prettier-ignore
-  sampleObject: { a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } },
-  sampleString: 'hello',
-  sampleTrue: true,
-  sampleUndefined: undefined
-};
-
-const defaultPropsReference = defaultProps;
-
 /** StatelessWithDefaultProps description */
 export const StatelessWithDefaultProps: React.StatelessComponent<
   StatelessWithDefaultPropsProps
-> = props => <div>test</div>;
-
-StatelessWithDefaultProps.defaultProps = defaultProps;
+> = ({
+  sampleEnum = enumSample.HELLO,
+  sampleFalse = false,
+  sampleNull = null,
+  sampleNumber = -1,
+  // prettier-ignore
+  sampleObject = { a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } },
+  sampleString = 'hello',
+  sampleTrue = true,
+  sampleUndefined = undefined
+}) => <div>test</div>;

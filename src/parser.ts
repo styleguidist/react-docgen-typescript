@@ -133,7 +133,9 @@ export function withCustomConfig(
   );
 
   if (error !== undefined) {
-    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${error.code}, message: ${error.messageText}`;
+    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${
+      error.code
+    }, message: ${error.messageText}`;
     throw new Error(errorText);
   }
 
@@ -410,7 +412,9 @@ export class Parser {
         param.valueDeclaration
       );
       const paramDeclaration = this.checker.symbolToParameterDeclaration(param);
-      const isOptionalParam: boolean = !!(paramDeclaration && paramDeclaration.questionToken);
+      const isOptionalParam: boolean = !!(
+        paramDeclaration && paramDeclaration.questionToken
+      );
 
       return {
         description:
@@ -564,6 +568,24 @@ export class Parser {
     };
   }
 
+  getFunctionStatement(statement: ts.Statement) {
+    if (ts.isFunctionDeclaration(statement)) {
+      return statement;
+    }
+
+    if (ts.isVariableStatement(statement)) {
+      const { initializer } = statement.declarationList.declarations[0];
+
+      if (
+        initializer &&
+        (ts.isArrowFunction(initializer) ||
+          ts.isFunctionExpression(initializer))
+      ) {
+        return initializer;
+      }
+    }
+  }
+
   public extractDefaultPropsFromComponent(
     symbol: ts.Symbol,
     source: ts.SourceFile
@@ -581,74 +603,93 @@ export class Parser {
     if (!possibleStatements.length) {
       // if no class declaration is found, try to find a
       // expression statement used in a React.StatelessComponent
-      possibleStatements = source.statements.filter(stmt =>
-        ts.isExpressionStatement(stmt)
+      possibleStatements = source.statements.filter(
+        stmt => ts.isExpressionStatement(stmt) || ts.isVariableStatement(stmt)
       );
     }
 
-    if (!possibleStatements.length) {
-      return {};
-    }
-
-    const statement = possibleStatements[0];
-
-    if (statementIsClassDeclaration(statement) && statement.members.length) {
-      const possibleDefaultProps = statement.members.filter(
-        member => member.name && getPropertyName(member.name) === 'defaultProps'
-      );
-
-      if (!possibleDefaultProps.length) {
-        return {};
-      }
-
-      const defaultProps = possibleDefaultProps[0];
-      let initializer = (defaultProps as ts.PropertyDeclaration).initializer;
-      let properties = (initializer as ts.ObjectLiteralExpression).properties;
-
-      while (ts.isIdentifier(initializer as ts.Identifier)) {
-        const defaultPropsReference = this.checker.getSymbolAtLocation(
-          initializer as ts.Node
+    return possibleStatements.reduce((res, statement) => {
+      if (statementIsClassDeclaration(statement) && statement.members.length) {
+        const possibleDefaultProps = statement.members.filter(
+          member =>
+            member.name && getPropertyName(member.name) === 'defaultProps'
         );
-        if (defaultPropsReference) {
-          const declarations = defaultPropsReference.getDeclarations();
 
-          if (declarations) {
-            initializer = (declarations[0] as ts.VariableDeclaration)
-              .initializer;
-            properties = (initializer as ts.ObjectLiteralExpression).properties;
+        if (!possibleDefaultProps.length) {
+          return res;
+        }
+
+        const defaultProps = possibleDefaultProps[0];
+        let initializer = (defaultProps as ts.PropertyDeclaration).initializer;
+        let properties = (initializer as ts.ObjectLiteralExpression).properties;
+
+        while (ts.isIdentifier(initializer as ts.Identifier)) {
+          const defaultPropsReference = this.checker.getSymbolAtLocation(
+            initializer as ts.Node
+          );
+          if (defaultPropsReference) {
+            const declarations = defaultPropsReference.getDeclarations();
+
+            if (declarations) {
+              initializer = (declarations[0] as ts.VariableDeclaration)
+                .initializer;
+              properties = (initializer as ts.ObjectLiteralExpression)
+                .properties;
+            }
           }
+        }
+
+        let propMap = {};
+
+        if (properties) {
+          propMap = this.getPropMap(properties as ts.NodeArray<
+            ts.PropertyAssignment
+          >);
+        }
+
+        return {
+          ...res,
+          ...propMap
+        };
+      } else if (statementIsStatelessWithDefaultProps(statement)) {
+        let propMap = {};
+        (statement as ts.ExpressionStatement).getChildren().forEach(child => {
+          const { right } = child as ts.BinaryExpression;
+          if (right) {
+            const { properties } = right as ts.ObjectLiteralExpression;
+            if (properties) {
+              propMap = this.getPropMap(properties as ts.NodeArray<
+                ts.PropertyAssignment
+              >);
+            }
+          }
+        });
+        return {
+          ...res,
+          ...propMap
+        };
+      }
+
+      const functionStatement = this.getFunctionStatement(statement);
+
+      // Extracting default values from props destructuring
+      if (functionStatement && functionStatement.parameters.length) {
+        const { name } = functionStatement.parameters[0];
+
+        if (ts.isObjectBindingPattern(name)) {
+          return {
+            ...res,
+            ...this.getPropMap(name.elements)
+          };
         }
       }
 
-      let propMap = {};
-
-      if (properties) {
-        propMap = this.getPropMap(properties as ts.NodeArray<
-          ts.PropertyAssignment
-        >);
-      }
-
-      return propMap;
-    } else if (statementIsStateless(statement)) {
-      let propMap = {};
-      (statement as ts.ExpressionStatement).getChildren().forEach(child => {
-        const { right } = child as ts.BinaryExpression;
-        if (right) {
-          const { properties } = right as ts.ObjectLiteralExpression;
-          if (properties) {
-            propMap = this.getPropMap(properties as ts.NodeArray<
-              ts.PropertyAssignment
-            >);
-          }
-        }
-      });
-      return propMap;
-    }
-    return {};
+      return res;
+    }, {});
   }
 
   public getLiteralValueFromPropertyAssignment(
-    property: ts.PropertyAssignment
+    property: ts.PropertyAssignment | ts.BindingElement
   ): string | null {
     let { initializer } = property;
 
@@ -699,7 +740,7 @@ export class Parser {
   }
 
   public getPropMap(
-    properties: ts.NodeArray<ts.PropertyAssignment>
+    properties: ts.NodeArray<ts.PropertyAssignment | ts.BindingElement>
   ): StringIndexedObject<string> {
     const propMap = properties.reduce(
       (acc, property) => {
@@ -730,7 +771,9 @@ function statementIsClassDeclaration(
   return !!(statement as ts.ClassDeclaration).members;
 }
 
-function statementIsStateless(statement: ts.Statement): boolean {
+function statementIsStatelessWithDefaultProps(
+  statement: ts.Statement
+): boolean {
   const children = (statement as ts.ExpressionStatement).getChildren();
   for (const child of children) {
     const { left } = child as ts.BinaryExpression;
@@ -744,7 +787,9 @@ function statementIsStateless(statement: ts.Statement): boolean {
   return false;
 }
 
-function getPropertyName(name: ts.PropertyName): string | null {
+function getPropertyName(
+  name: ts.PropertyName | ts.BindingPattern
+): string | null {
   switch (name.kind) {
     case ts.SyntaxKind.NumericLiteral:
     case ts.SyntaxKind.StringLiteral:
@@ -861,7 +906,8 @@ function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
 // Default export for a file: named after file
 export function getDefaultExportForFile(source: ts.SourceFile) {
   const name = path.basename(source.fileName, path.extname(source.fileName));
-  const filename = name === 'index' ? path.basename(path.dirname(source.fileName)) : name;
+  const filename =
+    name === 'index' ? path.basename(path.dirname(source.fileName)) : name;
 
   // JS identifiers must starts with a letter, and contain letters and/or numbers
   // So, you could not take filename as is

@@ -31,22 +31,16 @@ export interface StatelessWithDefaultPropsProps {
 }
 
 /** StatelessWithDefaultProps description */
-export const StatelessWithDefaultProps: React.StatelessComponent<
-  StatelessWithDefaultPropsProps
-> = props => <div>test</div>;
-
-const defaultProps = {
-  sampleFalse: false,
-  sampleNull: null,
-  sampleNumber: -1
-};
-
-StatelessWithDefaultProps.defaultProps = {
-  ...defaultProps,
+export function StatelessWithDefaultProps({
+  sampleEnum = enumSample.HELLO,
+  sampleFalse = false,
+  sampleNull = null,
+  sampleNumber = -1,
   // prettier-ignore
-  sampleObject: { a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } },
-  sampleEnum: enumSample.HELLO,
-  sampleString: 'hello',
-  sampleTrue: true,
-  sampleUndefined: undefined
-};
+  sampleObject = { a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } },
+  sampleString = 'hello',
+  sampleTrue = true,
+  sampleUndefined = undefined
+}: StatelessWithDefaultPropsProps) {
+  return <div>test</div>;
+}

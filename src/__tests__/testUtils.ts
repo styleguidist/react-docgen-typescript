@@ -160,16 +160,16 @@ export function checkComponent(
           );
         }
         const expectedDefaultValue = expectedProp.defaultValue;
+        const actualDefaultValue = prop.defaultValue
+          ? prop.defaultValue.value
+          : prop.defaultValue;
         if (
           expectedDefaultValue &&
-          prop.defaultValue &&
-          expectedDefaultValue !== prop.defaultValue.value
+          expectedDefaultValue !== actualDefaultValue
         ) {
           errors.push(
             // tslint:disable-next-line:max-line-length
-            `Property '${compName}.${expectedPropName}' defaultValue is different - expected: ${expectedDefaultValue}, actual: ${
-              prop.defaultValue.value
-            }`
+            `Property '${compName}.${expectedPropName}' defaultValue is different - expected: ${expectedDefaultValue}, actual: ${actualDefaultValue}`
           );
         }
       }
