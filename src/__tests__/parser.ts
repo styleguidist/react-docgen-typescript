@@ -765,6 +765,40 @@ describe('parser', () => {
         });
       });
     });
+
+    describe('Extracting literal values from enums', () => {
+      it('extracts literal values from enum', () => {
+        check(
+          'ExtractLiteralValuesFromEnum',
+          {
+            ExtractLiteralValuesFromEnum: {
+              sampleBoolean: { type: 'boolean' },
+              sampleComplexUnion: { type: 'number | "string1" | "string2"' },
+              sampleEnum: {
+                raw: 'sampleEnum',
+                type: 'enum',
+                value: [
+                  { value: '"one"' },
+                  { value: '"two"' },
+                  { value: '"three"' }
+                ]
+              },
+              sampleString: { type: 'string' },
+              sampleStringUnion: {
+                raw: '"string1" | "string2"',
+                type: 'enum',
+                value: [{ value: '"string1"' }, { value: '"string2"' }]
+              }
+            }
+          },
+          true,
+          null,
+          {
+            shouldExtractLiteralValuesFromEnum: true
+          }
+        );
+      });
+    });
   });
 
   describe('withCustomConfig', () => {

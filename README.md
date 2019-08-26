@@ -67,6 +67,10 @@ propsParser: require('react-docgen-typescript').withCustomConfig('./tsconfig.jso
   ```
 
   If a string is returned, then the component will use that name. Else it will fallback to the default logic of parser.
+  
+- shouldExtractLiteralValuesFromEnum: boolean
+  
+  If set to true, string enums and unions will be converted to docgen enum format. Useful if you use Storybook and want to generate knobs automatically using [addon-smart-knobs](https://github.com/storybookjs/addon-smart-knobs).
 
 **Styled components example:**
 
