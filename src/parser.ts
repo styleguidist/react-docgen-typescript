@@ -60,6 +60,7 @@ export interface Component {
 export interface PropItemType {
   name: string;
   value?: any;
+  raw?: string;
 }
 
 export interface ParentType {
@@ -77,6 +78,7 @@ export type ComponentNameResolver = (
 export interface ParserOptions {
   propFilter?: StaticPropFilter | PropFilter;
   componentNameResolver?: ComponentNameResolver;
+  shouldExtractLiteralValuesFromEnum?: boolean;
 }
 
 export interface StaticPropFilter {
@@ -195,10 +197,14 @@ const defaultJSDoc: JSDoc = {
 export class Parser {
   private checker: ts.TypeChecker;
   private propFilter: PropFilter;
+  private shouldExtractLiteralValuesFromEnum: boolean;
 
   constructor(program: ts.Program, opts: ParserOptions) {
     this.checker = program.getTypeChecker();
     this.propFilter = buildFilter(opts);
+    this.shouldExtractLiteralValuesFromEnum = Boolean(
+      opts.shouldExtractLiteralValuesFromEnum
+    );
   }
 
   public getComponentInfo(
@@ -452,6 +458,28 @@ export class Parser {
     return returnTag.text || null;
   }
 
+  public getDocgenType(propType: ts.Type): PropItemType {
+    const propTypeString = this.checker.typeToString(propType);
+
+    if (
+      this.shouldExtractLiteralValuesFromEnum &&
+      propType.isUnion() &&
+      propType.types.every(type => type.isStringLiteral())
+    ) {
+      return {
+        name: 'enum',
+        raw: propTypeString,
+        value: propType.types
+          .map(type => ({
+            value: type.isStringLiteral() ? `"${type.value}"` : undefined
+          }))
+          .filter(Boolean)
+      };
+    }
+
+    return { name: propTypeString };
+  }
+
   public getPropsInfo(
     propsObj: ts.Symbol,
     defaultProps: StringIndexedObject<string> = {}
@@ -476,8 +504,6 @@ export class Parser {
         propsObj.valueDeclaration!
       );
 
-      const propTypeString = this.checker.typeToString(propType);
-
       // tslint:disable-next-line:no-bitwise
       const isOptional = (prop.getFlags() & ts.SymbolFlags.Optional) !== 0;
 
@@ -499,7 +525,7 @@ export class Parser {
         name: propName,
         parent,
         required: !isOptional,
-        type: { name: propTypeString }
+        type: this.getDocgenType(propType)
       };
     });
 

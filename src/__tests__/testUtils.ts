@@ -1,5 +1,6 @@
 import { assert } from 'chai';
 import * as path from 'path';
+import { isEqual } from 'lodash';
 import {
   ComponentDoc,
   defaultParserOpts,
@@ -24,6 +25,8 @@ export interface ExpectedProp {
     name: string;
     fileName: string;
   };
+  raw?: string;
+  value?: any;
 }
 
 export function fixturePath(componentName: string) {
@@ -170,6 +173,24 @@ export function checkComponent(
           errors.push(
             // tslint:disable-next-line:max-line-length
             `Property '${compName}.${expectedPropName}' defaultValue is different - expected: ${expectedDefaultValue}, actual: ${actualDefaultValue}`
+          );
+        }
+        const exptectedRaw = expectedProp.raw;
+        if (exptectedRaw && exptectedRaw !== prop.type.raw) {
+          // tslint:disable-next-line:max-line-length
+          errors.push(
+            `Property '${compName}.${expectedPropName}' raw value is different - expected: ${exptectedRaw}, actual: ${
+              prop.type.raw
+            }`
+          );
+        }
+        const expectedValue = expectedProp.value;
+        if (expectedValue && !isEqual(expectedValue, prop.type.value)) {
+          // tslint:disable-next-line:max-line-length
+          errors.push(
+            `Property '${compName}.${expectedPropName}' value is different - expected: ${JSON.stringify(
+              expectedValue
+            )}, actual: ${JSON.stringify(prop.type.value)}`
           );
         }
       }
