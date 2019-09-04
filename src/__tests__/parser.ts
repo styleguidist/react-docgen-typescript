@@ -442,7 +442,7 @@ describe('parser', () => {
           regularProp: {
             defaultValue: 'foo',
             description: 'regularProp description',
-            required: true,
+            required: false,
             type: 'string'
           },
           shorthandProp: {
@@ -461,6 +461,10 @@ describe('parser', () => {
 
     it('supports destructuring for arrow functions', () => {
       check('StatelessWithDestructuredPropsArrow', expectation);
+    });
+
+    it('supports typescript 3.0 style defaulted props', () => {
+      check('StatelessWithDefaultPropsTypescript3', expectation);
     });
   });
 
