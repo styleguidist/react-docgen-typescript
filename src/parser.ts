@@ -135,9 +135,7 @@ export function withCustomConfig(
   );
 
   if (error !== undefined) {
-    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${
-      error.code
-    }, message: ${error.messageText}`;
+    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${error.code}, message: ${error.messageText}`;
     throw new Error(errorText);
   }
 
@@ -508,10 +506,11 @@ export class Parser {
       const isOptional = (prop.getFlags() & ts.SymbolFlags.Optional) !== 0;
 
       const jsDocComment = this.findDocComment(prop);
+      const hasCodeBasedDefault = defaultProps[propName] !== undefined;
 
       let defaultValue = null;
 
-      if (defaultProps[propName] !== undefined) {
+      if (hasCodeBasedDefault) {
         defaultValue = { value: defaultProps[propName] };
       } else if (jsDocComment.tags.default) {
         defaultValue = { value: jsDocComment.tags.default };
@@ -524,7 +523,7 @@ export class Parser {
         description: jsDocComment.fullComment,
         name: propName,
         parent,
-        required: !isOptional,
+        required: !isOptional && !hasCodeBasedDefault,
         type: this.getDocgenType(propType)
       };
     });
