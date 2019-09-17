@@ -599,7 +599,7 @@ export class Parser {
     }
 
     if (ts.isVariableStatement(statement)) {
-      const { initializer } = statement.declarationList.declarations[0];
+      const initializer = statement.declarationList && statement.declarationList.declarations[0].initializer;
 
       if (
         initializer &&
