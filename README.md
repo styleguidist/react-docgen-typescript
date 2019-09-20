@@ -42,7 +42,7 @@ propsParser: require('react-docgen-typescript').withCustomConfig('./tsconfig.jso
   or
 
   ```typescript
-  (props: PropItem, component: Component) => boolean
+  (prop: PropItem, component: Component) => boolean
   ```
 
   In case you do not want to print out all the HTML props, because your component is typed like this:
