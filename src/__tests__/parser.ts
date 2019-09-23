@@ -267,12 +267,12 @@ describe('parser', () => {
           type: '"hello" | "goodbye"'
         },
         sampleFalse: {
-          defaultValue: 'false',
+          defaultValue: false,
           required: false,
           type: 'boolean'
         },
-        sampleNull: { type: 'null', required: false, defaultValue: 'null' },
-        sampleNumber: { type: 'number', required: false, defaultValue: '-1' },
+        sampleNull: { type: 'null', required: false, defaultValue: null },
+        sampleNumber: { type: 'number', required: false, defaultValue: -1 },
         sampleObject: {
           defaultValue: `{ a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } }`,
           required: false,
@@ -283,7 +283,7 @@ describe('parser', () => {
           required: false,
           type: 'string'
         },
-        sampleTrue: { type: 'boolean', required: false, defaultValue: 'true' },
+        sampleTrue: { type: 'boolean', required: false, defaultValue: true },
         sampleUndefined: {
           defaultValue: 'undefined',
           required: false,
@@ -401,12 +401,12 @@ describe('parser', () => {
           type: 'enumSample'
         },
         sampleFalse: {
-          defaultValue: 'false',
+          defaultValue: false,
           required: false,
           type: 'boolean'
         },
-        sampleNull: { type: 'null', required: false, defaultValue: 'null' },
-        sampleNumber: { type: 'number', required: false, defaultValue: '-1' },
+        sampleNull: { type: 'null', required: false, defaultValue: null },
+        sampleNumber: { type: 'number', required: false, defaultValue: -1 },
         sampleObject: {
           defaultValue: `{ a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } }`,
           required: false,
@@ -417,9 +417,9 @@ describe('parser', () => {
           required: false,
           type: 'string'
         },
-        sampleTrue: { type: 'boolean', required: false, defaultValue: 'true' },
+        sampleTrue: { type: 'boolean', required: false, defaultValue: true },
         sampleUndefined: {
-          defaultValue: 'undefined',
+          defaultValue: undefined,
           required: false,
           type: 'any'
         }
@@ -446,7 +446,7 @@ describe('parser', () => {
             type: 'string'
           },
           shorthandProp: {
-            defaultValue: '123',
+            defaultValue: 123,
             description: 'shorthandProp description',
             required: false,
             type: 'number'
@@ -799,6 +799,53 @@ describe('parser', () => {
           null,
           {
             shouldExtractLiteralValuesFromEnum: true
+          }
+        );
+      });
+    });
+
+    describe('Returning not string default props ', () => {
+      it('returns not string defaultProps', () => {
+        check(
+          'StatelessWithDefaultPropsAsString',
+          {
+            StatelessWithDefaultPropsAsString: {
+              sampleFalse: {
+                defaultValue: 'false',
+                required: false,
+                type: 'boolean'
+              },
+              sampleNumberWithPrefix: {
+                type: 'number',
+                required: false,
+                defaultValue: '-1'
+              },
+              sampleNumber: {
+                type: 'number',
+                required: false,
+                defaultValue: '1'
+              },
+              sampleTrue: {
+                type: 'boolean',
+                required: false,
+                defaultValue: 'true'
+              },
+              sampleNull: {
+                type: 'null',
+                required: false,
+                defaultValue: 'null'
+              },
+              sampleUndefined: {
+                type: 'undefined',
+                required: false,
+                defaultValue: 'undefined'
+              }
+            }
+          },
+          true,
+          null,
+          {
+            savePropValueAsString: true
           }
         );
       });

@@ -20,7 +20,7 @@ export interface ExpectedProp {
   type: string;
   required?: boolean;
   description?: string;
-  defaultValue?: string | null;
+  defaultValue?: string | number | boolean | null | undefined;
   parent?: {
     name: string;
     fileName: string;
