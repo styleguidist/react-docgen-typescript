@@ -79,6 +79,7 @@ export interface ParserOptions {
   propFilter?: StaticPropFilter | PropFilter;
   componentNameResolver?: ComponentNameResolver;
   shouldExtractLiteralValuesFromEnum?: boolean;
+  savePropValueAsString?: boolean;
 }
 
 export interface StaticPropFilter {
@@ -135,7 +136,9 @@ export function withCustomConfig(
   );
 
   if (error !== undefined) {
-    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${error.code}, message: ${error.messageText}`;
+    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${
+      error.code
+    }, message: ${error.messageText}`;
     throw new Error(errorText);
   }
 
@@ -196,13 +199,16 @@ export class Parser {
   private checker: ts.TypeChecker;
   private propFilter: PropFilter;
   private shouldExtractLiteralValuesFromEnum: boolean;
+  private savePropValueAsString: boolean;
 
   constructor(program: ts.Program, opts: ParserOptions) {
+    const { savePropValueAsString, shouldExtractLiteralValuesFromEnum } = opts;
     this.checker = program.getTypeChecker();
     this.propFilter = buildFilter(opts);
     this.shouldExtractLiteralValuesFromEnum = Boolean(
-      opts.shouldExtractLiteralValuesFromEnum
+      shouldExtractLiteralValuesFromEnum
     );
+    this.savePropValueAsString = Boolean(savePropValueAsString);
   }
 
   public getComponentInfo(
@@ -715,7 +721,7 @@ export class Parser {
 
   public getLiteralValueFromPropertyAssignment(
     property: ts.PropertyAssignment | ts.BindingElement
-  ): string | null {
+  ): string | boolean | number | null | undefined {
     let { initializer } = property;
 
     // Shorthand properties, so inflect their actual value
@@ -732,7 +738,7 @@ export class Parser {
     }
 
     if (!initializer) {
-      return null;
+      return undefined;
     }
 
     // Literal values
@@ -740,17 +746,21 @@ export class Parser {
       case ts.SyntaxKind.PropertyAccessExpression:
         return initializer.getText();
       case ts.SyntaxKind.FalseKeyword:
-        return 'false';
+        return this.savePropValueAsString ? 'false' : false;
       case ts.SyntaxKind.TrueKeyword:
-        return 'true';
+        return this.savePropValueAsString ? 'true' : true;
       case ts.SyntaxKind.StringLiteral:
         return (initializer as ts.StringLiteral).text.trim();
       case ts.SyntaxKind.PrefixUnaryExpression:
-        return initializer.getFullText().trim();
+        return this.savePropValueAsString
+          ? initializer.getFullText().trim()
+          : Number((initializer as ts.PrefixUnaryExpression).getFullText());
       case ts.SyntaxKind.NumericLiteral:
-        return `${(initializer as ts.NumericLiteral).text}`;
+        return this.savePropValueAsString
+          ? `${(initializer as ts.NumericLiteral).text}`
+          : Number((initializer as ts.NumericLiteral).text);
       case ts.SyntaxKind.NullKeyword:
-        return 'null';
+        return this.savePropValueAsString ? 'null' : null;
       case ts.SyntaxKind.Identifier:
         // can potentially find other identifiers in the source and map those in the future
         return (initializer as ts.Identifier).text === 'undefined'
@@ -766,7 +776,7 @@ export class Parser {
 
   public getPropMap(
     properties: ts.NodeArray<ts.PropertyAssignment | ts.BindingElement>
-  ): StringIndexedObject<string> {
+  ): StringIndexedObject<string | boolean | number | null> {
     const propMap = properties.reduce(
       (acc, property) => {
         if (ts.isSpreadAssignment(property) || !property.name) {
@@ -778,14 +788,21 @@ export class Parser {
         );
         const propertyName = getPropertyName(property.name);
 
-        if (typeof literalValue === 'string' && propertyName !== null) {
+        if (
+          (typeof literalValue === 'string' ||
+            typeof literalValue === 'number' ||
+            typeof literalValue === 'boolean' ||
+            literalValue === null) &&
+          propertyName !== null
+        ) {
           acc[propertyName] = literalValue;
         }
 
         return acc;
       },
-      {} as StringIndexedObject<string>
+      {} as StringIndexedObject<string | boolean | number | null>
     );
+
     return propMap;
   }
 }
