@@ -72,6 +72,30 @@ propsParser: require('react-docgen-typescript').withCustomConfig('./tsconfig.jso
   
   If set to true, string enums and unions will be converted to docgen enum format. Useful if you use Storybook and want to generate knobs automatically using [addon-smart-knobs](https://github.com/storybookjs/addon-smart-knobs).
 
+- savePropValueAsString: boolean
+
+  If set to true, defaultValue to props will be string.
+  Example:
+  ```javascript
+    Component.defaultProps = {
+        counter: 123,
+        disabled: false
+    }
+  ```
+  Will return:
+  ```javascript
+    counter: {
+        defaultValue: '123',
+        required: true,
+        type: 'number'
+    },
+    disabled: {
+        defaultValue: 'false',
+        required: true,
+        type: 'boolean'
+    }
+  ```
+
 **Styled components example:**
 
 ```typescript
