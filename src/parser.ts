@@ -136,9 +136,7 @@ export function withCustomConfig(
   );
 
   if (error !== undefined) {
-    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${
-      error.code
-    }, message: ${error.messageText}`;
+    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${error.code}, message: ${error.messageText}`;
     throw new Error(errorText);
   }
 
@@ -856,18 +854,20 @@ function getTextValueOfClassMember(
   classDeclaration: ts.ClassDeclaration,
   memberName: string
 ): string {
-  const [textValue] = classDeclaration.members
-    .filter(member => ts.isPropertyDeclaration(member))
-    .filter(member => {
-      const name = ts.getNameOfDeclaration(member) as ts.Identifier;
-      return name && name.text === memberName;
-    })
-    .map(member => {
-      const property = member as ts.PropertyDeclaration;
-      return (
-        property.initializer && (property.initializer as ts.Identifier).text
-      );
-    });
+  const [textValue] =
+    classDeclaration.members &&
+    classDeclaration.members
+      .filter(member => ts.isPropertyDeclaration(member))
+      .filter(member => {
+        const name = ts.getNameOfDeclaration(member) as ts.Identifier;
+        return name && name.text === memberName;
+      })
+      .map(member => {
+        const property = member as ts.PropertyDeclaration;
+        return (
+          property.initializer && (property.initializer as ts.Identifier).text
+        );
+      });
 
   return textValue || '';
 }
