@@ -977,7 +977,7 @@ function getParentType(prop: ts.Symbol): ParentType | undefined {
   const parentName = parent.name.text;
   const { fileName } = parent.getSourceFile();
 
-  const fileNameParts = fileName.split(path.sep);
+  const fileNameParts = fileName.split('/');
   const trimmedFileNameParts = fileNameParts.slice();
 
   while (trimmedFileNameParts.length) {
@@ -988,7 +988,7 @@ function getParentType(prop: ts.Symbol): ParentType | undefined {
   }
   let trimmedFileName;
   if (trimmedFileNameParts.length) {
-    trimmedFileName = trimmedFileNameParts.join(path.sep);
+    trimmedFileName = trimmedFileNameParts.join('/');
   } else {
     trimmedFileName = fileName;
   }
