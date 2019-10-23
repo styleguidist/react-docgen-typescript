@@ -821,7 +821,7 @@ function statementIsStatelessWithDefaultProps(
     const { left } = child as ts.BinaryExpression;
     if (left) {
       const { name } = left as ts.PropertyAccessExpression;
-      if (name.escapedText === 'defaultProps') {
+      if (name && name.escapedText === 'defaultProps') {
         return true;
       }
     }
