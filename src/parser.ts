@@ -741,8 +741,6 @@ export class Parser {
 
     // Literal values
     switch (initializer.kind) {
-      case ts.SyntaxKind.PropertyAccessExpression:
-        return initializer.getText();
       case ts.SyntaxKind.FalseKeyword:
         return this.savePropValueAsString ? 'false' : false;
       case ts.SyntaxKind.TrueKeyword:
@@ -764,11 +762,14 @@ export class Parser {
         return (initializer as ts.Identifier).text === 'undefined'
           ? 'undefined'
           : null;
+      case ts.SyntaxKind.PropertyAccessExpression:
       case ts.SyntaxKind.ObjectLiteralExpression:
-        // return the source text for an object literal
-        return (initializer as ts.ObjectLiteralExpression).getText();
       default:
-        return null;
+        try {
+          return initializer.getText();
+        } catch(e) {
+          return null;
+        }
     }
   }
 
