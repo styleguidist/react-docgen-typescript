@@ -1,6 +1,6 @@
 import { assert } from 'chai';
-import * as path from 'path';
 import { isEqual } from 'lodash';
+import * as path from 'path';
 import {
   ComponentDoc,
   defaultParserOpts,

@@ -35,7 +35,7 @@ export interface Method {
   name: string;
   docblock: string;
   modifiers: string[];
-  params: Array<MethodParameter>;
+  params: MethodParameter[];
   returns?: {
     description?: string | null;
     type?: string;
@@ -136,7 +136,10 @@ export function withCustomConfig(
   );
 
   if (error !== undefined) {
-    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${error.code}, message: ${error.messageText}`;
+    // tslint:disable-next-line: max-line-length
+    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${
+      error.code
+    }, message: ${error.messageText}`;
     throw new Error(errorText);
   }
 
@@ -413,7 +416,7 @@ export class Parser {
     return modifiers;
   }
 
-  public getParameterInfo(callSignature: ts.Signature): Array<MethodParameter> {
+  public getParameterInfo(callSignature: ts.Signature): MethodParameter[] {
     return callSignature.parameters.map(param => {
       const paramType = this.checker.getTypeOfSymbolAtLocation(
         param,
@@ -603,7 +606,9 @@ export class Parser {
     }
 
     if (ts.isVariableStatement(statement)) {
-      const initializer = statement.declarationList && statement.declarationList.declarations[0].initializer;
+      const initializer =
+        statement.declarationList &&
+        statement.declarationList.declarations[0].initializer;
 
       if (
         initializer &&
@@ -855,9 +860,10 @@ function getTextValueOfClassMember(
   classDeclaration: ts.ClassDeclaration,
   memberName: string
 ): string {
+  const classDeclarationMembers = classDeclaration.members || [];
   const [textValue] =
-    classDeclaration.members &&
-    classDeclaration.members
+    classDeclarationMembers &&
+    classDeclarationMembers
       .filter(member => ts.isPropertyDeclaration(member))
       .filter(member => {
         const name = ts.getNameOfDeclaration(member) as ts.Identifier;
