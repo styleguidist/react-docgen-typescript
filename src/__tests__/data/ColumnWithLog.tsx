@@ -16,7 +16,8 @@ export interface IColumnProps {
   prop4: 'option1' | 'option2' | 'option3';
 }
 
-console.log("test");
+// tslint:disable-next-line: no-console
+console.log('test');
 
 /**
  * Column description

@@ -4,6 +4,6 @@ interface Props {
   content: string;
 }
 
-export const Header = ({content}: Props) => {
+export const Header = ({ content }: Props) => {
   return <h1>{content}</h1>;
 };

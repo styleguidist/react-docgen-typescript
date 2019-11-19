@@ -18,7 +18,10 @@ export interface IColumnWithPropsWithExternalTypeProps {
 /**
  * ColumnWithPropsWithExternalType description
  */
-export class ColumnWithPropsWithExternalType extends React.Component<IColumnWithPropsWithExternalTypeProps, {}> {
+export class ColumnWithPropsWithExternalType extends React.Component<
+  IColumnWithPropsWithExternalTypeProps,
+  {}
+> {
   public render() {
     const { prop1 } = this.props;
     return <div>{prop1}</div>;

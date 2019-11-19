@@ -22,9 +22,9 @@ export const StatelessWithDefaultPropsAsString: React.StatelessComponent<
 
 StatelessWithDefaultPropsAsString.defaultProps = {
   sampleFalse: false,
-  sampleNumberWithPrefix: -1,
-  sampleNumber: 1,
-  sampleTrue: true,
   sampleNull: null,
+  sampleNumber: 1,
+  sampleNumberWithPrefix: -1,
+  sampleTrue: true,
   sampleUndefined: undefined
 };

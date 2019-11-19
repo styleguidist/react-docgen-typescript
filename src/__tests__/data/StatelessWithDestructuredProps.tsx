@@ -40,7 +40,7 @@ export function StatelessWithDefaultProps({
   sampleObject = { a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } },
   sampleString = 'hello',
   sampleTrue = true,
-  sampleUndefined = undefined
+  sampleUndefined
 }: StatelessWithDefaultPropsProps) {
   return <div>test</div>;
 }

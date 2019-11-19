@@ -815,30 +815,30 @@ describe('parser', () => {
                 required: false,
                 type: 'boolean'
               },
-              sampleNumberWithPrefix: {
-                type: 'number',
+              sampleNull: {
+                defaultValue: 'null',
                 required: false,
-                defaultValue: '-1'
+                type: 'null'
               },
               sampleNumber: {
-                type: 'number',
+                defaultValue: '1',
                 required: false,
-                defaultValue: '1'
+                type: 'number'
+              },
+              sampleNumberWithPrefix: {
+                defaultValue: '-1',
+                required: false,
+                type: 'number'
               },
               sampleTrue: {
-                type: 'boolean',
+                defaultValue: 'true',
                 required: false,
-                defaultValue: 'true'
-              },
-              sampleNull: {
-                type: 'null',
-                required: false,
-                defaultValue: 'null'
+                type: 'boolean'
               },
               sampleUndefined: {
-                type: 'undefined',
+                defaultValue: 'undefined',
                 required: false,
-                defaultValue: 'undefined'
+                type: 'undefined'
               }
             }
           },
@@ -947,8 +947,8 @@ describe('parser', () => {
       assert.equal(myCoolMethod.description, 'My super cool method');
       assert.equal(
         myCoolMethod.docblock,
-        'My super cool method\n@param myParam Documentation for parameter 1\n@public\n@returns The answer to the universe'
-      ); // tslint:disable-line max-line-length
+        'My super cool method\n@param myParam Documentation for parameter 1\n@public\n@returns The answer to the universe' // tslint:disable-line max-line-length
+      );
       assert.deepEqual(myCoolMethod.modifiers, []);
       assert.equal(myCoolMethod.name, 'myCoolMethod');
       assert.deepEqual(myCoolMethod.params, [
