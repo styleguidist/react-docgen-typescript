@@ -108,6 +108,8 @@ componentNameResolver: (exp, source) => exp.getName() === 'StyledComponentClass'
 
 In the example folder you can see React Styleguidist integration.
 
+**Warning:** only named exports are supported. If your project uses default exports, you still need to include named exports for `react-docgen-typescript`.
+
 The component [`Column.tsx`](./examples/react-styleguidist-example/components/Column.tsx)
 
 ```javascript
