@@ -468,6 +468,14 @@ describe('parser', () => {
     });
   });
 
+  it('should parse jsdocs with the @default tag and no description', () => {
+    check('StatelessWithDefaultOnlyJsDoc', {
+      StatelessWithDefaultOnlyJsDoc: {
+        myProp: { defaultValue: 'hello', description: '', type: 'string' }
+      }
+    });
+  });
+
   it('should parse functional component component defined as function', () => {
     check('FunctionDeclaration', {
       Jumbotron: {

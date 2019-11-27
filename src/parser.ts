@@ -540,7 +540,7 @@ export class Parser {
 
   public findDocComment(symbol: ts.Symbol): JSDoc {
     const comment = this.getFullJsDocComment(symbol);
-    if (comment.fullComment) {
+    if (comment.fullComment || comment.tags.default) {
       return comment;
     }
 
@@ -548,7 +548,7 @@ export class Parser {
     const commentsOnRootSymbols = rootSymbols
       .filter(x => x !== symbol)
       .map(x => this.getFullJsDocComment(x))
-      .filter(x => !!x.fullComment);
+      .filter(x => !!x.fullComment || !!comment.tags.default);
 
     if (commentsOnRootSymbols.length) {
       return commentsOnRootSymbols[0];
