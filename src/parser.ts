@@ -226,17 +226,19 @@ export class Parser {
       exp.valueDeclaration || exp.declarations![0]
     );
     let commentSource = exp;
+    const typeSymbol = type.symbol || type.aliasSymbol;
 
     if (!exp.valueDeclaration) {
-      if (!type.symbol) {
+      if (!typeSymbol) {
         return null;
       }
-      exp = type.symbol;
+      exp = typeSymbol;
       const expName = exp.getName();
       if (
         expName === 'StatelessComponent' ||
         expName === 'Stateless' ||
         expName === 'StyledComponentClass' ||
+        expName === 'StyledComponent' ||
         expName === 'FunctionComponent'
       ) {
         commentSource = this.checker.getAliasedSymbol(commentSource);
@@ -247,9 +249,9 @@ export class Parser {
 
     // Skip over PropTypes that are exported
     if (
-      type.symbol &&
-      (type.symbol.getEscapedName() === 'Requireable' ||
-        type.symbol.getEscapedName() === 'Validator')
+      typeSymbol &&
+      (typeSymbol.getEscapedName() === 'Requireable' ||
+        typeSymbol.getEscapedName() === 'Validator')
     ) {
       return null;
     }
