@@ -359,6 +359,14 @@ describe('parser', () => {
     });
   });
 
+  it('should parse react stateless component with generic intersection props', () => {
+    check('StatelessIntersectionGenericProps', {
+      StatelessIntersectionGenericProps: {
+        myProp: { type: 'string' }
+      }
+    });
+  });
+
   it('should parse react stateful component with intersection props', () => {
     check('StatefulIntersectionProps', {
       StatefulIntersectionProps: {
