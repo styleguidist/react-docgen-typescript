@@ -553,14 +553,18 @@ export class Parser {
             : jsDocComment.fullComment;
         }
 
-        if (!stored.type.name.split(' | ').includes(type.name)) {
+        if (!stored.type) {
+          stored.type = type;
+        } else if (stored.type.name.split(' | ').indexOf(type.name) === -1) {
           stored.type.name += ` | ${this.getDocgenType(propType).name}`;
         }
 
         if (defaultValue) {
           if (!stored.defaultValue) {
             stored.defaultValue = defaultValue;
-          } else if (!stored.defaultValue.value.includes(defaultValue.value)) {
+          } else if (
+            stored.defaultValue.value.indexOf(defaultValue.value) === -1
+          ) {
             stored.defaultValue += ` | ${defaultValue}`;
           }
         }
