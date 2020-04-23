@@ -124,6 +124,23 @@ export function withDefaultConfig(
 }
 
 /**
+ * Resolve all the properties in an interface. Will resolve
+ * properties from union/intersection as well.
+ */
+function resolveProperties(type: ts.Type) {
+  let propertiesOfProps = type.getProperties();
+
+  if (type.isUnionOrIntersection()) {
+    // Get all the properties of union-ed types
+    propertiesOfProps = type.types.reduce<ts.Symbol[]>((acc, subType) => {
+      return [...acc, ...resolveProperties(subType)];
+    }, []);
+  }
+
+  return propertiesOfProps;
+}
+
+/**
  * Constructs a parser for a specified tsconfig file.
  */
 export function withCustomConfig(
@@ -492,19 +509,13 @@ export class Parser {
     if (!propsObj.valueDeclaration) {
       return {};
     }
+
     const propsType = this.checker.getTypeOfSymbolAtLocation(
       propsObj,
       propsObj.valueDeclaration
     );
-    let propertiesOfProps = propsType.getProperties();
 
-    if (!propertiesOfProps.length && propsType.isUnionOrIntersection()) {
-      propertiesOfProps = propsType.types.reduce<ts.Symbol[]>(
-        (acc, type) => [...acc, ...type.getProperties()],
-        []
-      );
-    }
-
+    const propertiesOfProps = resolveProperties(propsType);
     const result: Props = {};
 
     propertiesOfProps.forEach(prop => {
@@ -531,15 +542,42 @@ export class Parser {
       }
 
       const parent = getParentType(prop);
+      const required = !isOptional && !hasCodeBasedDefault;
+      const stored = result[propName];
+      const type = this.getDocgenType(propType);
 
-      result[propName] = {
-        defaultValue,
-        description: jsDocComment.fullComment,
-        name: propName,
-        parent,
-        required: !isOptional && !hasCodeBasedDefault,
-        type: this.getDocgenType(propType)
-      };
+      if (stored) {
+        if (jsDocComment.fullComment) {
+          stored.description = result[propName].description
+            ? `${result[propName].description}\n${jsDocComment.fullComment}`
+            : jsDocComment.fullComment;
+        }
+
+        if (!stored.type.name.split(' | ').includes(type.name)) {
+          stored.type.name += ` | ${this.getDocgenType(propType).name}`;
+        }
+
+        if (defaultValue) {
+          if (!stored.defaultValue) {
+            stored.defaultValue = defaultValue;
+          } else if (!stored.defaultValue.value.includes(defaultValue.value)) {
+            stored.defaultValue += ` | ${defaultValue}`;
+          }
+        }
+
+        if (stored.required && !required) {
+          stored.required = false;
+        }
+      } else {
+        result[propName] = {
+          defaultValue,
+          description: jsDocComment.fullComment,
+          name: propName,
+          parent,
+          required,
+          type
+        };
+      }
     });
 
     return result;

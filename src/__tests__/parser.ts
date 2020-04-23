@@ -367,6 +367,43 @@ describe('parser', () => {
     });
   });
 
+  it('should parse react stateless component with intersection + union props', () => {
+    check('SimpleUnionIntersection', {
+      SimpleUnionIntersection: {
+        foo: { type: 'string', description: '' },
+        bar: { type: 'string', description: '' },
+        baz: { type: 'string', description: '' }
+      }
+    });
+  });
+
+  it('should parse react stateless component with intersection + union overlap props', () => {
+    check('SimpleDiscriminatedUnionIntersection', {
+      SimpleDiscriminatedUnionIntersection: {
+        foo: { type: 'string', description: '' },
+        bar: { type: '"one" | "other"', description: '' },
+        test: { type: 'number', description: '' },
+        baz: { type: 'number', description: '' }
+      }
+    });
+  });
+
+  it('should parse react stateless component with generic intersection + union overlap props', () => {
+    check('ComplexGenericUnionIntersection', {
+      ComplexGenericUnionIntersection: {
+        as: { type: 'T', description: '' },
+        hasWrap: { type: 'boolean', description: '', required: false },
+        foo: { type: '"red" | "blue"', description: '', required: false },
+        gap: {
+          type: 'number | never',
+          description:
+            'The space between children\nYou cannot use gap when using a "space" justify property',
+          required: false
+        }
+      }
+    });
+  });
+
   it('should parse react stateful component with intersection props', () => {
     check('StatefulIntersectionProps', {
       StatefulIntersectionProps: {
