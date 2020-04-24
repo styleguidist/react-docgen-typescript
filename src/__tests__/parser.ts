@@ -389,18 +389,22 @@ describe('parser', () => {
   });
 
   it('should parse react stateless component with generic intersection + union overlap props', () => {
-    check('ComplexGenericUnionIntersection', {
+    check("ComplexGenericUnionIntersection", {
       ComplexGenericUnionIntersection: {
-        as: { type: 'T', description: '' },
-        hasWrap: { type: 'boolean', description: '', required: false },
-        foo: { type: '"red" | "blue"', description: '', required: false },
+        as: { type: "T", description: "" },
+        hasWrap: { type: "boolean", description: "", required: false },
+        foo: {
+          type: '"red" | "blue"',
+          required: false,
+          description: "The foo prop should not repeat the description",
+        },
         gap: {
-          type: 'number | never',
+          type: "number | never",
           description:
             'The space between children\nYou cannot use gap when using a "space" justify property',
-          required: false
-        }
-      }
+          required: false,
+        },
+      },
     });
   });
 

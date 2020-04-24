@@ -533,7 +533,7 @@ export class Parser {
       const jsDocComment = this.findDocComment(prop);
       const hasCodeBasedDefault = defaultProps[propName] !== undefined;
 
-      let defaultValue = null;
+      let defaultValue: { value: any } | null = null;
 
       if (hasCodeBasedDefault) {
         defaultValue = { value: defaultProps[propName] };
@@ -546,26 +546,36 @@ export class Parser {
       const stored = result[propName];
       const type = this.getDocgenType(propType);
 
+      function addToUnion(union: string, toAdd: string) {
+        const set = new Set(union.split(" | "));
+        toAdd.split(" | ").map(item => set.add(item))
+        return Array.from(set).join(" | ");
+      }
+
       if (stored) {
         if (jsDocComment.fullComment) {
-          stored.description = result[propName].description
-            ? `${result[propName].description}\n${jsDocComment.fullComment}`
-            : jsDocComment.fullComment;
+          stored.description =
+            stored.description &&
+            stored.description.indexOf(jsDocComment.fullComment) === -1
+              ? `${stored.description}\n${jsDocComment.fullComment}`
+              : jsDocComment.fullComment;
         }
 
         if (!stored.type) {
           stored.type = type;
-        } else if (stored.type.name.split(' | ').indexOf(type.name) === -1) {
-          stored.type.name += ` | ${this.getDocgenType(propType).name}`;
+        } else if (stored.type.name.split(" | ").indexOf(type.name) === -1) {
+          stored.type.name = addToUnion(
+            stored.type.name,
+            this.getDocgenType(propType).name
+          );
         }
 
         if (defaultValue) {
           if (!stored.defaultValue) {
             stored.defaultValue = defaultValue;
-          } else if (
-            stored.defaultValue.value.indexOf(defaultValue.value) === -1
-          ) {
-            stored.defaultValue += ` | ${defaultValue}`;
+          } else {
+            const value = String(stored.defaultValue.value);
+            stored.defaultValue.value = addToUnion(value, String(defaultValue.value));
           }
         }
 
@@ -579,7 +589,7 @@ export class Parser {
           name: propName,
           parent,
           required,
-          type
+          type,
         };
       }
     });

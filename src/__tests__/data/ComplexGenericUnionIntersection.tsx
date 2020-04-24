@@ -4,12 +4,14 @@ interface StackBaseProps<T> {
 }
 
 interface StackJustifyProps {
+  /** The foo prop should not repeat the description */
   foo?: 'blue';
   /** You cannot use gap when using a "space" justify property */
   gap?: never;
 }
 
 interface StackGapProps {
+  /** The foo prop should not repeat the description */
   foo?: 'red';
   /** The space between children */
   gap?: number;
