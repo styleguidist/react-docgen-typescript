@@ -370,9 +370,9 @@ describe('parser', () => {
   it('should parse react stateless component with intersection + union props', () => {
     check('SimpleUnionIntersection', {
       SimpleUnionIntersection: {
-        foo: { type: 'string', description: '' },
         bar: { type: 'string', description: '' },
-        baz: { type: 'string', description: '' }
+        baz: { type: 'string', description: '' },
+        foo: { type: 'string', description: '' }
       }
     });
   });
@@ -380,31 +380,32 @@ describe('parser', () => {
   it('should parse react stateless component with intersection + union overlap props', () => {
     check('SimpleDiscriminatedUnionIntersection', {
       SimpleDiscriminatedUnionIntersection: {
-        foo: { type: 'string', description: '' },
         bar: { type: '"one" | "other"', description: '' },
-        test: { type: 'number', description: '' },
-        baz: { type: 'number', description: '' }
+        baz: { type: 'number', description: '' },
+        foo: { type: 'string', description: '' },
+        test: { type: 'number', description: '' }
       }
     });
   });
 
   it('should parse react stateless component with generic intersection + union overlap props', () => {
-    check("ComplexGenericUnionIntersection", {
+    check('ComplexGenericUnionIntersection', {
       ComplexGenericUnionIntersection: {
-        as: { type: "T", description: "" },
-        hasWrap: { type: "boolean", description: "", required: false },
+        as: { type: 'T', description: '' },
         foo: {
-          type: '"red" | "blue"',
+          description:
+            'The foo prop should not repeat the description \nThe foo prop should not repeat the description',
           required: false,
-          description: "The foo prop should not repeat the description",
+          type: '"red" | "blue"'
         },
         gap: {
-          type: "number | never",
           description:
-            'The space between children\nYou cannot use gap when using a "space" justify property',
+            'The space between children \nYou cannot use gap when using a "space" justify property',
           required: false,
+          type: 'number'
         },
-      },
+        hasWrap: { type: 'boolean', description: '', required: false }
+      }
     });
   });
 

@@ -124,23 +124,6 @@ export function withDefaultConfig(
 }
 
 /**
- * Resolve all the properties in an interface. Will resolve
- * properties from union/intersection as well.
- */
-function resolveProperties(type: ts.Type) {
-  let propertiesOfProps = type.getProperties();
-
-  if (type.isUnionOrIntersection()) {
-    // Get all the properties of union-ed types
-    propertiesOfProps = type.types.reduce<ts.Symbol[]>((acc, subType) => {
-      return [...acc, ...resolveProperties(subType)];
-    }, []);
-  }
-
-  return propertiesOfProps;
-}
-
-/**
  * Constructs a parser for a specified tsconfig file.
  */
 export function withCustomConfig(
@@ -198,6 +181,10 @@ export function withCompilerOptions(
     }
   };
 }
+
+const isOptional = (prop: ts.Symbol) =>
+  // tslint:disable-next-line:no-bitwise
+  (prop.getFlags() & ts.SymbolFlags.Optional) !== 0;
 
 interface JSDoc {
   description: string;
@@ -514,8 +501,12 @@ export class Parser {
       propsObj,
       propsObj.valueDeclaration
     );
+    const baseProps = propsType.getProperties();
+    const propertiesOfProps: ts.Symbol[] = propsType.isUnionOrIntersection()
+      ? // Using internal typescript API to get all properties
+        (this.checker as any).getAllPossiblePropertiesOfTypes(propsType.types)
+      : baseProps;
 
-    const propertiesOfProps = resolveProperties(propsType);
     const result: Props = {};
 
     propertiesOfProps.forEach(prop => {
@@ -526,9 +517,6 @@ export class Parser {
         prop,
         propsObj.valueDeclaration!
       );
-
-      // tslint:disable-next-line:no-bitwise
-      const isOptional = (prop.getFlags() & ts.SymbolFlags.Optional) !== 0;
 
       const jsDocComment = this.findDocComment(prop);
       const hasCodeBasedDefault = defaultProps[propName] !== undefined;
@@ -542,56 +530,25 @@ export class Parser {
       }
 
       const parent = getParentType(prop);
-      const required = !isOptional && !hasCodeBasedDefault;
-      const stored = result[propName];
-      const type = this.getDocgenType(propType);
+      const declarations = prop.declarations || [];
+      const baseProp = baseProps.find((p) => p.getName() === propName);
 
-      function addToUnion(union: string, toAdd: string) {
-        const set = new Set(union.split(" | "));
-        toAdd.split(" | ").map(item => set.add(item))
-        return Array.from(set).join(" | ");
-      }
+      const required =
+        !isOptional(prop) &&
+        !hasCodeBasedDefault &&
+        // If in a intersection or union check original declaration for "?"
+        // @ts-ignore
+        declarations.every((d) => !d.questionToken) &&
+        (!baseProp || !isOptional(baseProp));
 
-      if (stored) {
-        if (jsDocComment.fullComment) {
-          stored.description =
-            stored.description &&
-            stored.description.indexOf(jsDocComment.fullComment) === -1
-              ? `${stored.description}\n${jsDocComment.fullComment}`
-              : jsDocComment.fullComment;
-        }
-
-        if (!stored.type) {
-          stored.type = type;
-        } else if (stored.type.name.split(" | ").indexOf(type.name) === -1) {
-          stored.type.name = addToUnion(
-            stored.type.name,
-            this.getDocgenType(propType).name
-          );
-        }
-
-        if (defaultValue) {
-          if (!stored.defaultValue) {
-            stored.defaultValue = defaultValue;
-          } else {
-            const value = String(stored.defaultValue.value);
-            stored.defaultValue.value = addToUnion(value, String(defaultValue.value));
-          }
-        }
-
-        if (stored.required && !required) {
-          stored.required = false;
-        }
-      } else {
-        result[propName] = {
-          defaultValue,
-          description: jsDocComment.fullComment,
-          name: propName,
-          parent,
-          required,
-          type,
-        };
-      }
+      result[propName] = {
+        defaultValue,
+        description: jsDocComment.fullComment,
+        name: propName,
+        parent,
+        required,
+        type: this.getDocgenType(propType)
+      };
     });
 
     return result;
