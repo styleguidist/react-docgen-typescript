@@ -137,7 +137,9 @@ export function withCustomConfig(
 
   if (error !== undefined) {
     // tslint:disable-next-line: max-line-length
-    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${error.code}, message: ${error.messageText}`;
+    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${
+      error.code
+    }, message: ${error.messageText}`;
     throw new Error(errorText);
   }
 
@@ -227,21 +229,25 @@ export class Parser {
     const typeSymbol = type.symbol || type.aliasSymbol;
 
     if (!exp.valueDeclaration) {
-      if (!typeSymbol) {
-        return null;
-      }
-      exp = typeSymbol;
-      const expName = exp.getName();
-      if (
-        expName === 'StatelessComponent' ||
-        expName === 'Stateless' ||
-        expName === 'StyledComponentClass' ||
-        expName === 'StyledComponent' ||
-        expName === 'FunctionComponent'
-      ) {
+      if (exp.getName() === 'default' && !typeSymbol) {
         commentSource = this.checker.getAliasedSymbol(commentSource);
+      } else if (!typeSymbol) {
+        return null;
       } else {
-        commentSource = exp;
+        exp = typeSymbol;
+        const expName = exp.getName();
+
+        if (
+          expName === 'StatelessComponent' ||
+          expName === 'Stateless' ||
+          expName === 'StyledComponentClass' ||
+          expName === 'StyledComponent' ||
+          expName === 'FunctionComponent'
+        ) {
+          commentSource = this.checker.getAliasedSymbol(commentSource);
+        } else {
+          commentSource = exp;
+        }
       }
     }
 
@@ -683,9 +689,9 @@ export class Parser {
         let propMap = {};
 
         if (properties) {
-          propMap = this.getPropMap(
-            properties as ts.NodeArray<ts.PropertyAssignment>
-          );
+          propMap = this.getPropMap(properties as ts.NodeArray<
+            ts.PropertyAssignment
+          >);
         }
 
         return {
@@ -699,9 +705,9 @@ export class Parser {
           if (right) {
             const { properties } = right as ts.ObjectLiteralExpression;
             if (properties) {
-              propMap = this.getPropMap(
-                properties as ts.NodeArray<ts.PropertyAssignment>
-              );
+              propMap = this.getPropMap(properties as ts.NodeArray<
+                ts.PropertyAssignment
+              >);
             }
           }
         });
@@ -788,26 +794,31 @@ export class Parser {
   public getPropMap(
     properties: ts.NodeArray<ts.PropertyAssignment | ts.BindingElement>
   ): StringIndexedObject<string | boolean | number | null> {
-    const propMap = properties.reduce((acc, property) => {
-      if (ts.isSpreadAssignment(property) || !property.name) {
+    const propMap = properties.reduce(
+      (acc, property) => {
+        if (ts.isSpreadAssignment(property) || !property.name) {
+          return acc;
+        }
+
+        const literalValue = this.getLiteralValueFromPropertyAssignment(
+          property
+        );
+        const propertyName = getPropertyName(property.name);
+
+        if (
+          (typeof literalValue === 'string' ||
+            typeof literalValue === 'number' ||
+            typeof literalValue === 'boolean' ||
+            literalValue === null) &&
+          propertyName !== null
+        ) {
+          acc[propertyName] = literalValue;
+        }
+
         return acc;
-      }
-
-      const literalValue = this.getLiteralValueFromPropertyAssignment(property);
-      const propertyName = getPropertyName(property.name);
-
-      if (
-        (typeof literalValue === 'string' ||
-          typeof literalValue === 'number' ||
-          typeof literalValue === 'boolean' ||
-          literalValue === null) &&
-        propertyName !== null
-      ) {
-        acc[propertyName] = literalValue;
-      }
-
-      return acc;
-    }, {} as StringIndexedObject<string | boolean | number | null>);
+      },
+      {} as StringIndexedObject<string | boolean | number | null>
+    );
 
     return propMap;
   }
