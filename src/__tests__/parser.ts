@@ -531,6 +531,14 @@ describe('parser', () => {
     });
   });
 
+  it('should parse components with unioned types', () => {
+    check('OnlyDefaultExportUnion', {
+      OnlyDefaultExportUnion: {
+        content: { description: 'The content', type: 'string' }
+      }
+    });
+  });
+
   it('should parse jsdocs with the @default tag and no description', () => {
     check('StatelessWithDefaultOnlyJsDoc', {
       StatelessWithDefaultOnlyJsDoc: {

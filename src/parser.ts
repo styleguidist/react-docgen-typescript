@@ -233,21 +233,25 @@ export class Parser {
     const typeSymbol = type.symbol || type.aliasSymbol;
 
     if (!exp.valueDeclaration) {
-      if (!typeSymbol) {
-        return null;
-      }
-      exp = typeSymbol;
-      const expName = exp.getName();
-      if (
-        expName === 'StatelessComponent' ||
-        expName === 'Stateless' ||
-        expName === 'StyledComponentClass' ||
-        expName === 'StyledComponent' ||
-        expName === 'FunctionComponent'
-      ) {
+      if (exp.getName() === 'default' && !typeSymbol) {
         commentSource = this.checker.getAliasedSymbol(commentSource);
+      } else if (!typeSymbol) {
+        return null;
       } else {
-        commentSource = exp;
+        exp = typeSymbol;
+        const expName = exp.getName();
+
+        if (
+          expName === 'StatelessComponent' ||
+          expName === 'Stateless' ||
+          expName === 'StyledComponentClass' ||
+          expName === 'StyledComponent' ||
+          expName === 'FunctionComponent'
+        ) {
+          commentSource = this.checker.getAliasedSymbol(commentSource);
+        } else {
+          commentSource = exp;
+        }
       }
     }
 
