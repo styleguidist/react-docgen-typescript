@@ -79,6 +79,7 @@ export interface ParserOptions {
   propFilter?: StaticPropFilter | PropFilter;
   componentNameResolver?: ComponentNameResolver;
   shouldExtractLiteralValuesFromEnum?: boolean;
+  shouldRemoveUndefinedFromOptional?: boolean;
   savePropValueAsString?: boolean;
 }
 
@@ -203,15 +204,23 @@ const defaultJSDoc: JSDoc = {
 export class Parser {
   private checker: ts.TypeChecker;
   private propFilter: PropFilter;
+  private shouldRemoveUndefinedFromOptional: boolean;
   private shouldExtractLiteralValuesFromEnum: boolean;
   private savePropValueAsString: boolean;
 
   constructor(program: ts.Program, opts: ParserOptions) {
-    const { savePropValueAsString, shouldExtractLiteralValuesFromEnum } = opts;
+    const {
+      savePropValueAsString,
+      shouldExtractLiteralValuesFromEnum,
+      shouldRemoveUndefinedFromOptional
+    } = opts;
     this.checker = program.getTypeChecker();
     this.propFilter = buildFilter(opts);
     this.shouldExtractLiteralValuesFromEnum = Boolean(
       shouldExtractLiteralValuesFromEnum
+    );
+    this.shouldRemoveUndefinedFromOptional = Boolean(
+      shouldRemoveUndefinedFromOptional
     );
     this.savePropValueAsString = Boolean(savePropValueAsString);
   }
@@ -473,8 +482,8 @@ export class Parser {
     return returnTag.text || null;
   }
 
-  public getDocgenType(propType: ts.Type): PropItemType {
-    const propTypeString = this.checker.typeToString(propType);
+  public getDocgenType(propType: ts.Type, isRequired: boolean): PropItemType {
+    let propTypeString = this.checker.typeToString(propType);
 
     if (
       this.shouldExtractLiteralValuesFromEnum &&
@@ -490,6 +499,10 @@ export class Parser {
           }))
           .filter(Boolean)
       };
+    }
+
+    if (this.shouldRemoveUndefinedFromOptional && !isRequired) {
+      propTypeString = propTypeString.replace(' | undefined', '');
     }
 
     return { name: propTypeString };
@@ -537,14 +550,14 @@ export class Parser {
 
       const parent = getParentType(prop);
       const declarations = prop.declarations || [];
-      const baseProp = baseProps.find((p) => p.getName() === propName);
+      const baseProp = baseProps.find(p => p.getName() === propName);
 
       const required =
         !isOptional(prop) &&
         !hasCodeBasedDefault &&
         // If in a intersection or union check original declaration for "?"
         // @ts-ignore
-        declarations.every((d) => !d.questionToken) &&
+        declarations.every(d => !d.questionToken) &&
         (!baseProp || !isOptional(baseProp));
 
       result[propName] = {
@@ -553,7 +566,7 @@ export class Parser {
         name: propName,
         parent,
         required,
-        type: this.getDocgenType(propType)
+        type: this.getDocgenType(propType, required)
       };
     });
 
