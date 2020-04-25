@@ -22,7 +22,9 @@
     "prettier:write": "npm run prettier:base -- --write \"src/**/*.{ts,tsx}\""
   },
   "license": "MIT",
-  "dependencies": {},
+  "peerDependencies": {
+    "typescript": ">= 3.x"
+  },
   "devDependencies": {
     "@types/chai": "^4.1.0",
     "@types/lodash": "^4.14.137",
