@@ -182,6 +182,10 @@ export function withCompilerOptions(
   };
 }
 
+const isOptional = (prop: ts.Symbol) =>
+  // tslint:disable-next-line:no-bitwise
+  (prop.getFlags() & ts.SymbolFlags.Optional) !== 0;
+
 interface JSDoc {
   description: string;
   fullComment: string;
@@ -492,18 +496,16 @@ export class Parser {
     if (!propsObj.valueDeclaration) {
       return {};
     }
+
     const propsType = this.checker.getTypeOfSymbolAtLocation(
       propsObj,
       propsObj.valueDeclaration
     );
-    let propertiesOfProps = propsType.getProperties();
-
-    if (!propertiesOfProps.length && propsType.isUnionOrIntersection()) {
-      propertiesOfProps = propsType.types.reduce<ts.Symbol[]>(
-        (acc, type) => [...acc, ...type.getProperties()],
-        []
-      );
-    }
+    const baseProps = propsType.getProperties();
+    const propertiesOfProps: ts.Symbol[] = propsType.isUnionOrIntersection()
+      ? // Using internal typescript API to get all properties
+        (this.checker as any).getAllPossiblePropertiesOfTypes(propsType.types)
+      : baseProps;
 
     const result: Props = {};
 
@@ -516,13 +518,10 @@ export class Parser {
         propsObj.valueDeclaration!
       );
 
-      // tslint:disable-next-line:no-bitwise
-      const isOptional = (prop.getFlags() & ts.SymbolFlags.Optional) !== 0;
-
       const jsDocComment = this.findDocComment(prop);
       const hasCodeBasedDefault = defaultProps[propName] !== undefined;
 
-      let defaultValue = null;
+      let defaultValue: { value: any } | null = null;
 
       if (hasCodeBasedDefault) {
         defaultValue = { value: defaultProps[propName] };
@@ -531,13 +530,23 @@ export class Parser {
       }
 
       const parent = getParentType(prop);
+      const declarations = prop.declarations || [];
+      const baseProp = baseProps.find((p) => p.getName() === propName);
+
+      const required =
+        !isOptional(prop) &&
+        !hasCodeBasedDefault &&
+        // If in a intersection or union check original declaration for "?"
+        // @ts-ignore
+        declarations.every((d) => !d.questionToken) &&
+        (!baseProp || !isOptional(baseProp));
 
       result[propName] = {
         defaultValue,
         description: jsDocComment.fullComment,
         name: propName,
         parent,
-        required: !isOptional && !hasCodeBasedDefault,
+        required,
         type: this.getDocgenType(propType)
       };
     });
