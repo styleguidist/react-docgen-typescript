@@ -350,6 +350,19 @@ describe('parser', () => {
     });
   });
 
+  it('should parse react stateless component default props when declared as a normal function', () => {
+    check('FunctionDeclarationDefaultProps', {
+      FunctionDeclarationDefaultProps: {
+        id: {
+          defaultValue: 1,
+          description: '',
+          required: false,
+          type: 'number'
+        }
+      }
+    });
+  });
+
   it('should parse react stateless component with external intersection props', () => {
     check('StatelessIntersectionExternalProps', {
       StatelessIntersectionExternalProps: {
