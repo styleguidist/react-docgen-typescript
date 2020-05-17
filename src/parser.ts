@@ -243,7 +243,11 @@ export class Parser {
     const originalName = exp.getName();
 
     if (!exp.valueDeclaration) {
-      if (originalName === 'default' && !typeSymbol) {
+      if (
+        originalName === 'default' &&
+        !typeSymbol &&
+        (exp.flags & ts.SymbolFlags.Alias) !== 0
+      ) {
         commentSource = this.checker.getAliasedSymbol(commentSource);
       } else if (!typeSymbol) {
         return null;
