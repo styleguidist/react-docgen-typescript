@@ -240,9 +240,10 @@ export class Parser {
     );
     let commentSource = exp;
     const typeSymbol = type.symbol || type.aliasSymbol;
+    const originalName = exp.getName();
 
     if (!exp.valueDeclaration) {
-      if (exp.getName() === 'default' && !typeSymbol) {
+      if (originalName === 'default' && !typeSymbol) {
         commentSource = this.checker.getAliasedSymbol(commentSource);
       } else if (!typeSymbol) {
         return null;
@@ -251,6 +252,7 @@ export class Parser {
         const expName = exp.getName();
 
         if (
+          expName === '__function' ||
           expName === 'StatelessComponent' ||
           expName === 'Stateless' ||
           expName === 'StyledComponentClass' ||
@@ -277,9 +279,10 @@ export class Parser {
       this.extractPropsFromTypeIfStatelessComponent(type) ||
       this.extractPropsFromTypeIfStatefulComponent(type);
 
-    const resolvedComponentName = componentNameResolver(exp, source);
+    const nameSource = originalName === 'default' ? exp : commentSource;
+    const resolvedComponentName = componentNameResolver(nameSource, source);
     const displayName =
-      resolvedComponentName || computeComponentName(exp, source);
+      resolvedComponentName || computeComponentName(nameSource, source);
     const description = this.findDocComment(commentSource).fullComment;
     const methods = this.getMethodsInfo(type);
 

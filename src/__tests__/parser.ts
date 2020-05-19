@@ -341,6 +341,20 @@ describe('parser', () => {
     });
   });
 
+  it('should component where last line is a comment', () => {
+    check('ExportObject', {
+      Baz: {
+        baz: { description: '', type: 'string' }
+      },
+      Bar: {
+        foo: { description: '', type: 'string' }
+      },
+      FooBar: {
+        foobar: { description: '', type: 'string' }
+      }
+    });
+  });
+
   it('should parse react stateless component with intersection props', () => {
     check('StatelessIntersectionProps', {
       StatelessIntersectionProps: {
@@ -612,7 +626,7 @@ describe('parser', () => {
       'FunctionalComponentAsConstAsNamedExport',
       {
         // in this case the component name is taken from the file name
-        FunctionalComponentAsConstAsNamedExport: {
+        Jumbotron: {
           prop1: { type: 'string', required: true }
         }
       },
@@ -626,7 +640,7 @@ describe('parser', () => {
       'ReactSFCAsConstAsNamedExport',
       {
         // in this case the component name is taken from the file name
-        ReactSFCAsConstAsNamedExport: {
+        Jumbotron: {
           prop1: { type: 'string', required: true }
         }
       },
