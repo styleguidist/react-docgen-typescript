@@ -221,6 +221,14 @@ describe('parser', () => {
     });
   });
 
+  it('should parse default interface export', () => {
+    check('ExportsDefaultInterface', {
+      Component: {
+        foo: { type: 'any' }
+      }
+    });
+  });
+
   it('should parse react component that exports a prop type const', () => {
     check('ExportsPropTypeShape', {
       ExportsPropTypes: {
