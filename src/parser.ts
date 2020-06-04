@@ -567,13 +567,19 @@ export class Parser {
         declarations.every(d => !d.questionToken) &&
         (!baseProp || !isOptional(baseProp));
 
+      const type = jsDocComment.tags.type
+        ? {
+            name: jsDocComment.tags.type
+          }
+        : this.getDocgenType(propType, required);
+
       result[propName] = {
         defaultValue,
         description: jsDocComment.fullComment,
         name: propName,
         parent,
         required,
-        type: this.getDocgenType(propType, required)
+        type
       };
     });
 
@@ -630,7 +636,7 @@ export class Parser {
         ? currentValue + '\n' + trimmedText
         : trimmedText;
 
-      if (tag.name !== 'default') {
+      if (['default', 'type'].indexOf(tag.name) < 0) {
         tagComments.push(formatTag(tag));
       }
     });

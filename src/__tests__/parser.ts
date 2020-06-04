@@ -309,6 +309,22 @@ describe('parser', () => {
     });
   });
 
+  describe('component with @type jsdoc tag', () => {
+    const expectation = {
+      ComponentWithTypeJsDocTag: {
+        sampleTypeFromJSDoc: {
+          description: 'sample with custom type',
+          required: true,
+          type: 'string'
+        }
+      }
+    };
+
+    it('should parse defined props', () => {
+      check('ComponentWithTypeJsDocTag', expectation);
+    });
+  });
+
   it('should parse react PureComponent', () => {
     check('PureRow', {
       Row: {
