@@ -921,6 +921,32 @@ describe('parser', () => {
       });
     });
 
+    describe('Extracting values from unions', () => {
+      it('extracts all values from union', () => {
+        check(
+          'ExtractLiteralValuesFromEnum',
+          {
+            ExtractLiteralValuesFromEnum: {
+              sampleComplexUnion: {
+                raw: 'number | "string1" | "string2"',
+                type: 'enum',
+                value: [
+                  { value: 'number' },
+                  { value: '"string1"' },
+                  { value: '"string2"' }
+                ]
+              }
+            }
+          },
+          false,
+          null,
+          {
+            shouldExtractValuesFromUnion: true
+          }
+        );
+      });
+    });
+
     describe('Returning not string default props ', () => {
       it('returns not string defaultProps', () => {
         check(
