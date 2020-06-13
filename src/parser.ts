@@ -80,6 +80,7 @@ export interface ParserOptions {
   componentNameResolver?: ComponentNameResolver;
   shouldExtractLiteralValuesFromEnum?: boolean;
   shouldRemoveUndefinedFromOptional?: boolean;
+  shouldExtractValuesFromUnion?: boolean;
   savePropValueAsString?: boolean;
 }
 
@@ -206,13 +207,15 @@ export class Parser {
   private propFilter: PropFilter;
   private shouldRemoveUndefinedFromOptional: boolean;
   private shouldExtractLiteralValuesFromEnum: boolean;
+  private shouldExtractValuesFromUnion: boolean;
   private savePropValueAsString: boolean;
 
   constructor(program: ts.Program, opts: ParserOptions) {
     const {
       savePropValueAsString,
       shouldExtractLiteralValuesFromEnum,
-      shouldRemoveUndefinedFromOptional
+      shouldRemoveUndefinedFromOptional,
+      shouldExtractValuesFromUnion
     } = opts;
     this.checker = program.getTypeChecker();
     this.propFilter = buildFilter(opts);
@@ -222,6 +225,7 @@ export class Parser {
     this.shouldRemoveUndefinedFromOptional = Boolean(
       shouldRemoveUndefinedFromOptional
     );
+    this.shouldExtractValuesFromUnion = Boolean(shouldExtractValuesFromUnion);
     this.savePropValueAsString = Boolean(savePropValueAsString);
   }
 
@@ -493,18 +497,19 @@ export class Parser {
     let propTypeString = this.checker.typeToString(propType);
 
     if (
-      this.shouldExtractLiteralValuesFromEnum &&
       propType.isUnion() &&
-      propType.types.every(type => type.isStringLiteral())
+      (this.shouldExtractValuesFromUnion ||
+        (this.shouldExtractLiteralValuesFromEnum &&
+          propType.types.every(type => type.isStringLiteral())))
     ) {
       return {
         name: 'enum',
         raw: propTypeString,
-        value: propType.types
-          .map(type => ({
-            value: type.isStringLiteral() ? `"${type.value}"` : undefined
-          }))
-          .filter(Boolean)
+        value: propType.types.map(type => ({
+          value: type.isStringLiteral()
+            ? `"${type.value}"`
+            : this.checker.typeToString(type)
+        }))
       };
     }
 
