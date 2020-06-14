@@ -14,7 +14,44 @@ It can be used with [React Styleguidist](https://github.com/styleguidist/react-s
 npm install --save-dev react-docgen-typescript
 ```
 
-## React Styleguidist integration
+## Usage
+
+To parse a file for docgen information use the `parse` function.
+
+```ts
+const docgen = require("react-docgen-typescript");
+
+const options = {
+  savePropValueAsString: true,
+};
+
+// Parse a file for docgen info
+docgen.parse("./path/to/component", options);
+```
+
+If you want to customize the typescript configuration or docgen options, this package exports a variety of ways to create custom parsers.
+
+```ts
+const docgen = require("react-docgen-typescript");
+
+// Create a parser with the default typescript config and custom docgen options
+const customParser = docgen.withDefaultConfig(options);
+
+const docs = customParser.parse("./path/to/component");
+
+// Create a parser with the custom typescript and custom docgen options
+const customCompilerOptionsParser = docgen.withCompilerOptions(
+  { esModuleInterop: true },
+  options
+);
+
+// Create a parser with using your typescript config
+const tsConfigParser = docgen.withCustomConfig("./tsconfig.json", {
+  savePropValueAsString: true,
+});
+```
+
+### React Styleguidist integration
 
 Include following line in your `styleguide.config.js`:
 
