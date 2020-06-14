@@ -19,56 +19,71 @@ npm install --save-dev react-docgen-typescript
 Include following line in your `styleguide.config.js`:
 
 ```javascript
-propsParser: require("react-docgen-typescript").withDefaultConfig([
-  parserOptions,
-]).parse;
+module.exports = {
+  propsParser: require("react-docgen-typescript").withDefaultConfig([
+    parserOptions,
+  ]).parse,
+};
 ```
 
 or if you want to use custom tsconfig file
 
 ```javascript
-propsParser: require("react-docgen-typescript").withCustomConfig(
-  "./tsconfig.json",
-  [parserOptions]
-).parse;
+module.exports = {
+  propsParser: require("react-docgen-typescript").withCustomConfig(
+    "./tsconfig.json",
+    [parserOptions]
+  ).parse,
+};
 ```
 
-### parserOptions
+## Options
 
-#### `propFilter`
+### `propFilter`
+
+The `propFilter` option allows you to omit certain props from documentation generation.
+
+You can either provide and object with some of our pre-configured filters:
 
 ```typescript
-{
+interface FilterOptions {
   skipPropsWithName?: string[] | string;
   skipPropsWithoutDoc?: boolean;
 }
+
+const options = {
+  propFilter: {
+    skipPropsWithName: ['as', 'id'];
+    skipPropsWithoutDoc: true;
+  }
+}
 ```
 
-or
-
-```typescript
-(prop: PropItem, component: Component) => boolean;
-```
-
-In case you do not want to print out all the HTML props, because your component is typed like this:
+If you do not want to print out all the HTML attributes of a component typed like the following:
 
 ```typescript
 const MyComponent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ()...
 ```
 
-you can use this workaround inside `propFilter`:
+you can provide a `propFilter` function and do the filtering logic yourself.
 
 ```typescript
-if (prop.parent) {
-  return !prop.parent.fileName.includes("node_modules");
-}
+type PropFilter = (prop: PropItem, component: Component) => boolean;
 
-return true;
+const options = {
+  propFilter: (prop: PropItem, component: Component) => {
+    if (prop.parent) {
+      return !prop.parent.fileName.includes("node_modules");
+    }
+
+    return true;
+  },
+};
 ```
 
 Note: `children` without a doc comment will not be documented.
 
-#### `componentNameResolver`
+### `componentNameResolver`
 
 ```typescript
 (exp: ts.Symbol, source: ts.SourceFile) => string | undefined | null | false;
@@ -76,19 +91,19 @@ Note: `children` without a doc comment will not be documented.
 
 If a string is returned, then the component will use that name. Else it will fallback to the default logic of parser.
 
-#### `shouldExtractLiteralValuesFromEnum`: boolean
+### `shouldExtractLiteralValuesFromEnum`: boolean
 
 If set to true, string enums and unions will be converted to docgen enum format. Useful if you use Storybook and want to generate knobs automatically using [addon-smart-knobs](https://github.com/storybookjs/addon-smart-knobs).
 
-#### `shouldExtractValuesFromUnion`: boolean
+### `shouldExtractValuesFromUnion`: boolean
 
 If set to true, every unions will be converted to docgen enum format.
 
-#### `shouldRemoveUndefinedFromOptional`: boolean
+### `shouldRemoveUndefinedFromOptional`: boolean
 
 If set to true, types that are optional will not display " | undefined" in the type.
 
-#### `savePropValueAsString`: boolean
+### `savePropValueAsString`: boolean
 
 If set to true, defaultValue to props will be string.
 Example:
