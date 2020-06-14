@@ -365,6 +365,18 @@ describe('parser', () => {
     });
   });
 
+  it('should get name for default export', () => {
+    check(
+      'ForwardRefDefaultExport',
+      {
+        ForwardRefDefaultExport: {
+          myProp: { type: 'string' }
+        }
+      },
+      false
+    );
+  });
+
   it('should component where last line is a comment', () => {
     check('ExportObject', {
       Baz: {
