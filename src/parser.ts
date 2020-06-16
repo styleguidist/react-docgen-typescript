@@ -3,6 +3,8 @@ import * as path from 'path';
 import * as ts from 'typescript';
 
 import { buildFilter } from './buildFilter';
+import { symbol } from 'prop-types';
+import { check } from './__tests__/testUtils';
 
 // We'll use the currentDirectoryName to trim parent fileNames
 const currentDirectoryPath = process.cwd();
@@ -238,10 +240,9 @@ export class Parser {
       return null;
     }
 
-    const type = this.checker.getTypeOfSymbolAtLocation(
-      exp,
-      exp.valueDeclaration || exp.declarations![0]
-    );
+    const declaration = exp.valueDeclaration || exp.declarations![0];
+    const type = this.checker.getTypeOfSymbolAtLocation(exp, declaration);
+
     let commentSource = exp;
     const typeSymbol = type.symbol || type.aliasSymbol;
     const originalName = exp.getName();
@@ -272,6 +273,8 @@ export class Parser {
           commentSource = exp;
         }
       }
+    } else if (type.symbol && (ts.isPropertyAccessExpression(declaration) || ts.isPropertyDeclaration(declaration))) {
+      commentSource = type.symbol;
     }
 
     // Skip over PropTypes that are exported
@@ -1085,10 +1088,10 @@ function parseWithProgramProvider(
   const checker = program.getTypeChecker();
 
   return filePaths
-    .map(filePath => program.getSourceFile(filePath))
+    .map((filePath) => program.getSourceFile(filePath))
     .filter(
       (sourceFile): sourceFile is ts.SourceFile =>
-        typeof sourceFile !== 'undefined'
+        typeof sourceFile !== "undefined"
     )
     .reduce<ComponentDoc[]>((docs, sourceFile) => {
       const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
@@ -1097,25 +1100,64 @@ function parseWithProgramProvider(
         return docs;
       }
 
-      Array.prototype.push.apply(
-        docs,
-        checker
-          .getExportsOfModule(moduleSymbol)
-          .map(exp =>
-            parser.getComponentInfo(
-              exp,
-              sourceFile,
-              parserOpts.componentNameResolver
-            )
-          )
-          .filter((comp): comp is ComponentDoc => comp !== null)
-          .filter((comp, index, comps) =>
-            comps
-              .slice(index + 1)
-              .every(innerComp => innerComp!.displayName !== comp!.displayName)
-          )
-      );
+      const components = checker.getExportsOfModule(moduleSymbol);
+      const componentDocs: ComponentDoc[] = [];
 
-      return docs;
+      // First document all components
+      components.forEach((exp) => {
+        const doc = parser.getComponentInfo(
+          exp,
+          sourceFile,
+          parserOpts.componentNameResolver
+        );
+
+        if (doc) {
+          componentDocs.push(doc);
+        }
+
+        if (!exp.exports) {
+          return;
+        }
+
+        // Then document any static sub-components
+        exp.exports.forEach((symbol) => {
+          if (symbol.flags & ts.SymbolFlags.Prototype) {
+            return;
+          }
+
+          if (symbol.flags & ts.SymbolFlags.Method) {
+            const signature = parser.getCallSignature(symbol);
+            const returnType = checker.typeToString(
+              signature.getReturnType()
+            );
+
+            if (returnType !== 'Element') {
+              return;
+            }
+          }
+
+          const doc = parser.getComponentInfo(
+            symbol,
+            sourceFile,
+            parserOpts.componentNameResolver
+          );
+
+          if (doc) {
+            componentDocs.push({
+              ...doc,
+              displayName: `${exp.escapedName}.${symbol.escapedName}`,
+            });
+          }
+        });
+      });
+
+      return [
+        ...docs,
+        ...componentDocs.filter((comp, index, comps) =>
+          comps
+            .slice(index + 1)
+            .every((innerComp) => innerComp!.displayName !== comp!.displayName)
+        ),
+      ];
     }, []);
 }
