@@ -94,11 +94,10 @@ describe('parser', () => {
   });
 
   it('should parse simple react class component with picked properties', () => {
-    // we are not able to get correct descriptions for prop1,prop2
     check('ColumnWithPick', {
       Column: {
-        prop1: { type: 'string', required: false, description: '' },
-        prop2: { type: 'number', description: '' },
+        prop1: { type: 'string', required: false },
+        prop2: { type: 'number' },
         propx: { type: 'number' }
       }
     });
@@ -188,6 +187,29 @@ describe('parser', () => {
       ExternalPropsComponent: {
         prop1: { type: 'string' }
       }
+    });
+  });
+
+  it('should parse static sub components', () => {
+    check('StatelessStaticComponents', {
+      StatelessStaticComponents: {
+        myProp: { type: 'string' }
+      },
+      'StatelessStaticComponents.Label': {
+        title: { type: 'string' }
+      }
+    });
+  });
+  
+  it('should parse static sub components on class components', () => {
+    check('ColumnWithStaticComponents', {
+      Column: {
+        prop1: { type: 'string' }
+      },
+      'Column.Label': {
+        title: { type: 'string' }
+      },
+      'Column.SubLabel': {}
     });
   });
 
@@ -457,13 +479,13 @@ describe('parser', () => {
         as: { type: 'T', description: '' },
         foo: {
           description:
-            'The foo prop should not repeat the description \nThe foo prop should not repeat the description',
+            'The foo prop should not repeat the description\nThe foo prop should not repeat the description',
           required: false,
           type: '"red" | "blue"'
         },
         gap: {
           description:
-            'The space between children \nYou cannot use gap when using a "space" justify property',
+            'The space between children\nYou cannot use gap when using a "space" justify property',
           required: false,
           type: 'number'
         },
