@@ -461,9 +461,9 @@ describe('parser', () => {
     });
   });
 
-  it('should parse react stateless component with generic intersection + union overlap props', () => {
-    check('ComplexGenericUnionIntersection', {
-      ComplexGenericUnionIntersection: {
+  it('should parse react stateless component with generic intersection + union overlap props - simple', () => {
+    check('SimpleGenericUnionIntersection', {
+      SimpleGenericUnionIntersection: {
         as: { type: 'T', description: '' },
         foo: {
           description:
@@ -479,6 +479,36 @@ describe('parser', () => {
         },
         hasWrap: { type: 'boolean', description: '', required: false }
       }
+    });
+  });
+
+  it("should parse react stateless component with generic intersection + union overlap props", () => {
+    check("ComplexGenericUnionIntersection", {
+      ComplexGenericUnionIntersection: {
+        as: {
+          type: "E",
+          required: false,
+          description: "Render the component as another component",
+        },
+        align: {
+          description: 'The flex "align" property',
+          required: false,
+          type: '"stretch" | "center" | "flex-start" | "flex-end"',
+        },
+        justify: {
+          description:
+            "Use flex 'center' | 'flex-start' | 'flex-end' | 'stretch' with\na gap between each child.\nUse flex 'space-between' | 'space-around' | 'space-evenly' and\nflex will space the children.",
+          required: false,
+          type:
+            '"stretch" | "center" | "flex-start" | "flex-end" | "space-between" | "space-around" | "space-evenly"',
+        },
+        gap: {
+          description:
+            'The space between children\nYou cannot use gap when using a "space" justify property',
+          required: false,
+          type: "ReactText",
+        }
+      },
     });
   });
 

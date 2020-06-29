@@ -536,10 +536,24 @@ export class Parser {
       propsObj.valueDeclaration
     );
     const baseProps = propsType.getProperties();
-    const propertiesOfProps: ts.Symbol[] = propsType.isUnionOrIntersection()
-      ? // Using internal typescript API to get all properties
-        (this.checker as any).getAllPossiblePropertiesOfTypes(propsType.types)
-      : baseProps;
+    let propertiesOfProps = baseProps;
+
+    if (propsType.isUnionOrIntersection()) {
+      // Using internal typescript API to get all properties
+      propertiesOfProps = (this.checker as any).getAllPossiblePropertiesOfTypes(
+        propsType.types
+      );
+
+      if (!propertiesOfProps.length) {
+        propertiesOfProps = (this.checker as any).getAllPossiblePropertiesOfTypes(
+          propsType.types.reduce<ts.Symbol[]>(
+            // @ts-ignore
+            (all, t) => [...all, ...(t.types || [])],
+            []
+          )
+        );
+      }
+    }
 
     const result: Props = {};
 
