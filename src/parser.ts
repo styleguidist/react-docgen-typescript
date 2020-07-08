@@ -141,9 +141,7 @@ export function withCustomConfig(
 
   if (error !== undefined) {
     // tslint:disable-next-line: max-line-length
-    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${
-      error.code
-    }, message: ${error.messageText}`;
+    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${error.code}, message: ${error.messageText}`;
     throw new Error(errorText);
   }
 
@@ -274,7 +272,11 @@ export class Parser {
           commentSource = exp;
         }
       }
-    } else if (type.symbol && (ts.isPropertyAccessExpression(declaration) || ts.isPropertyDeclaration(declaration))) {
+    } else if (
+      type.symbol &&
+      (ts.isPropertyAccessExpression(declaration) ||
+        ts.isPropertyDeclaration(declaration))
+    ) {
       commentSource = type.symbol;
     }
 
@@ -546,7 +548,8 @@ export class Parser {
       );
 
       if (!propertiesOfProps.length) {
-        propertiesOfProps = (this.checker as any).getAllPossiblePropertiesOfTypes(
+        propertiesOfProps = (this
+          .checker as any).getAllPossiblePropertiesOfTypes(
           propsType.types.reduce<ts.Symbol[]>(
             // @ts-ignore
             (all, t) => [...all, ...(t.types || [])],
@@ -744,9 +747,9 @@ export class Parser {
         let propMap = {};
 
         if (properties) {
-          propMap = this.getPropMap(properties as ts.NodeArray<
-            ts.PropertyAssignment
-          >);
+          propMap = this.getPropMap(
+            properties as ts.NodeArray<ts.PropertyAssignment>
+          );
         }
 
         return {
@@ -760,9 +763,9 @@ export class Parser {
           if (right) {
             const { properties } = right as ts.ObjectLiteralExpression;
             if (properties) {
-              propMap = this.getPropMap(properties as ts.NodeArray<
-                ts.PropertyAssignment
-              >);
+              propMap = this.getPropMap(
+                properties as ts.NodeArray<ts.PropertyAssignment>
+              );
             }
           }
         });
@@ -850,31 +853,26 @@ export class Parser {
   public getPropMap(
     properties: ts.NodeArray<ts.PropertyAssignment | ts.BindingElement>
   ): StringIndexedObject<string | boolean | number | null> {
-    const propMap = properties.reduce(
-      (acc, property) => {
-        if (ts.isSpreadAssignment(property) || !property.name) {
-          return acc;
-        }
-
-        const literalValue = this.getLiteralValueFromPropertyAssignment(
-          property
-        );
-        const propertyName = getPropertyName(property.name);
-
-        if (
-          (typeof literalValue === 'string' ||
-            typeof literalValue === 'number' ||
-            typeof literalValue === 'boolean' ||
-            literalValue === null) &&
-          propertyName !== null
-        ) {
-          acc[propertyName] = literalValue;
-        }
-
+    const propMap = properties.reduce((acc, property) => {
+      if (ts.isSpreadAssignment(property) || !property.name) {
         return acc;
-      },
-      {} as StringIndexedObject<string | boolean | number | null>
-    );
+      }
+
+      const literalValue = this.getLiteralValueFromPropertyAssignment(property);
+      const propertyName = getPropertyName(property.name);
+
+      if (
+        (typeof literalValue === 'string' ||
+          typeof literalValue === 'number' ||
+          typeof literalValue === 'boolean' ||
+          literalValue === null) &&
+        propertyName !== null
+      ) {
+        acc[propertyName] = literalValue;
+      }
+
+      return acc;
+    }, {} as StringIndexedObject<string | boolean | number | null>);
 
     return propMap;
   }
@@ -1104,10 +1102,10 @@ function parseWithProgramProvider(
   const checker = program.getTypeChecker();
 
   return filePaths
-    .map((filePath) => program.getSourceFile(filePath))
+    .map(filePath => program.getSourceFile(filePath))
     .filter(
       (sourceFile): sourceFile is ts.SourceFile =>
-        typeof sourceFile !== "undefined"
+        typeof sourceFile !== 'undefined'
     )
     .reduce<ComponentDoc[]>((docs, sourceFile) => {
       const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
@@ -1120,7 +1118,7 @@ function parseWithProgramProvider(
       const componentDocs: ComponentDoc[] = [];
 
       // First document all components
-      components.forEach((exp) => {
+      components.forEach(exp => {
         const doc = parser.getComponentInfo(
           exp,
           sourceFile,
@@ -1136,16 +1134,14 @@ function parseWithProgramProvider(
         }
 
         // Then document any static sub-components
-        exp.exports.forEach((symbol) => {
+        exp.exports.forEach(symbol => {
           if (symbol.flags & ts.SymbolFlags.Prototype) {
             return;
           }
 
           if (symbol.flags & ts.SymbolFlags.Method) {
             const signature = parser.getCallSignature(symbol);
-            const returnType = checker.typeToString(
-              signature.getReturnType()
-            );
+            const returnType = checker.typeToString(signature.getReturnType());
 
             if (returnType !== 'Element') {
               return;
@@ -1161,19 +1157,31 @@ function parseWithProgramProvider(
           if (doc) {
             componentDocs.push({
               ...doc,
-              displayName: `${exp.escapedName}.${symbol.escapedName}`,
+              displayName: `${exp.escapedName}.${symbol.escapedName}`
             });
           }
         });
       });
 
-      return [
-        ...docs,
-        ...componentDocs.filter((comp, index, comps) =>
+      // Remove any duplicates (for HOC where the names are the same)
+      const componentDocsNoDuplicates = componentDocs.reduce(
+        (prevVal, comp) => {
+          const duplicate = prevVal.find(compDoc => {
+            return compDoc!.displayName === comp!.displayName;
+          });
+          if (duplicate) return prevVal;
+          return [...prevVal, comp];
+        },
+        [] as ComponentDoc[]
+      );
+
+      const filteredComponentDocs = componentDocsNoDuplicates.filter(
+        (comp, index, comps) =>
           comps
             .slice(index + 1)
-            .every((innerComp) => innerComp!.displayName !== comp!.displayName)
-        ),
-      ];
+            .every(innerComp => innerComp!.displayName !== comp!.displayName)
+      );
+
+      return [...docs, ...filteredComponentDocs];
     }, []);
 }
