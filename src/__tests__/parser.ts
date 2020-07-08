@@ -200,7 +200,7 @@ describe('parser', () => {
       }
     });
   });
-  
+
   it('should parse static sub components on class components', () => {
     check('ColumnWithStaticComponents', {
       Column: {
@@ -494,33 +494,33 @@ describe('parser', () => {
     });
   });
 
-  it("should parse react stateless component with generic intersection + union overlap props", () => {
-    check("ComplexGenericUnionIntersection", {
+  it('should parse react stateless component with generic intersection + union overlap props', () => {
+    check('ComplexGenericUnionIntersection', {
       ComplexGenericUnionIntersection: {
         as: {
-          type: "E",
+          type: 'E',
           required: false,
-          description: "Render the component as another component",
+          description: 'Render the component as another component'
         },
         align: {
           description: 'The flex "align" property',
           required: false,
-          type: '"stretch" | "center" | "flex-start" | "flex-end"',
+          type: '"stretch" | "center" | "flex-start" | "flex-end"'
         },
         justify: {
           description:
             "Use flex 'center' | 'flex-start' | 'flex-end' | 'stretch' with\na gap between each child.\nUse flex 'space-between' | 'space-around' | 'space-evenly' and\nflex will space the children.",
           required: false,
           type:
-            '"stretch" | "center" | "flex-start" | "flex-end" | "space-between" | "space-around" | "space-evenly"',
+            '"stretch" | "center" | "flex-start" | "flex-end" | "space-between" | "space-around" | "space-evenly"'
         },
         gap: {
           description:
             'The space between children\nYou cannot use gap when using a "space" justify property',
           required: false,
-          type: "ReactText",
+          type: 'ReactText'
         }
-      },
+      }
     });
   });
 
@@ -958,7 +958,6 @@ describe('parser', () => {
           {
             ExtractLiteralValuesFromEnum: {
               sampleBoolean: { type: 'boolean' },
-              sampleComplexUnion: { type: 'number | "string1" | "string2"' },
               sampleEnum: {
                 raw: 'sampleEnum',
                 type: 'enum',
@@ -968,12 +967,7 @@ describe('parser', () => {
                   { value: '"three"' }
                 ]
               },
-              sampleString: { type: 'string' },
-              sampleStringUnion: {
-                raw: '"string1" | "string2"',
-                type: 'enum',
-                value: [{ value: '"string1"' }, { value: '"string2"' }]
-              }
+              sampleString: { type: 'string' }
             }
           },
           true,
@@ -988,9 +982,9 @@ describe('parser', () => {
     describe('Extracting values from unions', () => {
       it('extracts all values from union', () => {
         check(
-          'ExtractLiteralValuesFromEnum',
+          'ExtractLiteralValuesFromUnion',
           {
-            ExtractLiteralValuesFromEnum: {
+            ExtractLiteralValuesFromUnion: {
               sampleComplexUnion: {
                 raw: 'number | "string1" | "string2"',
                 type: 'enum',
@@ -998,6 +992,49 @@ describe('parser', () => {
                   { value: 'number' },
                   { value: '"string1"' },
                   { value: '"string2"' }
+                ]
+              }
+            }
+          },
+          false,
+          null,
+          {
+            shouldExtractValuesFromUnion: true
+          }
+        );
+      });
+      it('extracts numbers from a union', () => {
+        check(
+          'ExtractLiteralValuesFromUnion',
+          {
+            ExtractLiteralValuesFromUnion: {
+              sampleNumberUnion: {
+                raw: '1 | 2 | 3',
+                type: 'enum',
+                value: [{ value: '1' }, { value: '2' }, { value: '3' }]
+              }
+            }
+          },
+          false,
+          null,
+          {
+            shouldExtractValuesFromUnion: true
+          }
+        );
+      });
+      it('extracts numbers and strings from a mixed union', () => {
+        check(
+          'ExtractLiteralValuesFromUnion',
+          {
+            ExtractLiteralValuesFromUnion: {
+              sampleMixedUnion: {
+                raw: '"string1" | "string2" | 1 | 2',
+                type: 'enum',
+                value: [
+                  { value: '"string1"' },
+                  { value: '"string2"' },
+                  { value: '1' },
+                  { value: '2' }
                 ]
               }
             }
