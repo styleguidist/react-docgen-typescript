@@ -2,4 +2,4 @@
 language: node_js
 script: npm run test
 node_js:
-  - 6
+  - 10
