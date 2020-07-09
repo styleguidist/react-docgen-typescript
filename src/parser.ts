@@ -274,7 +274,11 @@ export class Parser {
           commentSource = exp;
         }
       }
-    } else if (type.symbol && (ts.isPropertyAccessExpression(declaration) || ts.isPropertyDeclaration(declaration))) {
+    } else if (
+      type.symbol &&
+      (ts.isPropertyAccessExpression(declaration) ||
+        ts.isPropertyDeclaration(declaration))
+    ) {
       commentSource = type.symbol;
     }
 
@@ -299,7 +303,10 @@ export class Parser {
     const methods = this.getMethodsInfo(type);
 
     if (propsType) {
-      const defaultProps = this.extractDefaultPropsFromComponent(exp, source);
+      const defaultProps = this.extractDefaultPropsFromComponent(
+        commentSource,
+        commentSource.valueDeclaration.getSourceFile()
+      );
       const props = this.getPropsInfo(propsType, defaultProps);
 
       for (const propName of Object.keys(props)) {
@@ -546,7 +553,8 @@ export class Parser {
       );
 
       if (!propertiesOfProps.length) {
-        propertiesOfProps = (this.checker as any).getAllPossiblePropertiesOfTypes(
+        propertiesOfProps = (this
+          .checker as any).getAllPossiblePropertiesOfTypes(
           propsType.types.reduce<ts.Symbol[]>(
             // @ts-ignore
             (all, t) => [...all, ...(t.types || [])],
@@ -677,9 +685,16 @@ export class Parser {
     }
 
     if (ts.isVariableStatement(statement)) {
-      const initializer =
+      let initializer =
         statement.declarationList &&
         statement.declarationList.declarations[0].initializer;
+
+      // Look at forwardRef function argument
+      if (initializer && ts.isCallExpression(initializer)) {
+        const symbol = this.checker.getSymbolAtLocation(initializer.expression);
+        if (!symbol || symbol.getName() !== 'forwardRef') return;
+        initializer = initializer.arguments[0];
+      }
 
       if (
         initializer &&
@@ -1104,10 +1119,10 @@ function parseWithProgramProvider(
   const checker = program.getTypeChecker();
 
   return filePaths
-    .map((filePath) => program.getSourceFile(filePath))
+    .map(filePath => program.getSourceFile(filePath))
     .filter(
       (sourceFile): sourceFile is ts.SourceFile =>
-        typeof sourceFile !== "undefined"
+        typeof sourceFile !== 'undefined'
     )
     .reduce<ComponentDoc[]>((docs, sourceFile) => {
       const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
@@ -1120,7 +1135,7 @@ function parseWithProgramProvider(
       const componentDocs: ComponentDoc[] = [];
 
       // First document all components
-      components.forEach((exp) => {
+      components.forEach(exp => {
         const doc = parser.getComponentInfo(
           exp,
           sourceFile,
@@ -1136,16 +1151,14 @@ function parseWithProgramProvider(
         }
 
         // Then document any static sub-components
-        exp.exports.forEach((symbol) => {
+        exp.exports.forEach(symbol => {
           if (symbol.flags & ts.SymbolFlags.Prototype) {
             return;
           }
 
           if (symbol.flags & ts.SymbolFlags.Method) {
             const signature = parser.getCallSignature(symbol);
-            const returnType = checker.typeToString(
-              signature.getReturnType()
-            );
+            const returnType = checker.typeToString(signature.getReturnType());
 
             if (returnType !== 'Element') {
               return;
@@ -1161,7 +1174,7 @@ function parseWithProgramProvider(
           if (doc) {
             componentDocs.push({
               ...doc,
-              displayName: `${exp.escapedName}.${symbol.escapedName}`,
+              displayName: `${exp.escapedName}.${symbol.escapedName}`
             });
           }
         });
@@ -1172,8 +1185,8 @@ function parseWithProgramProvider(
         ...componentDocs.filter((comp, index, comps) =>
           comps
             .slice(index + 1)
-            .every((innerComp) => innerComp!.displayName !== comp!.displayName)
-        ),
+            .every(innerComp => innerComp!.displayName !== comp!.displayName)
+        )
       ];
     }, []);
 }

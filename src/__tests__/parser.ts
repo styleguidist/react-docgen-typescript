@@ -200,7 +200,7 @@ describe('parser', () => {
       }
     });
   });
-  
+
   it('should parse static sub components on class components', () => {
     check('ColumnWithStaticComponents', {
       Column: {
@@ -435,6 +435,24 @@ describe('parser', () => {
     });
   });
 
+  it('should parse react stateless component default props when declared as a normal function inside forwardRef', () => {
+    check(
+      'ForwardRefDefaultValues',
+      {
+        ForwardRefDefaultValues: {
+          myProp: {
+            defaultValue: "I'm default",
+            description: 'myProp description',
+            type: 'string',
+            required: false
+          }
+        }
+      },
+      false,
+      'ForwardRefDefaultValues description'
+    );
+  });
+
   it('should parse react stateless component with external intersection props', () => {
     check('StatelessIntersectionExternalProps', {
       StatelessIntersectionExternalProps: {
@@ -494,33 +512,33 @@ describe('parser', () => {
     });
   });
 
-  it("should parse react stateless component with generic intersection + union overlap props", () => {
-    check("ComplexGenericUnionIntersection", {
+  it('should parse react stateless component with generic intersection + union overlap props', () => {
+    check('ComplexGenericUnionIntersection', {
       ComplexGenericUnionIntersection: {
         as: {
-          type: "E",
+          type: 'E',
           required: false,
-          description: "Render the component as another component",
+          description: 'Render the component as another component'
         },
         align: {
           description: 'The flex "align" property',
           required: false,
-          type: '"stretch" | "center" | "flex-start" | "flex-end"',
+          type: '"stretch" | "center" | "flex-start" | "flex-end"'
         },
         justify: {
           description:
             "Use flex 'center' | 'flex-start' | 'flex-end' | 'stretch' with\na gap between each child.\nUse flex 'space-between' | 'space-around' | 'space-evenly' and\nflex will space the children.",
           required: false,
           type:
-            '"stretch" | "center" | "flex-start" | "flex-end" | "space-between" | "space-around" | "space-evenly"',
+            '"stretch" | "center" | "flex-start" | "flex-end" | "space-between" | "space-around" | "space-evenly"'
         },
         gap: {
           description:
             'The space between children\nYou cannot use gap when using a "space" justify property',
           required: false,
-          type: "ReactText",
+          type: 'ReactText'
         }
-      },
+      }
     });
   });
 
