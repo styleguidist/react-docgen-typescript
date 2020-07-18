@@ -499,24 +499,39 @@ export class Parser {
     return returnTag.text || null;
   }
 
+  private getValuesFromUnionType(type: ts.Type): string | number {
+    if (type.isStringLiteral()) return `"${type.value}"`;
+    if (type.isNumberLiteral()) return `${type.value}`;
+    return this.checker.typeToString(type);
+  }
+
   public getDocgenType(propType: ts.Type, isRequired: boolean): PropItemType {
     let propTypeString = this.checker.typeToString(propType);
 
-    if (
-      propType.isUnion() &&
-      (this.shouldExtractValuesFromUnion ||
-        (this.shouldExtractLiteralValuesFromEnum &&
-          propType.types.every(type => type.isStringLiteral())))
-    ) {
-      return {
-        name: 'enum',
-        raw: propTypeString,
-        value: propType.types.map(type => ({
-          value: type.isStringLiteral()
-            ? `"${type.value}"`
-            : this.checker.typeToString(type)
-        }))
-      };
+    if (propType.isUnion()) {
+      if (this.shouldExtractValuesFromUnion) {
+        return {
+          name: 'enum',
+          raw: propTypeString,
+          value: propType.types.map(type => ({
+            value: this.getValuesFromUnionType(type)
+          }))
+        };
+      }
+      if (
+        this.shouldExtractLiteralValuesFromEnum &&
+        propType.types.every(type => type.isStringLiteral())
+      ) {
+        return {
+          name: 'enum',
+          raw: propTypeString,
+          value: propType.types.map(type => ({
+            value: type.isStringLiteral()
+              ? `"${type.value}"`
+              : this.checker.typeToString(type)
+          }))
+        };
+      }
     }
 
     if (this.shouldRemoveUndefinedFromOptional && !isRequired) {

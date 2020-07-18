@@ -13,12 +13,8 @@ interface ExtractLiteralValuesFromEnumProps {
   sampleBoolean: boolean;
   /** sampleEnum description */
   sampleEnum: sampleEnum;
-  /** sampleStringUnion description */
-  sampleStringUnion: 'string1' | 'string2';
-  /** sampleComplexUnion description */
-  sampleComplexUnion: number | 'string1' | 'string2';
 }
 
-export const Stateless: React.StatelessComponent<
-  ExtractLiteralValuesFromEnumProps
-> = props => <div>test</div>;
+export const Stateless: React.StatelessComponent<ExtractLiteralValuesFromEnumProps> = props => (
+  <div>test</div>
+);
