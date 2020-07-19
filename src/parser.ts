@@ -301,7 +301,10 @@ export class Parser {
     const methods = this.getMethodsInfo(type);
 
     if (propsType) {
-      const defaultProps = this.extractDefaultPropsFromComponent(exp, source);
+      const defaultProps = this.extractDefaultPropsFromComponent(
+        commentSource,
+        commentSource.valueDeclaration.getSourceFile()
+      );
       const props = this.getPropsInfo(propsType, defaultProps);
 
       for (const propName of Object.keys(props)) {
@@ -695,9 +698,16 @@ export class Parser {
     }
 
     if (ts.isVariableStatement(statement)) {
-      const initializer =
+      let initializer =
         statement.declarationList &&
         statement.declarationList.declarations[0].initializer;
+
+      // Look at forwardRef function argument
+      if (initializer && ts.isCallExpression(initializer)) {
+        const symbol = this.checker.getSymbolAtLocation(initializer.expression);
+        if (!symbol || symbol.getName() !== 'forwardRef') return;
+        initializer = initializer.arguments[0];
+      }
 
       if (
         initializer &&

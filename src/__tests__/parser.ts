@@ -435,6 +435,24 @@ describe('parser', () => {
     });
   });
 
+  it('should parse react stateless component default props when declared as a normal function inside forwardRef', () => {
+    check(
+      'ForwardRefDefaultValues',
+      {
+        ForwardRefDefaultValues: {
+          myProp: {
+            defaultValue: "I'm default",
+            description: 'myProp description',
+            type: 'string',
+            required: false
+          }
+        }
+      },
+      false,
+      'ForwardRefDefaultValues description'
+    );
+  });
+
   it('should parse react stateless component with external intersection props', () => {
     check('StatelessIntersectionExternalProps', {
       StatelessIntersectionExternalProps: {
