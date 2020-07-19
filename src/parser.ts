@@ -141,9 +141,7 @@ export function withCustomConfig(
 
   if (error !== undefined) {
     // tslint:disable-next-line: max-line-length
-    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${
-      error.code
-    }, message: ${error.messageText}`;
+    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${error.code}, message: ${error.messageText}`;
     throw new Error(errorText);
   }
 
@@ -504,24 +502,39 @@ export class Parser {
     return returnTag.text || null;
   }
 
+  private getValuesFromUnionType(type: ts.Type): string | number {
+    if (type.isStringLiteral()) return `"${type.value}"`;
+    if (type.isNumberLiteral()) return `${type.value}`;
+    return this.checker.typeToString(type);
+  }
+
   public getDocgenType(propType: ts.Type, isRequired: boolean): PropItemType {
     let propTypeString = this.checker.typeToString(propType);
 
-    if (
-      propType.isUnion() &&
-      (this.shouldExtractValuesFromUnion ||
-        (this.shouldExtractLiteralValuesFromEnum &&
-          propType.types.every(type => type.isStringLiteral())))
-    ) {
-      return {
-        name: 'enum',
-        raw: propTypeString,
-        value: propType.types.map(type => ({
-          value: type.isStringLiteral()
-            ? `"${type.value}"`
-            : this.checker.typeToString(type)
-        }))
-      };
+    if (propType.isUnion()) {
+      if (this.shouldExtractValuesFromUnion) {
+        return {
+          name: 'enum',
+          raw: propTypeString,
+          value: propType.types.map(type => ({
+            value: this.getValuesFromUnionType(type)
+          }))
+        };
+      }
+      if (
+        this.shouldExtractLiteralValuesFromEnum &&
+        propType.types.every(type => type.isStringLiteral())
+      ) {
+        return {
+          name: 'enum',
+          raw: propTypeString,
+          value: propType.types.map(type => ({
+            value: type.isStringLiteral()
+              ? `"${type.value}"`
+              : this.checker.typeToString(type)
+          }))
+        };
+      }
     }
 
     if (this.shouldRemoveUndefinedFromOptional && !isRequired) {
@@ -759,9 +772,9 @@ export class Parser {
         let propMap = {};
 
         if (properties) {
-          propMap = this.getPropMap(properties as ts.NodeArray<
-            ts.PropertyAssignment
-          >);
+          propMap = this.getPropMap(
+            properties as ts.NodeArray<ts.PropertyAssignment>
+          );
         }
 
         return {
@@ -775,9 +788,9 @@ export class Parser {
           if (right) {
             const { properties } = right as ts.ObjectLiteralExpression;
             if (properties) {
-              propMap = this.getPropMap(properties as ts.NodeArray<
-                ts.PropertyAssignment
-              >);
+              propMap = this.getPropMap(
+                properties as ts.NodeArray<ts.PropertyAssignment>
+              );
             }
           }
         });
@@ -865,31 +878,26 @@ export class Parser {
   public getPropMap(
     properties: ts.NodeArray<ts.PropertyAssignment | ts.BindingElement>
   ): StringIndexedObject<string | boolean | number | null> {
-    const propMap = properties.reduce(
-      (acc, property) => {
-        if (ts.isSpreadAssignment(property) || !property.name) {
-          return acc;
-        }
-
-        const literalValue = this.getLiteralValueFromPropertyAssignment(
-          property
-        );
-        const propertyName = getPropertyName(property.name);
-
-        if (
-          (typeof literalValue === 'string' ||
-            typeof literalValue === 'number' ||
-            typeof literalValue === 'boolean' ||
-            literalValue === null) &&
-          propertyName !== null
-        ) {
-          acc[propertyName] = literalValue;
-        }
-
+    const propMap = properties.reduce((acc, property) => {
+      if (ts.isSpreadAssignment(property) || !property.name) {
         return acc;
-      },
-      {} as StringIndexedObject<string | boolean | number | null>
-    );
+      }
+
+      const literalValue = this.getLiteralValueFromPropertyAssignment(property);
+      const propertyName = getPropertyName(property.name);
+
+      if (
+        (typeof literalValue === 'string' ||
+          typeof literalValue === 'number' ||
+          typeof literalValue === 'boolean' ||
+          literalValue === null) &&
+        propertyName !== null
+      ) {
+        acc[propertyName] = literalValue;
+      }
+
+      return acc;
+    }, {} as StringIndexedObject<string | boolean | number | null>);
 
     return propMap;
   }
@@ -1180,13 +1188,25 @@ function parseWithProgramProvider(
         });
       });
 
-      return [
-        ...docs,
-        ...componentDocs.filter((comp, index, comps) =>
+      // Remove any duplicates (for HOC where the names are the same)
+      const componentDocsNoDuplicates = componentDocs.reduce(
+        (prevVal, comp) => {
+          const duplicate = prevVal.find(compDoc => {
+            return compDoc!.displayName === comp!.displayName;
+          });
+          if (duplicate) return prevVal;
+          return [...prevVal, comp];
+        },
+        [] as ComponentDoc[]
+      );
+
+      const filteredComponentDocs = componentDocsNoDuplicates.filter(
+        (comp, index, comps) =>
           comps
             .slice(index + 1)
             .every(innerComp => innerComp!.displayName !== comp!.displayName)
-        )
-      ];
+      );
+
+      return [...docs, ...filteredComponentDocs];
     }, []);
 }

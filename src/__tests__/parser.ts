@@ -976,7 +976,6 @@ describe('parser', () => {
           {
             ExtractLiteralValuesFromEnum: {
               sampleBoolean: { type: 'boolean' },
-              sampleComplexUnion: { type: 'number | "string1" | "string2"' },
               sampleEnum: {
                 raw: 'sampleEnum',
                 type: 'enum',
@@ -986,12 +985,7 @@ describe('parser', () => {
                   { value: '"three"' }
                 ]
               },
-              sampleString: { type: 'string' },
-              sampleStringUnion: {
-                raw: '"string1" | "string2"',
-                type: 'enum',
-                value: [{ value: '"string1"' }, { value: '"string2"' }]
-              }
+              sampleString: { type: 'string' }
             }
           },
           true,
@@ -1006,9 +1000,9 @@ describe('parser', () => {
     describe('Extracting values from unions', () => {
       it('extracts all values from union', () => {
         check(
-          'ExtractLiteralValuesFromEnum',
+          'ExtractLiteralValuesFromUnion',
           {
-            ExtractLiteralValuesFromEnum: {
+            ExtractLiteralValuesFromUnion: {
               sampleComplexUnion: {
                 raw: 'number | "string1" | "string2"',
                 type: 'enum',
@@ -1016,6 +1010,49 @@ describe('parser', () => {
                   { value: 'number' },
                   { value: '"string1"' },
                   { value: '"string2"' }
+                ]
+              }
+            }
+          },
+          false,
+          null,
+          {
+            shouldExtractValuesFromUnion: true
+          }
+        );
+      });
+      it('extracts numbers from a union', () => {
+        check(
+          'ExtractLiteralValuesFromUnion',
+          {
+            ExtractLiteralValuesFromUnion: {
+              sampleNumberUnion: {
+                raw: '1 | 2 | 3',
+                type: 'enum',
+                value: [{ value: '1' }, { value: '2' }, { value: '3' }]
+              }
+            }
+          },
+          false,
+          null,
+          {
+            shouldExtractValuesFromUnion: true
+          }
+        );
+      });
+      it('extracts numbers and strings from a mixed union', () => {
+        check(
+          'ExtractLiteralValuesFromUnion',
+          {
+            ExtractLiteralValuesFromUnion: {
+              sampleMixedUnion: {
+                raw: '"string1" | "string2" | 1 | 2',
+                type: 'enum',
+                value: [
+                  { value: '"string1"' },
+                  { value: '"string2"' },
+                  { value: '1' },
+                  { value: '2' }
                 ]
               }
             }
