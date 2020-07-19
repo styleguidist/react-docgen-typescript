@@ -1178,13 +1178,25 @@ function parseWithProgramProvider(
         });
       });
 
-      return [
-        ...docs,
-        ...componentDocs.filter((comp, index, comps) =>
+      // Remove any duplicates (for HOC where the names are the same)
+      const componentDocsNoDuplicates = componentDocs.reduce(
+        (prevVal, comp) => {
+          const duplicate = prevVal.find(compDoc => {
+            return compDoc!.displayName === comp!.displayName;
+          });
+          if (duplicate) return prevVal;
+          return [...prevVal, comp];
+        },
+        [] as ComponentDoc[]
+      );
+
+      const filteredComponentDocs = componentDocsNoDuplicates.filter(
+        (comp, index, comps) =>
           comps
             .slice(index + 1)
             .every(innerComp => innerComp!.displayName !== comp!.displayName)
-        )
-      ];
+      );
+
+      return [...docs, ...filteredComponentDocs];
     }, []);
 }
