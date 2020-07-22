@@ -301,6 +301,9 @@ export class Parser {
     const methods = this.getMethodsInfo(type);
 
     if (propsType) {
+      if (!commentSource.valueDeclaration) {
+        return null;
+      }
       const defaultProps = this.extractDefaultPropsFromComponent(
         commentSource,
         commentSource.valueDeclaration.getSourceFile()
