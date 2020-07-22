@@ -542,6 +542,36 @@ describe('parser', () => {
     });
   });
 
+  it('should parse react stateless component with generic intersection + union + omit overlap props', () => {
+    check('ComplexGenericUnionIntersectionWithOmit', {
+      ComplexGenericUnionIntersectionWithOmit: {
+        as: {
+          type: 'E',
+          required: false,
+          description: 'Render the component as another component'
+        },
+        align: {
+          description: 'The flex "align" property',
+          required: false,
+          type: '"center" | "flex-start" | "flex-end" | "stretch"'
+        },
+        justify: {
+          description:
+            "Use flex 'center' | 'flex-start' | 'flex-end' | 'stretch' with\na gap between each child.\nUse flex 'space-between' | 'space-around' | 'space-evenly' and\nflex will space the children.",
+          required: false,
+          type:
+            '"center" | "flex-start" | "flex-end" | "stretch" | "space-between" | "space-around" | "space-evenly"'
+        },
+        gap: {
+          description:
+            'The space between children\nYou cannot use gap when using a "space" justify property',
+          required: false,
+          type: 'ReactText'
+        }
+      }
+    });
+  });
+
   it('should parse react stateful component with intersection props', () => {
     check('StatefulIntersectionProps', {
       StatefulIntersectionProps: {
