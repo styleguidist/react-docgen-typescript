@@ -699,6 +699,19 @@ describe('parser', () => {
     });
   });
 
+  it('should parse JSDoc correctly', () => {
+    check(
+      'JSDocWithParam',
+      {
+        JSDocWithParam: {
+          prop1: { type: 'string', required: true }
+        }
+      },
+      true,
+      'JSDocWithParamProps description\n\nNOTE: If a parent element of this control is `overflow: hidden` then the\nballoon may not show up.'
+    );
+  });
+
   it('should parse functional component component defined as const as default export', () => {
     check(
       'FunctionalComponentAsConstAsDefaultExport',
