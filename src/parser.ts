@@ -297,7 +297,7 @@ export class Parser {
     const resolvedComponentName = componentNameResolver(nameSource, source);
     const displayName =
       resolvedComponentName || computeComponentName(nameSource, source);
-    const description = this.findDocComment(commentSource).fullComment;
+    const { description } = this.findDocComment(commentSource);
     const methods = this.getMethodsInfo(type);
 
     if (propsType) {
