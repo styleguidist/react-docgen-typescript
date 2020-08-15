@@ -559,24 +559,28 @@ export class Parser {
       propsObj,
       propsObj.valueDeclaration
     );
-    const baseProps = propsType.getProperties();
+    const baseProps = propsType.getApparentProperties();
     let propertiesOfProps = baseProps;
 
     if (propsType.isUnionOrIntersection()) {
-      // Using internal typescript API to get all properties
-      propertiesOfProps = (this.checker as any).getAllPossiblePropertiesOfTypes(
-        propsType.types
-      );
+      propertiesOfProps = [
+        // Resolve extra properties in the union/intersection
+        ...(propertiesOfProps = (this
+          .checker as any).getAllPossiblePropertiesOfTypes(propsType.types)),
+        // But props we already have override those as they are already correct.
+        ...baseProps
+      ];
 
       if (!propertiesOfProps.length) {
-        propertiesOfProps = (this
-          .checker as any).getAllPossiblePropertiesOfTypes(
+        const subTypes = (this.checker as any).getAllPossiblePropertiesOfTypes(
           propsType.types.reduce<ts.Symbol[]>(
             // @ts-ignore
             (all, t) => [...all, ...(t.types || [])],
             []
           )
         );
+
+        propertiesOfProps = [...subTypes, ...baseProps];
       }
     }
 

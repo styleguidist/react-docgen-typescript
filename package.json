@@ -44,7 +44,7 @@
     "prop-types": "^15.6.2",
     "react": "^16.4.2",
     "source-map-support": "^0.5.6",
-    "typescript": "3.1.6"
+    "typescript": "3.5.2"
   },
   "files": [
     "lib",
