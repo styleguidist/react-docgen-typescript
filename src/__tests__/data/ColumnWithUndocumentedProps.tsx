@@ -8,6 +8,7 @@ export interface IColumnProps {
   prop1?: string;
   /** prop2 description */
   prop2: number;
+  prop3: () => void;
 }
 
 /**

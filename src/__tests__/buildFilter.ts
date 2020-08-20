@@ -1,4 +1,4 @@
-import { assert, expect } from 'chai';
+import { expect } from 'chai';
 import { buildFilter } from '../buildFilter';
 import { ParentType, ParserOptions, PropItem } from '../parser';
 
@@ -22,27 +22,10 @@ function createProp(
 
 describe('buildFilter', () => {
   describe('default behaviour', () => {
-    it('should skip "children" property if no description is set', () => {
+    it('should not skip "children" property, even if no description is set', () => {
       const prop1 = createProp('prop1', false, undefined, 'prop1 description');
       const prop2 = createProp('prop2', false, undefined, 'prop2 description');
       const children = createProp('children', false, undefined, '');
-      const opts: ParserOptions = {};
-      const filterFn = buildFilter(opts);
-      expect(
-        [prop1, prop2, children].filter(prop =>
-          filterFn(prop, { name: prop.name })
-        )
-      ).to.eql([prop1, prop2]);
-    });
-    it('should not skip "children" property if description is set', () => {
-      const prop1 = createProp('prop1', false, undefined, 'prop1 description');
-      const prop2 = createProp('prop2', false, undefined, 'prop2 description');
-      const children = createProp(
-        'children',
-        false,
-        undefined,
-        'children description'
-      );
       const opts: ParserOptions = {};
       const filterFn = buildFilter(opts);
       expect(
@@ -108,7 +91,7 @@ describe('buildFilter', () => {
     });
 
     describe('skipPropsWithoutDoc', () => {
-      it('should skip children props with no documentation', () => {
+      it('should skip props with no documentation', () => {
         const prop1 = createProp(
           'prop1',
           false,
@@ -148,7 +131,7 @@ describe('buildFilter', () => {
       ).to.eql([prop2]);
     });
 
-    it('should get be possible to filter by component name', () => {
+    it('should be possible to filter by component name', () => {
       const prop1 = createProp('foo', false, undefined, 'foo description');
       const prop2 = createProp('bar', false, undefined, 'bar description');
       const prop3 = createProp(

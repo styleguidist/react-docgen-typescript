@@ -17,6 +17,7 @@ describe('parser', () => {
   it('should parse simple react class component', () => {
     check('Column', {
       Column: {
+        children,
         prop1: { type: 'string', required: false },
         prop2: { type: 'number' },
         prop3: { type: '() => void' },
@@ -28,6 +29,7 @@ describe('parser', () => {
   it('should parse simple react class component with console.log inside', () => {
     check('ColumnWithLog', {
       Column: {
+        children,
         prop1: { type: 'string', required: false },
         prop2: { type: 'number' },
         prop3: { type: '() => void' },
@@ -39,6 +41,7 @@ describe('parser', () => {
   it('should parse simple react class component as default export', () => {
     check('ColumnWithDefaultExport', {
       Column: {
+        children,
         prop1: { type: 'string', required: false },
         prop2: { type: 'number' },
         prop3: { type: '() => void' },
@@ -66,6 +69,7 @@ describe('parser', () => {
   it('should parse simple react class component as default export only', () => {
     check('ColumnWithDefaultExportOnly', {
       ColumnWithDefaultExportOnly: {
+        children,
         prop1: { type: 'string', required: false },
         prop2: { type: 'number' },
         prop3: { type: '() => void' },
@@ -77,6 +81,7 @@ describe('parser', () => {
   it('should parse simple react class component as default anonymous export', () => {
     check('ColumnWithDefaultAnonymousExportOnly', {
       ColumnWithDefaultAnonymousExportOnly: {
+        children,
         prop1: { type: 'string', required: false },
         prop2: { type: 'number' },
         prop3: { type: '() => void' },
@@ -88,6 +93,7 @@ describe('parser', () => {
   it('should parse simple react class component with state', () => {
     check('AppMenu', {
       AppMenu: {
+        children,
         menu: { type: 'any' }
       }
     });
@@ -96,6 +102,7 @@ describe('parser', () => {
   it('should parse simple react class component with picked properties', () => {
     check('ColumnWithPick', {
       Column: {
+        children,
         prop1: { type: 'string', required: false },
         prop2: { type: 'number' },
         propx: { type: 'number' }
@@ -106,6 +113,7 @@ describe('parser', () => {
   it('should parse component with props with external type', () => {
     check('ColumnWithPropsWithExternalType', {
       ColumnWithPropsWithExternalType: {
+        children,
         prop1: { type: 'string', required: false },
         prop2: { type: 'number' },
         prop3: { type: 'MyExternalType' }
@@ -116,12 +124,15 @@ describe('parser', () => {
   it('should parse HOCs', () => {
     check('ColumnHigherOrderComponent', {
       ColumnExternalHigherOrderComponent: {
+        children,
         prop1: { type: 'string' }
       },
       ColumnHigherOrderComponent1: {
+        children,
         prop1: { type: 'string' }
       },
       ColumnHigherOrderComponent2: {
+        children,
         prop1: { type: 'string' }
       },
       RowExternalHigherOrderComponent: {
@@ -141,6 +152,7 @@ describe('parser', () => {
       'ColumnWithHtmlAttributes',
       {
         Column: {
+          children,
           // tslint:disable:object-literal-sort-keys
           prop1: { type: 'string', required: false },
           prop2: { type: 'number' },
@@ -161,6 +173,7 @@ describe('parser', () => {
   it('should parse component without exported props interface', () => {
     check('ColumnWithoutExportedProps', {
       Column: {
+        children,
         prop1: { type: 'string', required: false },
         prop2: { type: 'number' }
       }
@@ -185,6 +198,7 @@ describe('parser', () => {
   it('should parse react component with properties defined in external file', () => {
     check('ExternalPropsComponent', {
       ExternalPropsComponent: {
+        children,
         prop1: { type: 'string' }
       }
     });
@@ -204,6 +218,7 @@ describe('parser', () => {
   it('should parse static sub components on class components', () => {
     check('ColumnWithStaticComponents', {
       Column: {
+        children,
         prop1: { type: 'string' }
       },
       'Column.Label': {
@@ -216,6 +231,7 @@ describe('parser', () => {
   it('should parse react component with properties extended from an external .tsx file', () => {
     check('ExtendsExternalPropsComponent', {
       ExtendsExternalPropsComponent: {
+        children,
         prop1: { type: 'number', required: false, description: 'prop1' },
         prop2: { type: 'string', required: false, description: 'prop2' }
       }
@@ -227,6 +243,7 @@ describe('parser', () => {
       'FlippableImage',
       {
         FlippableImage: {
+          children,
           isFlippedX: { type: 'boolean', required: false },
           isFlippedY: { type: 'boolean', required: false }
         }
@@ -238,6 +255,7 @@ describe('parser', () => {
   it('should parse react component with const definitions', () => {
     check('InlineConst', {
       MyComponent: {
+        children,
         foo: { type: 'any' }
       }
     });
@@ -246,6 +264,7 @@ describe('parser', () => {
   it('should parse default interface export', () => {
     check('ExportsDefaultInterface', {
       Component: {
+        children,
         foo: { type: 'any' }
       }
     });
@@ -254,6 +273,7 @@ describe('parser', () => {
   it('should parse react component that exports a prop type const', () => {
     check('ExportsPropTypeShape', {
       ExportsPropTypes: {
+        children,
         foo: { type: 'any' }
       }
     });
@@ -262,6 +282,7 @@ describe('parser', () => {
   it('should parse react component that exports a prop type thats imported', () => {
     check('ExportsPropTypeImport', {
       ExportsPropTypes: {
+        children,
         foo: { type: 'any' }
       }
     });
@@ -273,6 +294,7 @@ describe('parser', () => {
       'ExportsPropTypeImport',
       {
         ExportsPropTypes: {
+          children,
           foo: {
             parent: {
               fileName:
@@ -290,6 +312,7 @@ describe('parser', () => {
   describe('component with default props', () => {
     const expectation = {
       ComponentWithDefaultProps: {
+        children,
         sampleDefaultFromJSDoc: {
           defaultValue: 'hello',
           description: 'sample with default value',
@@ -334,6 +357,7 @@ describe('parser', () => {
   describe('component with @type jsdoc tag', () => {
     const expectation = {
       ComponentWithTypeJsDocTag: {
+        children,
         sampleTypeFromJSDoc: {
           description: 'sample with custom type',
           required: true,
@@ -350,6 +374,7 @@ describe('parser', () => {
   it('should parse react PureComponent', () => {
     check('PureRow', {
       Row: {
+        children,
         prop1: { type: 'string', required: false },
         prop2: { type: 'number' }
       }
@@ -361,6 +386,7 @@ describe('parser', () => {
       'Regression_v0_0_12',
       {
         Zoomable: {
+          children,
           originX: { type: 'number' },
           originY: { type: 'number' },
           scaleFactor: { type: 'number' }
@@ -382,6 +408,7 @@ describe('parser', () => {
   it('should parse react stateless component', () => {
     check('Stateless', {
       Stateless: {
+        children,
         myProp: { type: 'string' }
       }
     });
@@ -405,9 +432,11 @@ describe('parser', () => {
         baz: { description: '', type: 'string' }
       },
       Bar: {
+        children,
         foo: { description: '', type: 'string' }
       },
       FooBar: {
+        children,
         foobar: { description: '', type: 'string' }
       }
     });
@@ -416,6 +445,7 @@ describe('parser', () => {
   it('should parse react stateless component with intersection props', () => {
     check('StatelessIntersectionProps', {
       StatelessIntersectionProps: {
+        children,
         moreProp: { type: 'number' },
         myProp: { type: 'string' }
       }
@@ -456,6 +486,7 @@ describe('parser', () => {
   it('should parse react stateless component with external intersection props', () => {
     check('StatelessIntersectionExternalProps', {
       StatelessIntersectionExternalProps: {
+        children,
         myProp: { type: 'string' },
         prop1: { type: 'string', required: false }
       }
@@ -575,6 +606,7 @@ describe('parser', () => {
   it('should parse react stateful component with intersection props', () => {
     check('StatefulIntersectionProps', {
       StatefulIntersectionProps: {
+        children,
         moreProp: { type: 'number' },
         myProp: { type: 'string' }
       }
@@ -584,6 +616,7 @@ describe('parser', () => {
   it('should parse react stateful component with external intersection props', () => {
     check('StatefulIntersectionExternalProps', {
       StatefulIntersectionExternalProps: {
+        children,
         myProp: { type: 'string' },
         prop1: { type: 'string', required: false }
       }
@@ -593,6 +626,7 @@ describe('parser', () => {
   it('should parse react stateful component (wrapped in HOC) with intersection props', () => {
     check('HOCIntersectionProps', {
       HOCIntersectionProps: {
+        children,
         injected: { type: 'boolean' },
         myProp: { type: 'string' }
       }
@@ -602,6 +636,7 @@ describe('parser', () => {
   describe('stateless component with default props', () => {
     const expectation = {
       StatelessWithDefaultProps: {
+        children,
         sampleDefaultFromJSDoc: {
           defaultValue: 'hello',
           description: 'sample with default value',
@@ -646,6 +681,7 @@ describe('parser', () => {
     it('should parse props with shorthands', () => {
       check('StatelessShorthandDefaultProps', {
         StatelessShorthandDefaultProps: {
+          children,
           onCallback: {
             defaultValue: null,
             description: 'onCallback description',
@@ -669,7 +705,44 @@ describe('parser', () => {
     });
 
     it('supports destructuring', () => {
-      check('StatelessWithDestructuredProps', expectation);
+      check('StatelessWithDestructuredProps', {
+        StatelessWithDefaultProps: {
+          sampleDefaultFromJSDoc: {
+            defaultValue: 'hello',
+            description: 'sample with default value',
+            required: true,
+            type: '"hello" | "goodbye"'
+          },
+          sampleEnum: {
+            defaultValue: 'enumSample.HELLO',
+            required: false,
+            type: 'enumSample'
+          },
+          sampleFalse: {
+            defaultValue: false,
+            required: false,
+            type: 'boolean'
+          },
+          sampleNull: { type: 'null', required: false, defaultValue: null },
+          sampleNumber: { type: 'number', required: false, defaultValue: -1 },
+          sampleObject: {
+            defaultValue: `{ a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } }`,
+            required: false,
+            type: '{ [key: string]: any; }'
+          },
+          sampleString: {
+            defaultValue: 'hello',
+            required: false,
+            type: 'string'
+          },
+          sampleTrue: { type: 'boolean', required: false, defaultValue: true },
+          sampleUndefined: {
+            defaultValue: undefined,
+            required: false,
+            type: 'any'
+          }
+        }
+      });
     });
 
     it('supports destructuring for arrow functions', () => {
@@ -684,6 +757,7 @@ describe('parser', () => {
   it('should parse components with unioned types', () => {
     check('OnlyDefaultExportUnion', {
       OnlyDefaultExportUnion: {
+        children,
         content: { description: 'The content', type: 'string' }
       }
     });
@@ -692,6 +766,7 @@ describe('parser', () => {
   it('should parse jsdocs with the @default tag and no description', () => {
     check('StatelessWithDefaultOnlyJsDoc', {
       StatelessWithDefaultOnlyJsDoc: {
+        children,
         myProp: { defaultValue: 'hello', description: '', type: 'string' }
       }
     });
@@ -716,6 +791,7 @@ describe('parser', () => {
   it('should parse React.SFC component defined as const', () => {
     check('ReactSFCAsConst', {
       Jumbotron: {
+        children,
         prop1: { type: 'string', required: true }
       }
     });
@@ -762,6 +838,7 @@ describe('parser', () => {
       {
         // in this case the component name is taken from the file name
         ReactSFCAsConstAsDefaultExport: {
+          children,
           prop1: { type: 'string', required: true }
         }
       },
@@ -790,6 +867,7 @@ describe('parser', () => {
       {
         // in this case the component name is taken from the file name
         Jumbotron: {
+          children,
           prop1: { type: 'string', required: true }
         }
       },
@@ -842,44 +920,7 @@ describe('parser', () => {
 
   describe('Parser options', () => {
     describe('Property filtering', () => {
-      describe('children', () => {
-        it('should ignore property "children" if not explicitly documented', () => {
-          check(
-            'Column',
-            {
-              Column: {
-                prop1: { type: 'string', required: false },
-                prop2: { type: 'number' },
-                prop3: { type: '() => void' },
-                prop4: { type: '"option1" | "option2" | "option3"' }
-              }
-            },
-            true
-          );
-        });
-
-        it('should not ignore any property that is documented explicitly', () => {
-          check(
-            'ColumnWithAnnotatedChildren',
-            {
-              Column: {
-                children: {
-                  description: 'children description',
-                  required: false,
-                  type: 'ReactNode'
-                },
-                prop1: { type: 'string', required: false },
-                prop2: { type: 'number' },
-                prop3: { type: '() => void' },
-                prop4: { type: '"option1" | "option2" | "option3"' }
-              }
-            },
-            true
-          );
-        });
-      });
-
-      describe('propsFilter method', () => {
+      describe('propFilter method', () => {
         it('should apply filter function and filter components accordingly', () => {
           const propFilter: PropFilter = (prop, component) =>
             prop.name !== 'prop1';
@@ -887,6 +928,7 @@ describe('parser', () => {
             'Column',
             {
               Column: {
+                children,
                 prop2: { type: 'number' },
                 prop3: { type: '() => void' },
                 prop4: { type: '"option1" | "option2" | "option3"' }
@@ -909,6 +951,7 @@ describe('parser', () => {
             'Column',
             {
               Column: {
+                children,
                 prop2: { type: 'number' },
                 prop3: { type: '() => void' },
                 prop4: { type: '"option1" | "option2" | "option3"' }
@@ -922,6 +965,7 @@ describe('parser', () => {
             'AppMenu',
             {
               AppMenu: {
+                children,
                 menu: { type: 'any' }
               }
             },
@@ -965,6 +1009,7 @@ describe('parser', () => {
             'Column',
             {
               Column: {
+                children,
                 prop2: { type: 'number' },
                 prop3: { type: '() => void' },
                 prop4: { type: '"option1" | "option2" | "option3"' }
@@ -982,6 +1027,7 @@ describe('parser', () => {
             'Column',
             {
               Column: {
+                children,
                 prop3: { type: '() => void' },
                 prop4: { type: '"option1" | "option2" | "option3"' }
               }
@@ -994,14 +1040,32 @@ describe('parser', () => {
       });
 
       describe('skipPropsWithoutDoc', () => {
-        it('should skip a properties without documentation', () => {
-          const propFilter = { skipPropsWithoutDoc: false };
+        it('should skip properties without documentation', () => {
+          const propFilter = { skipPropsWithoutDoc: true };
           check(
             'ColumnWithUndocumentedProps',
             {
               Column: {
                 prop1: { type: 'string', required: false },
                 prop2: { type: 'number' }
+              }
+            },
+            true,
+            undefined,
+            { propFilter }
+          );
+        });
+
+        it('should not skip properties without documentation', () => {
+          const propFilter = { skipPropsWithoutDoc: false };
+          check(
+            'ColumnWithUndocumentedProps',
+            {
+              Column: {
+                children,
+                prop1: { type: 'string', required: false },
+                prop2: { type: 'number' },
+                prop3: { type: '() => void', description: '' }
               }
             },
             true,
@@ -1018,6 +1082,7 @@ describe('parser', () => {
           'ExtractLiteralValuesFromEnum',
           {
             ExtractLiteralValuesFromEnum: {
+              children,
               sampleBoolean: { type: 'boolean' },
               sampleEnum: {
                 raw: 'sampleEnum',
@@ -1115,6 +1180,7 @@ describe('parser', () => {
           'StatelessWithDefaultPropsAsString',
           {
             StatelessWithDefaultPropsAsString: {
+              children,
               sampleFalse: {
                 defaultValue: 'false',
                 required: false,
