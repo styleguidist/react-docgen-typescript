@@ -141,7 +141,9 @@ export function withCustomConfig(
 
   if (error !== undefined) {
     // tslint:disable-next-line: max-line-length
-    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${error.code}, message: ${error.messageText}`;
+    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${
+      error.code
+    }, message: ${error.messageText}`;
     throw new Error(errorText);
   }
 
@@ -775,9 +777,9 @@ export class Parser {
         let propMap = {};
 
         if (properties) {
-          propMap = this.getPropMap(
-            properties as ts.NodeArray<ts.PropertyAssignment>
-          );
+          propMap = this.getPropMap(properties as ts.NodeArray<
+            ts.PropertyAssignment
+          >);
         }
 
         return {
@@ -787,13 +789,29 @@ export class Parser {
       } else if (statementIsStatelessWithDefaultProps(statement)) {
         let propMap = {};
         (statement as ts.ExpressionStatement).getChildren().forEach(child => {
-          const { right } = child as ts.BinaryExpression;
+          let { right } = child as ts.BinaryExpression;
+
+          if (right && ts.isIdentifier(right)) {
+            const value = ((source as any).locals as ts.SymbolTable).get(
+              right.escapedText
+            );
+
+            if (
+              value &&
+              value.valueDeclaration &&
+              ts.isVariableDeclaration(value.valueDeclaration) &&
+              value.valueDeclaration.initializer
+            ) {
+              right = value.valueDeclaration.initializer;
+            }
+          }
+
           if (right) {
             const { properties } = right as ts.ObjectLiteralExpression;
             if (properties) {
-              propMap = this.getPropMap(
-                properties as ts.NodeArray<ts.PropertyAssignment>
-              );
+              propMap = this.getPropMap(properties as ts.NodeArray<
+                ts.PropertyAssignment
+              >);
             }
           }
         });
@@ -867,7 +885,22 @@ export class Parser {
         return (initializer as ts.Identifier).text === 'undefined'
           ? 'undefined'
           : null;
-      case ts.SyntaxKind.PropertyAccessExpression:
+      case ts.SyntaxKind.PropertyAccessExpression: {
+        const symbol = this.checker.getSymbolAtLocation(
+          initializer as ts.PropertyAccessExpression
+        );
+
+        if (symbol && symbol.declarations.length) {
+          const declaration = symbol.declarations[0];
+
+          if (
+            ts.isBindingElement(declaration) ||
+            ts.isPropertyAssignment(declaration)
+          ) {
+            return this.getLiteralValueFromPropertyAssignment(declaration);
+          }
+        }
+      }
       case ts.SyntaxKind.ObjectLiteralExpression:
       default:
         try {
@@ -881,26 +914,31 @@ export class Parser {
   public getPropMap(
     properties: ts.NodeArray<ts.PropertyAssignment | ts.BindingElement>
   ): StringIndexedObject<string | boolean | number | null> {
-    const propMap = properties.reduce((acc, property) => {
-      if (ts.isSpreadAssignment(property) || !property.name) {
+    const propMap = properties.reduce(
+      (acc, property) => {
+        if (ts.isSpreadAssignment(property) || !property.name) {
+          return acc;
+        }
+
+        const literalValue = this.getLiteralValueFromPropertyAssignment(
+          property
+        );
+        const propertyName = getPropertyName(property.name);
+
+        if (
+          (typeof literalValue === 'string' ||
+            typeof literalValue === 'number' ||
+            typeof literalValue === 'boolean' ||
+            literalValue === null) &&
+          propertyName !== null
+        ) {
+          acc[propertyName] = literalValue;
+        }
+
         return acc;
-      }
-
-      const literalValue = this.getLiteralValueFromPropertyAssignment(property);
-      const propertyName = getPropertyName(property.name);
-
-      if (
-        (typeof literalValue === 'string' ||
-          typeof literalValue === 'number' ||
-          typeof literalValue === 'boolean' ||
-          literalValue === null) &&
-        propertyName !== null
-      ) {
-        acc[propertyName] = literalValue;
-      }
-
-      return acc;
-    }, {} as StringIndexedObject<string | boolean | number | null>);
+      },
+      {} as StringIndexedObject<string | boolean | number | null>
+    );
 
     return propMap;
   }

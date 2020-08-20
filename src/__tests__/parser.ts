@@ -982,6 +982,44 @@ describe('parser', () => {
       });
     });
 
+    it('should defaultProps in variable', () => {
+      check('SeparateDefaultProps', {
+        SeparateDefaultProps: {
+          disabled: {
+            description: '',
+            required: false,
+            defaultValue: false,
+            type: 'boolean'
+          },
+          id: {
+            description: '',
+            required: false,
+            defaultValue: 123,
+            type: 'number'
+          }
+        }
+      });
+    });
+
+    it('should defaultProps accessed variable', () => {
+      check('SeparateDefaultPropsIndividual', {
+        SeparateDefaultPropsIndividual: {
+          disabled: {
+            description: '',
+            required: false,
+            defaultValue: false,
+            type: 'boolean'
+          },
+          id: {
+            description: '',
+            required: false,
+            defaultValue: 123,
+            type: 'number'
+          }
+        }
+      });
+    });
+
     describe('Extracting literal values from enums', () => {
       it('extracts literal values from enum', () => {
         check(
