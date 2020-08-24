@@ -243,7 +243,9 @@ export class Parser {
     const symbolName = typeSymbol.getName()
 
     if (
-      symbolName === "MemoExoticComponent" &&
+      (symbolName === "MemoExoticComponent" ||
+        symbolName === "ForwardRefExoticComponent") &&
+      exp.valueDeclaration &&
       ts.isExportAssignment(exp.valueDeclaration) &&
       ts.isCallExpression(exp.valueDeclaration.expression)
     ) {
