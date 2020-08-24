@@ -229,6 +229,36 @@ export class Parser {
     this.savePropValueAsString = Boolean(savePropValueAsString);
   }
 
+  private getComponentFromExpression(
+    exp: ts.Symbol,
+  ) {
+    const declaration = exp.valueDeclaration || exp.declarations![0];
+    const type = this.checker.getTypeOfSymbolAtLocation(exp, declaration);
+    const typeSymbol = type.symbol || type.aliasSymbol;
+
+    if (!typeSymbol) {
+      return exp;
+    }
+
+    const symbolName = typeSymbol.getName()
+
+    if (
+      symbolName === "MemoExoticComponent" &&
+      ts.isExportAssignment(exp.valueDeclaration) &&
+      ts.isCallExpression(exp.valueDeclaration.expression)
+    ) {
+      const component = this.checker.getSymbolAtLocation(
+        exp.valueDeclaration.expression.arguments[0]
+      );
+
+      if (component) {
+        exp = component;
+      }
+    }
+
+    return exp;
+  }
+
   public getComponentInfo(
     exp: ts.Symbol,
     source: ts.SourceFile,
@@ -238,25 +268,26 @@ export class Parser {
       return null;
     }
 
-    const declaration = exp.valueDeclaration || exp.declarations![0];
-    const type = this.checker.getTypeOfSymbolAtLocation(exp, declaration);
+    let rootExp = this.getComponentFromExpression(exp);
+    const declaration = rootExp.valueDeclaration || rootExp.declarations![0];
+    const type = this.checker.getTypeOfSymbolAtLocation(rootExp, declaration);
 
-    let commentSource = exp;
+    let commentSource = rootExp;
     const typeSymbol = type.symbol || type.aliasSymbol;
-    const originalName = exp.getName();
+    const originalName = rootExp.getName();
 
-    if (!exp.valueDeclaration) {
+    if (!rootExp.valueDeclaration) {
       if (
         originalName === 'default' &&
         !typeSymbol &&
-        (exp.flags & ts.SymbolFlags.Alias) !== 0
+        (rootExp.flags & ts.SymbolFlags.Alias) !== 0
       ) {
         commentSource = this.checker.getAliasedSymbol(commentSource);
       } else if (!typeSymbol) {
         return null;
       } else {
-        exp = typeSymbol;
-        const expName = exp.getName();
+        rootExp = typeSymbol;
+        const expName = rootExp.getName();
 
         if (
           expName === '__function' ||
@@ -269,7 +300,7 @@ export class Parser {
         ) {
           commentSource = this.checker.getAliasedSymbol(commentSource);
         } else {
-          commentSource = exp;
+          commentSource = rootExp;
         }
       }
     } else if (
@@ -293,7 +324,7 @@ export class Parser {
       this.extractPropsFromTypeIfStatelessComponent(type) ||
       this.extractPropsFromTypeIfStatefulComponent(type);
 
-    const nameSource = originalName === 'default' ? exp : commentSource;
+    const nameSource = originalName === 'default' ? rootExp : commentSource;
     const resolvedComponentName = componentNameResolver(nameSource, source);
     const displayName =
       resolvedComponentName || computeComponentName(nameSource, source);

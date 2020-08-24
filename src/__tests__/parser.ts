@@ -721,8 +721,16 @@ describe('parser', () => {
     });
   });
 
-  it('should parse functional component component defined as function as default export', () => {
-    check('FunctionDeclarationAsDefaultExport', {
+  it("should parse functional component component defined as function as default export", () => {
+    check("FunctionDeclarationAsDefaultExport", {
+      Jumbotron: {
+        prop1: { type: "string", required: true },
+      },
+    });
+  });
+
+  it('should parse functional component component thats been wrapped in React.memo', () => {
+    check('FunctionDeclarationAsDefaultExportWithMemo', {
       Jumbotron: {
         prop1: { type: 'string', required: true }
       }
