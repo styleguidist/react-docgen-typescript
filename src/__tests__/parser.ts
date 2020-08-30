@@ -725,6 +725,14 @@ describe('parser', () => {
     });
   });
 
+  it('should parse functional component component defined as const', () => {
+    check('FunctionDeclarationVisibleName', {
+      'Awesome Jumbotron': {
+        prop1: { type: 'string', required: true }
+      }
+    });
+  });
+
   it('should parse React.SFC component defined as const', () => {
     check('ReactSFCAsConst', {
       Jumbotron: {
