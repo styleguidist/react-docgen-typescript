@@ -927,7 +927,7 @@ export class Parser {
           initializer as ts.PropertyAccessExpression
         );
 
-        if (symbol && symbol.declarations.length) {
+        if (symbol && symbol.declarations && symbol.declarations.length) {
           const declaration = symbol.declarations[0];
 
           if (
