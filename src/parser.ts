@@ -101,7 +101,7 @@ export interface FileParser {
   ): ComponentDoc[];
 }
 
-const defaultOptions: ts.CompilerOptions = {
+export const defaultOptions: ts.CompilerOptions = {
   jsx: ts.JsxEmit.React,
   module: ts.ModuleKind.CommonJS,
   target: ts.ScriptTarget.Latest
