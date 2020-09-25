@@ -793,6 +793,9 @@ export class Parser {
 
         const defaultProps = possibleDefaultProps[0];
         let initializer = (defaultProps as ts.PropertyDeclaration).initializer;
+        if (!initializer) {
+          return res;
+        }
         let properties = (initializer as ts.ObjectLiteralExpression).properties;
 
         while (ts.isIdentifier(initializer as ts.Identifier)) {
