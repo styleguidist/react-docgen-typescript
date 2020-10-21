@@ -53,6 +53,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/styleguidist/react-docgen-typescript.git"
-  },
-  "dependencies": {}
+  }
 }

@@ -3,8 +3,15 @@ import * as path from 'path';
 import * as ts from 'typescript';
 
 import { buildFilter } from './buildFilter';
-import { symbol } from 'prop-types';
-import { check } from './__tests__/testUtils';
+
+import {
+  Props,
+  ParentType,
+  PropItem,
+  PropItemType,
+  EnumPropItem
+} from './PropItem';
+export { Props, ParentType, PropItem, PropItemType };
 
 // We'll use the currentDirectoryName to trim parent fileNames
 const currentDirectoryPath = process.cwd();
@@ -20,17 +27,6 @@ export interface ComponentDoc {
   description: string;
   props: Props;
   methods: Method[];
-}
-
-export interface Props extends StringIndexedObject<PropItem> {}
-
-export interface PropItem {
-  name: string;
-  required: boolean;
-  type: PropItemType;
-  description: string;
-  defaultValue: any;
-  parent?: ParentType;
 }
 
 export interface Method {
@@ -59,17 +55,6 @@ export interface Component {
   name: string;
 }
 
-export interface PropItemType {
-  name: string;
-  value?: any;
-  raw?: string;
-}
-
-export interface ParentType {
-  name: string;
-  fileName: string;
-}
-
 export type PropFilter = (props: PropItem, component: Component) => boolean;
 
 export type ComponentNameResolver = (
@@ -80,9 +65,8 @@ export type ComponentNameResolver = (
 export interface ParserOptions {
   propFilter?: StaticPropFilter | PropFilter;
   componentNameResolver?: ComponentNameResolver;
-  shouldExtractLiteralValuesFromEnum?: boolean;
   shouldRemoveUndefinedFromOptional?: boolean;
-  shouldExtractValuesFromUnion?: boolean;
+  maxValueFromObjectExtractionDepth?: number;
   savePropValueAsString?: boolean;
 }
 
@@ -208,32 +192,27 @@ export class Parser {
   private checker: ts.TypeChecker;
   private propFilter: PropFilter;
   private shouldRemoveUndefinedFromOptional: boolean;
-  private shouldExtractLiteralValuesFromEnum: boolean;
-  private shouldExtractValuesFromUnion: boolean;
+  private maxValueFromObjectExtractionDepth: number;
   private savePropValueAsString: boolean;
 
   constructor(program: ts.Program, opts: ParserOptions) {
     const {
       savePropValueAsString,
-      shouldExtractLiteralValuesFromEnum,
       shouldRemoveUndefinedFromOptional,
-      shouldExtractValuesFromUnion
+      maxValueFromObjectExtractionDepth = 5
     } = opts;
     this.checker = program.getTypeChecker();
     this.propFilter = buildFilter(opts);
-    this.shouldExtractLiteralValuesFromEnum = Boolean(
-      shouldExtractLiteralValuesFromEnum
-    );
     this.shouldRemoveUndefinedFromOptional = Boolean(
       shouldRemoveUndefinedFromOptional
     );
-    this.shouldExtractValuesFromUnion = Boolean(shouldExtractValuesFromUnion);
+    this.maxValueFromObjectExtractionDepth = Number(
+      maxValueFromObjectExtractionDepth
+    );
     this.savePropValueAsString = Boolean(savePropValueAsString);
   }
 
-  private getComponentFromExpression(
-    exp: ts.Symbol,
-  ) {
+  private getComponentFromExpression(exp: ts.Symbol) {
     const declaration = exp.valueDeclaration || exp.declarations![0];
     const type = this.checker.getTypeOfSymbolAtLocation(exp, declaration);
     const typeSymbol = type.symbol || type.aliasSymbol;
@@ -242,11 +221,11 @@ export class Parser {
       return exp;
     }
 
-    const symbolName = typeSymbol.getName()
+    const symbolName = typeSymbol.getName();
 
     if (
-      (symbolName === "MemoExoticComponent" ||
-        symbolName === "ForwardRefExoticComponent") &&
+      (symbolName === 'MemoExoticComponent' ||
+        symbolName === 'ForwardRefExoticComponent') &&
       exp.valueDeclaration &&
       ts.isExportAssignment(exp.valueDeclaration) &&
       ts.isCallExpression(exp.valueDeclaration.expression)
@@ -276,7 +255,11 @@ export class Parser {
     const declaration = rootExp.valueDeclaration || rootExp.declarations![0];
     const type = this.checker.getTypeOfSymbolAtLocation(rootExp, declaration);
 
+    // The type Symbol from which props documentation should be resolved
     let commentSource = rootExp;
+    /**
+     * Root components type symbol
+     */
     const typeSymbol = type.symbol || type.aliasSymbol;
     const originalName = rootExp.getName();
 
@@ -315,7 +298,7 @@ export class Parser {
       commentSource = type.symbol;
     }
 
-    // Skip over PropTypes that are exported
+    // Skip over PropTypes functions (from prop-types library) that are exported
     if (
       typeSymbol &&
       (typeSymbol.getEscapedName() === 'Requireable' ||
@@ -332,7 +315,9 @@ export class Parser {
     const resolvedComponentName = componentNameResolver(nameSource, source);
     const { description, tags } = this.findDocComment(commentSource);
     const displayName =
-      resolvedComponentName || tags.visibleName || computeComponentName(nameSource, source);
+      resolvedComponentName ||
+      tags.visibleName ||
+      computeComponentName(nameSource, source);
     const methods = this.getMethodsInfo(type);
 
     if (propsType) {
@@ -345,6 +330,10 @@ export class Parser {
       );
       const props = this.getPropsInfo(propsType, defaultProps);
 
+      // Filters props from being returned in the ComponentDoc
+      // - children when it does not have a description
+      // - other props which do not pass a propFilter function
+      //   that the parser has been called with.
       for (const propName of Object.keys(props)) {
         const prop = props[propName];
         const component: Component = { name: displayName };
@@ -368,6 +357,10 @@ export class Parser {
       };
     }
 
+    return null;
+  }
+
+  public extractNestedValueFromObjectType(type: ts.Type): ts.Symbol | null {
     return null;
   }
 
@@ -540,61 +533,18 @@ export class Parser {
     return returnTag.text || null;
   }
 
-  private getValuesFromUnionType(type: ts.Type): string | number {
-    if (type.isStringLiteral()) return `"${type.value}"`;
-    if (type.isNumberLiteral()) return `${type.value}`;
-    return this.checker.typeToString(type);
-  }
-
-  public getDocgenType(propType: ts.Type, isRequired: boolean): PropItemType {
-    let propTypeString = this.checker.typeToString(propType);
-
-    if (propType.isUnion()) {
-      if (this.shouldExtractValuesFromUnion) {
-        return {
-          name: 'enum',
-          raw: propTypeString,
-          value: propType.types.map(type => ({
-            value: this.getValuesFromUnionType(type)
-          }))
-        };
-      }
-      if (
-        this.shouldExtractLiteralValuesFromEnum &&
-        propType.types.every(type => type.isStringLiteral())
-      ) {
-        return {
-          name: 'enum',
-          raw: propTypeString,
-          value: propType.types.map(type => ({
-            value: type.isStringLiteral()
-              ? `"${type.value}"`
-              : this.checker.typeToString(type)
-          }))
-        };
-      }
-    }
-
-    if (this.shouldRemoveUndefinedFromOptional && !isRequired) {
-      propTypeString = propTypeString.replace(' | undefined', '');
-    }
-
-    return { name: propTypeString };
-  }
-
-  public getPropsInfo(
-    propsObj: ts.Symbol,
-    defaultProps: StringIndexedObject<string> = {}
-  ): Props {
-    if (!propsObj.valueDeclaration) {
-      return {};
-    }
-
+  public getDocsForALayerOfProperties(
+    sourceObjectTsSymbol: ts.Symbol,
+    defaultProps: StringIndexedObject<string>,
+    depth: number = 1,
+    debug = false
+  ) {
     const propsType = this.checker.getTypeOfSymbolAtLocation(
-      propsObj,
-      propsObj.valueDeclaration
+      sourceObjectTsSymbol,
+      sourceObjectTsSymbol.valueDeclaration
     );
     const baseProps = propsType.getApparentProperties();
+    // Props Properties (ie. keys)
     let propertiesOfProps = baseProps;
 
     if (propsType.isUnionOrIntersection()) {
@@ -620,14 +570,13 @@ export class Parser {
     }
 
     const result: Props = {};
-
     propertiesOfProps.forEach(prop => {
       const propName = prop.getName();
 
       // Find type of prop by looking in context of the props object itself.
       const propType = this.checker.getTypeOfSymbolAtLocation(
         prop,
-        propsObj.valueDeclaration!
+        sourceObjectTsSymbol.valueDeclaration!
       );
 
       const jsDocComment = this.findDocComment(prop);
@@ -653,21 +602,130 @@ export class Parser {
         declarations.every(d => !d.questionToken) &&
         (!baseProp || !isOptional(baseProp));
 
-      const type = jsDocComment.tags.type
-        ? {
-            name: jsDocComment.tags.type
-          }
-        : this.getDocgenType(propType, required);
+      const type = this.getDocgenType(
+        jsDocComment,
+        prop,
+        propType,
+        required,
+        depth,
+        debug
+      );
 
-      result[propName] = {
+      const propItem = {
         defaultValue,
         description: jsDocComment.fullComment,
         name: propName,
         parent,
         required,
         type
-      };
+        // casting to avoid issue with JSDocTypeTagPropItem colliding
+        // with NonBasicOrLiteralPropItem and StringLiteralPropItem
+      } as PropItem;
+
+      result[propName] = propItem;
     });
+
+    return result;
+  }
+
+  public getDocgenType(
+    jsDocComment: JSDoc | undefined,
+    prop: ts.Symbol,
+    propType: ts.Type,
+    isRequired: boolean,
+    depth: number,
+    debug: boolean
+  ): PropItemType {
+    let propTypeString = this.checker.typeToString(propType);
+
+    if (jsDocComment && jsDocComment.tags.type) {
+      return {
+        name: jsDocComment.tags.type,
+        raw: propTypeString,
+        source: 'JSDoc type tag'
+      };
+    }
+
+    if (propType.isUnion()) {
+      const value: EnumPropItem['type']['value'] = [];
+
+      propType.types.forEach(type => {
+        let typeString = this.checker.typeToString(type);
+        if (type.isStringLiteral()) {
+          value.push({
+            value: `"${type.value}"`,
+            raw: typeString
+          });
+        } else if (type.isNumberLiteral()) {
+          return { value: type.value, raw: typeString };
+        } else {
+          value.push({ value: typeString, raw: typeString });
+        }
+      });
+
+      return {
+        name: 'enum',
+        raw: propTypeString,
+        value
+      };
+    }
+
+    const members = propType.symbol && propType.symbol.members;
+    // TODO: there's probably a bettter way to work out if the propType is a function,
+    const isProbablyAFunction =
+      propTypeString.startsWith('(') || propTypeString.startsWith('<');
+    const isObjecty = !isProbablyAFunction && members !== undefined;
+
+    if (isObjecty) {
+      if (depth > this.maxValueFromObjectExtractionDepth) {
+        return {
+          name: 'shape',
+          raw: propTypeString
+        };
+      }
+      try {
+        const nestedDocs = this.getDocsForALayerOfProperties(
+          prop,
+          {},
+          depth + 1,
+          debug
+        );
+
+        return {
+          name: 'shape',
+          raw: propTypeString,
+          value: nestedDocs
+        };
+      } catch (e) {
+        throw e;
+      }
+    }
+
+    if (this.shouldRemoveUndefinedFromOptional && !isRequired) {
+      propTypeString = propTypeString.replace(' | undefined', '');
+    }
+
+    if (propType.isStringLiteral()) {
+      return {
+        name: `"${propType.value}"`,
+        raw: propTypeString
+      };
+    }
+    if (propType.isNumberLiteral()) {
+      return { name: propType.value, raw: propTypeString };
+    }
+
+    return { name: propTypeString, raw: propTypeString };
+  }
+
+  public getPropsInfo(
+    propsObj: ts.Symbol,
+    defaultProps: StringIndexedObject<string> = {}
+  ): Props {
+    if (!propsObj.valueDeclaration) {
+      return {};
+    }
+    const result = this.getDocsForALayerOfProperties(propsObj, defaultProps);
 
     return result;
   }
@@ -1141,8 +1199,15 @@ export function getDefaultExportForFile(source: ts.SourceFile) {
   return identifier.length ? identifier : 'DefaultName';
 }
 
-function getParentType(prop: ts.Symbol): ParentType | undefined {
-  const declarations = prop.getDeclarations();
+function hasName<T extends ts.Node & { name: any }>(
+  parent: ts.Node
+): parent is T {
+  // @ts-ignore
+  return parent.name !== undefined;
+}
+
+function getParentType(propertySymbol: ts.Symbol): ParentType | undefined {
+  const declarations = propertySymbol.getDeclarations();
 
   if (declarations == null || declarations.length === 0) {
     return undefined;
@@ -1151,7 +1216,7 @@ function getParentType(prop: ts.Symbol): ParentType | undefined {
   // Props can be declared only in one place
   const { parent } = declarations[0];
 
-  if (!isInterfaceOrTypeAliasDeclaration(parent)) {
+  if (!hasName(parent)) {
     return undefined;
   }
 
@@ -1178,15 +1243,6 @@ function getParentType(prop: ts.Symbol): ParentType | undefined {
     fileName: trimmedFileName,
     name: parentName
   };
-}
-
-function isInterfaceOrTypeAliasDeclaration(
-  node: ts.Node
-): node is ts.InterfaceDeclaration | ts.TypeAliasDeclaration {
-  return (
-    node.kind === ts.SyntaxKind.InterfaceDeclaration ||
-    node.kind === ts.SyntaxKind.TypeAliasDeclaration
-  );
 }
 
 function parseWithProgramProvider(

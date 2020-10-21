@@ -16,6 +16,7 @@ function createProp(
     name,
     parent,
     required,
+    // @ts-ignore
     type
   };
 }

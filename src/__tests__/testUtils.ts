@@ -185,12 +185,16 @@ export function checkComponent(
           );
         }
         const expectedValue = expectedProp.value;
+        // @ts-ignore
         if (expectedValue && !isEqual(expectedValue, prop.type.value)) {
           // tslint:disable-next-line:max-line-length
           errors.push(
             `Property '${compName}.${expectedPropName}' value is different - expected: ${JSON.stringify(
               expectedValue
-            )}, actual: ${JSON.stringify(prop.type.value)}`
+            )}, actual: ${
+              // @ts-ignore
+              JSON.stringify(prop.type.value)
+            }`
           );
         }
       }

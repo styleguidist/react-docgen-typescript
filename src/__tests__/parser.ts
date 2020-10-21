@@ -741,11 +741,11 @@ describe('parser', () => {
     });
   });
 
-  it("should parse functional component component defined as function as default export", () => {
-    check("FunctionDeclarationAsDefaultExport", {
+  it('should parse functional component component defined as function as default export', () => {
+    check('FunctionDeclarationAsDefaultExport', {
       Jumbotron: {
-        prop1: { type: "string", required: true },
-      },
+        prop1: { type: 'string', required: true }
+      }
     });
   });
 
@@ -1098,10 +1098,7 @@ describe('parser', () => {
             }
           },
           true,
-          null,
-          {
-            shouldExtractLiteralValuesFromEnum: true
-          }
+          null
         );
       });
     });
@@ -1124,10 +1121,7 @@ describe('parser', () => {
             }
           },
           false,
-          null,
-          {
-            shouldExtractValuesFromUnion: true
-          }
+          null
         );
       });
       it('extracts numbers from a union', () => {
@@ -1143,10 +1137,7 @@ describe('parser', () => {
             }
           },
           false,
-          null,
-          {
-            shouldExtractValuesFromUnion: true
-          }
+          null
         );
       });
       it('extracts numbers and strings from a mixed union', () => {
@@ -1167,10 +1158,7 @@ describe('parser', () => {
             }
           },
           false,
-          null,
-          {
-            shouldExtractValuesFromUnion: true
-          }
+          null
         );
       });
     });
