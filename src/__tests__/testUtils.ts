@@ -91,9 +91,7 @@ export function checkComponent(
     if (componentDoc.description !== expectedComponentDescription) {
       // tslint:disable-next-line:max-line-length
       errors.push(
-        `${compName} description is different - expected: '${expectedComponentDescription}', actual: '${
-          componentDoc.description
-        }'`
+        `${compName} description is different - expected: '${expectedComponentDescription}', actual: '${componentDoc.description}'`
       );
     }
 
@@ -120,9 +118,7 @@ export function checkComponent(
         if (expectedProp.type !== prop.type.name) {
           // tslint:disable-next-line:max-line-length
           errors.push(
-            `Property '${compName}.${expectedPropName}' type is different - expected: ${
-              expectedProp.type
-            }, actual: ${prop.type.name}`
+            `Property '${compName}.${expectedPropName}' type is different - expected: ${expectedProp.type}, actual: ${prop.type.name}`
           );
         }
         const expectedDescription =
@@ -132,9 +128,7 @@ export function checkComponent(
         if (expectedDescription !== prop.description) {
           errors.push(
             // tslint:disable-next-line:max-line-length
-            `Property '${compName}.${expectedPropName}' description is different - expected: ${expectedDescription}, actual: ${
-              prop.description
-            }`
+            `Property '${compName}.${expectedPropName}' description is different - expected: ${expectedDescription}, actual: ${prop.description}`
           );
         }
         const expectedParentFileName = expectedProp.parent
@@ -147,9 +141,7 @@ export function checkComponent(
         ) {
           errors.push(
             // tslint:disable-next-line:max-line-length
-            `Property '${compName}.${expectedPropName}' parent fileName is different - expected: ${expectedParentFileName}, actual: ${
-              prop.parent.fileName
-            }`
+            `Property '${compName}.${expectedPropName}' parent fileName is different - expected: ${expectedParentFileName}, actual: ${prop.parent.fileName}`
           );
         }
         const expectedRequired =
@@ -157,9 +149,7 @@ export function checkComponent(
         if (expectedRequired !== prop.required) {
           errors.push(
             // tslint:disable-next-line:max-line-length
-            `Property '${compName}.${expectedPropName}' required is different - expected: ${expectedRequired}, actual: ${
-              prop.required
-            }`
+            `Property '${compName}.${expectedPropName}' required is different - expected: ${expectedRequired}, actual: ${prop.required}`
           );
         }
         const expectedDefaultValue = expectedProp.defaultValue;
@@ -179,9 +169,7 @@ export function checkComponent(
         if (exptectedRaw && exptectedRaw !== prop.type.raw) {
           // tslint:disable-next-line:max-line-length
           errors.push(
-            `Property '${compName}.${expectedPropName}' raw value is different - expected: ${exptectedRaw}, actual: ${
-              prop.type.raw
-            }`
+            `Property '${compName}.${expectedPropName}' raw value is different - expected: ${exptectedRaw}, actual: ${prop.type.raw}`
           );
         }
         const expectedValue = expectedProp.value;

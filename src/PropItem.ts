@@ -83,13 +83,34 @@ export interface StringLiteralPropItem {
   parent?: ParentType;
 }
 
+export interface ArrayOfPropItem {
+  name: string;
+  required: boolean;
+  type: {
+    name: 'arrayOf';
+    /**
+     * NOTE: shapes/arrayOfs are by default limited to 8 levels of expansion
+     * This is to avoid issues with recursive types, there is likely a
+     * better way to handle this.
+     *
+     * The configuration option to change this is
+     * `maxValueFromObjectExtractionDepth`.
+     **/
+    value?: PropItemType[];
+    raw: string;
+  };
+  description: string;
+  defaultValue?: any;
+  parent?: ParentType;
+}
+
 export interface ShapePropItem {
   name: string;
   required: boolean;
   type: {
     name: 'shape';
     /**
-     * NOTE: shapes are by default limited to 5 levels of expansion
+     * NOTE: shapes/arrayOfs are by default limited to 8 levels of expansion
      * This is to avoid issues with recursive types, there is likely a
      * better way to handle this.
      *
@@ -159,6 +180,7 @@ export type PropItem =
   | NumericLiteralPropItem
   | StringPropItem
   | StringLiteralPropItem
+  | ArrayOfPropItem
   | ShapePropItem
   | EnumPropItem
   | NonBasicOrLiteralPropItem

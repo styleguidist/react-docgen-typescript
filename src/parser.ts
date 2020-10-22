@@ -125,9 +125,7 @@ export function withCustomConfig(
 
   if (error !== undefined) {
     // tslint:disable-next-line: max-line-length
-    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${
-      error.code
-    }, message: ${error.messageText}`;
+    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${error.code}, message: ${error.messageText}`;
     throw new Error(errorText);
   }
 
@@ -199,7 +197,7 @@ export class Parser {
     const {
       savePropValueAsString,
       shouldRemoveUndefinedFromOptional,
-      maxValueFromObjectExtractionDepth = 5
+      maxValueFromObjectExtractionDepth = 8
     } = opts;
     this.checker = program.getTypeChecker();
     this.propFilter = buildFilter(opts);
@@ -533,16 +531,7 @@ export class Parser {
     return returnTag.text || null;
   }
 
-  public getDocsForALayerOfProperties(
-    sourceObjectTsSymbol: ts.Symbol,
-    defaultProps: StringIndexedObject<string>,
-    depth: number = 1,
-    debug = false
-  ) {
-    const propsType = this.checker.getTypeOfSymbolAtLocation(
-      sourceObjectTsSymbol,
-      sourceObjectTsSymbol.valueDeclaration
-    );
+  public getLayerProperties(propsType: ts.Type) {
     const baseProps = propsType.getApparentProperties();
     // Props Properties (ie. keys)
     let propertiesOfProps = baseProps;
@@ -569,17 +558,93 @@ export class Parser {
       }
     }
 
+    return { baseProps, propertiesOfProps };
+  }
+
+  public getDocsForANestedLayerOfProperties(
+    sourceSymbol: ts.Symbol,
+    propType: ts.Type,
+    depth: number = 1,
+    debug = false
+  ) {
+    // TODO it might make sense to have an enum for unions rather than merging like
+    // is done for the root layer
+    const { baseProps, propertiesOfProps } = this.getLayerProperties(propType);
+
     const result: Props = {};
-    propertiesOfProps.forEach(prop => {
-      const propName = prop.getName();
+
+    propertiesOfProps.forEach(propSymbol => {
+      const propName = propSymbol.getName();
 
       // Find type of prop by looking in context of the props object itself.
       const propType = this.checker.getTypeOfSymbolAtLocation(
-        prop,
+        propSymbol,
+        sourceSymbol.valueDeclaration!
+      );
+
+      const jsDocComment = this.findDocComment(propSymbol);
+
+      const parent = getParentType(propSymbol);
+      const declarations = propSymbol.declarations || [];
+      const baseProp = baseProps.find(p => p.getName() === propName);
+
+      const required =
+        !isOptional(propSymbol) &&
+        // If in a intersection or union check original declaration for "?"
+        // @ts-ignore
+        declarations.every(d => !d.questionToken) &&
+        (!baseProp || !isOptional(baseProp));
+
+      const type = this.getDocgenType(
+        undefined,
+        propSymbol,
+        propType,
+        false,
+        depth,
+        debug
+      );
+
+      const propItem = {
+        defaultValue: undefined,
+        description: jsDocComment.fullComment,
+        name: propName,
+        parent,
+        required,
+        type
+        // casting to avoid issue with JSDocTypeTagPropItem colliding
+        // with NonBasicOrLiteralPropItem and StringLiteralPropItem
+      } as PropItem;
+
+      result[propName] = propItem;
+    });
+
+    return result;
+  }
+
+  public getDocsForALayerOfProperties(
+    sourceObjectTsSymbol: ts.Symbol,
+    defaultProps: StringIndexedObject<string>,
+    depth: number = 1,
+    debug = false
+  ) {
+    const propsType = this.checker.getTypeOfSymbolAtLocation(
+      sourceObjectTsSymbol,
+      sourceObjectTsSymbol.valueDeclaration
+    );
+    const { baseProps, propertiesOfProps } = this.getLayerProperties(propsType);
+
+    const result: Props = {};
+
+    propertiesOfProps.forEach(propSymbol => {
+      const propName = propSymbol.getName();
+
+      // Find type of prop by looking in context of the props object itself.
+      const propType = this.checker.getTypeOfSymbolAtLocation(
+        propSymbol,
         sourceObjectTsSymbol.valueDeclaration!
       );
 
-      const jsDocComment = this.findDocComment(prop);
+      const jsDocComment = this.findDocComment(propSymbol);
       const hasCodeBasedDefault = defaultProps[propName] !== undefined;
 
       let defaultValue: { value: any } | null = null;
@@ -590,12 +655,12 @@ export class Parser {
         defaultValue = { value: jsDocComment.tags.default };
       }
 
-      const parent = getParentType(prop);
-      const declarations = prop.declarations || [];
+      const parent = getParentType(propSymbol);
+      const declarations = propSymbol.declarations || [];
       const baseProp = baseProps.find(p => p.getName() === propName);
 
       const required =
-        !isOptional(prop) &&
+        !isOptional(propSymbol) &&
         !hasCodeBasedDefault &&
         // If in a intersection or union check original declaration for "?"
         // @ts-ignore
@@ -604,7 +669,7 @@ export class Parser {
 
       const type = this.getDocgenType(
         jsDocComment,
-        prop,
+        propSymbol,
         propType,
         required,
         depth,
@@ -630,7 +695,7 @@ export class Parser {
 
   public getDocgenType(
     jsDocComment: JSDoc | undefined,
-    prop: ts.Symbol,
+    propSymbol: ts.Symbol,
     propType: ts.Type,
     isRequired: boolean,
     depth: number,
@@ -670,6 +735,46 @@ export class Parser {
       };
     }
 
+    function isArrayType(type: ts.Type): type is ts.TypeReference {
+      return !!(
+        (propType as ts.ObjectType).objectFlags & ts.ObjectFlags.Reference
+      );
+    }
+
+    if (isArrayType(propType)) {
+      const values: PropItemType[] = [];
+
+      if (depth > this.maxValueFromObjectExtractionDepth) {
+        return {
+          name: 'arrayOf',
+          raw: propTypeString
+        };
+      }
+
+      const typeArgs: readonly ts.Type[] =
+        this.checker.getTypeArguments(propType) ?? [];
+
+      if (typeArgs.length > 0) {
+        typeArgs.forEach(type => {
+          const value: PropItemType = this.getDocgenType(
+            undefined,
+            type.symbol,
+            type,
+            false,
+            depth + 1,
+            debug
+          );
+          values.push(value);
+        });
+      }
+
+      return {
+        name: 'arrayOf',
+        value: values,
+        raw: propTypeString
+      };
+    }
+
     const members = propType.symbol && propType.symbol.members;
     // TODO: there's probably a bettter way to work out if the propType is a function,
     const isProbablyAFunction =
@@ -684,9 +789,9 @@ export class Parser {
         };
       }
       try {
-        const nestedDocs = this.getDocsForALayerOfProperties(
-          prop,
-          {},
+        const nestedDocs = this.getDocsForANestedLayerOfProperties(
+          propSymbol,
+          propType,
           depth + 1,
           debug
         );
@@ -875,9 +980,9 @@ export class Parser {
         let propMap = {};
 
         if (properties) {
-          propMap = this.getPropMap(properties as ts.NodeArray<
-            ts.PropertyAssignment
-          >);
+          propMap = this.getPropMap(
+            properties as ts.NodeArray<ts.PropertyAssignment>
+          );
         }
 
         return {
@@ -907,9 +1012,9 @@ export class Parser {
           if (right) {
             const { properties } = right as ts.ObjectLiteralExpression;
             if (properties) {
-              propMap = this.getPropMap(properties as ts.NodeArray<
-                ts.PropertyAssignment
-              >);
+              propMap = this.getPropMap(
+                properties as ts.NodeArray<ts.PropertyAssignment>
+              );
             }
           }
         });
@@ -1012,31 +1117,26 @@ export class Parser {
   public getPropMap(
     properties: ts.NodeArray<ts.PropertyAssignment | ts.BindingElement>
   ): StringIndexedObject<string | boolean | number | null> {
-    const propMap = properties.reduce(
-      (acc, property) => {
-        if (ts.isSpreadAssignment(property) || !property.name) {
-          return acc;
-        }
-
-        const literalValue = this.getLiteralValueFromPropertyAssignment(
-          property
-        );
-        const propertyName = getPropertyName(property.name);
-
-        if (
-          (typeof literalValue === 'string' ||
-            typeof literalValue === 'number' ||
-            typeof literalValue === 'boolean' ||
-            literalValue === null) &&
-          propertyName !== null
-        ) {
-          acc[propertyName] = literalValue;
-        }
-
+    const propMap = properties.reduce((acc, property) => {
+      if (ts.isSpreadAssignment(property) || !property.name) {
         return acc;
-      },
-      {} as StringIndexedObject<string | boolean | number | null>
-    );
+      }
+
+      const literalValue = this.getLiteralValueFromPropertyAssignment(property);
+      const propertyName = getPropertyName(property.name);
+
+      if (
+        (typeof literalValue === 'string' ||
+          typeof literalValue === 'number' ||
+          typeof literalValue === 'boolean' ||
+          literalValue === null) &&
+        propertyName !== null
+      ) {
+        acc[propertyName] = literalValue;
+      }
+
+      return acc;
+    }, {} as StringIndexedObject<string | boolean | number | null>);
 
     return propMap;
   }
