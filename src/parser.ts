@@ -577,10 +577,20 @@ export class Parser {
       const propName = propSymbol.getName();
 
       // Find type of prop by looking in context of the props object itself.
-      const propType = this.checker.getTypeOfSymbolAtLocation(
+      const propTypeFromSourceSymbol = this.checker.getTypeOfSymbolAtLocation(
         propSymbol,
         sourceSymbol.valueDeclaration!
       );
+
+      const propTypeFromPropSymbol = this.checker.getTypeOfSymbolAtLocation(
+        propSymbol,
+        propSymbol.valueDeclaration!
+      );
+
+      const propType =
+        this.checker.typeToString(propTypeFromSourceSymbol) === 'any'
+          ? propTypeFromPropSymbol
+          : propTypeFromSourceSymbol;
 
       const jsDocComment = this.findDocComment(propSymbol);
 
@@ -755,11 +765,11 @@ export class Parser {
         this.checker.getTypeArguments(propType) ?? [];
 
       if (typeArgs.length > 0) {
-        typeArgs.forEach(type => {
+        typeArgs.forEach(typeArg => {
           const value: PropItemType = this.getDocgenType(
             undefined,
-            type.symbol,
-            type,
+            typeArg.symbol,
+            typeArg,
             false,
             depth + 1,
             debug
