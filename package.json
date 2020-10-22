@@ -1,9 +1,9 @@
 {
-  "name": "react-docgen-typescript",
+  "name": "@luke-john/react-docgen-typescript",
   "version": "1.20.5",
   "description": "",
-  "homepage": "https://github.com/styleguidist/react-docgen-typescript/",
-  "bugs": "https://github.com/styleguidist/react-docgen-typescript/issues",
+  "homepage": "https://github.com/luke-john/react-docgen-typescript/",
+  "bugs": "https://github.com/luke-john/react-docgen-typescript/issues",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
