@@ -136,6 +136,10 @@ If set to true, string enums and unions will be converted to docgen enum format.
 
 If set to true, every unions will be converted to docgen enum format.
 
+### `skipChildrenPropWithoutDoc`: boolean (default: `true`)
+
+If set to false the docs for the `children` prop will be generated even without an explicit description.
+
 ### `shouldRemoveUndefinedFromOptional`: boolean
 
 If set to true, types that are optional will not display " | undefined" in the type.

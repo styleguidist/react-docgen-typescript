@@ -83,6 +83,7 @@ export interface ParserOptions {
   shouldExtractLiteralValuesFromEnum?: boolean;
   shouldRemoveUndefinedFromOptional?: boolean;
   shouldExtractValuesFromUnion?: boolean;
+  skipChildrenPropWithoutDoc?: boolean;
   savePropValueAsString?: boolean;
 }
 
@@ -231,9 +232,7 @@ export class Parser {
     this.savePropValueAsString = Boolean(savePropValueAsString);
   }
 
-  private getComponentFromExpression(
-    exp: ts.Symbol,
-  ) {
+  private getComponentFromExpression(exp: ts.Symbol) {
     const declaration = exp.valueDeclaration || exp.declarations![0];
     const type = this.checker.getTypeOfSymbolAtLocation(exp, declaration);
     const typeSymbol = type.symbol || type.aliasSymbol;
@@ -242,11 +241,11 @@ export class Parser {
       return exp;
     }
 
-    const symbolName = typeSymbol.getName()
+    const symbolName = typeSymbol.getName();
 
     if (
-      (symbolName === "MemoExoticComponent" ||
-        symbolName === "ForwardRefExoticComponent") &&
+      (symbolName === 'MemoExoticComponent' ||
+        symbolName === 'ForwardRefExoticComponent') &&
       exp.valueDeclaration &&
       ts.isExportAssignment(exp.valueDeclaration) &&
       ts.isCallExpression(exp.valueDeclaration.expression)
@@ -332,7 +331,9 @@ export class Parser {
     const resolvedComponentName = componentNameResolver(nameSource, source);
     const { description, tags } = this.findDocComment(commentSource);
     const displayName =
-      resolvedComponentName || tags.visibleName || computeComponentName(nameSource, source);
+      resolvedComponentName ||
+      tags.visibleName ||
+      computeComponentName(nameSource, source);
     const methods = this.getMethodsInfo(type);
 
     if (propsType) {
