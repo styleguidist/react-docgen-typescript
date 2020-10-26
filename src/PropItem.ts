@@ -11,7 +11,7 @@ export interface BooleanPropItem {
   name: string;
   required: boolean;
   type: {
-    name: 'boolean';
+    name: 'bool';
     raw: string;
   };
   description: string;
@@ -125,18 +125,111 @@ export interface ShapePropItem {
   parent?: ParentType;
 }
 
-export interface EnumPropItem {
+export interface StringEnumPropItem {
   name: string;
   required: boolean;
   type: {
     name: 'enum';
+    membersType: 'string';
+    /**
+     * - string values are wrapped in quotes (ie. `{ value: '"string"',`)
+     */
+    value: { value: string; raw: string; type: 'string' }[];
+    raw: string;
+  };
+  description: string;
+  defaultValue?: any;
+  parent?: ParentType;
+}
+
+export interface NumericEnumPropItem {
+  name: string;
+  required: boolean;
+  type: {
+    name: 'enum';
+    membersType: 'number';
+    value: { value: number; raw: string; type: 'number' }[];
+    raw: string;
+  };
+  description: string;
+  defaultValue?: any;
+  parent?: ParentType;
+}
+/**
+ * highly unlikely this would be intentional
+ *
+ * result of `propName: undefined[]`
+ **/
+export interface UndefinedEnumPropItem {
+  name: string;
+  required: boolean;
+  type: {
+    name: 'enum';
+    membersType: 'undefined';
+    value: { value: undefined; raw: string; type: 'undefined' }[];
+    raw: string;
+  };
+  description: string;
+  defaultValue?: any;
+  parent?: ParentType;
+}
+
+export interface HeterogeneousEnumPropItem {
+  name: string;
+  required: boolean;
+  type: {
+    name: 'enum';
+    membersType: 'heterogeneous';
     /**
      * - string values will be wrapped in quotes (ie. `{ value: '"string"',`)
      * - number values will be numbers (ie. `{ value: 10,`)
-     * - other primitive values will strings without quotes (ie. `{ value: boolean,`)
-     * - other types are not currently handled, and will be the type string (ie. `{ value: '{foo: boolean}',`)
+     * - boolean values will be a boolean (ie. `{ value: false,`)
+     * - undefined values will be undefined (ie. `{ value: undefined,`)
+     * - other types are not currently handled, and will result in a UnionPropItem
      */
-    value: { value: string | number; raw: string }[];
+    value: {
+      value: number | string | boolean | undefined;
+      raw: string;
+      type: 'number' | 'string' | 'boolean' | 'undefined';
+    }[];
+    raw: string;
+  };
+  description: string;
+  defaultValue?: any;
+  parent?: ParentType;
+}
+
+export type EnumPropItem =
+  | StringEnumPropItem
+  | NumericEnumPropItem
+  | UndefinedEnumPropItem
+  | HeterogeneousEnumPropItem;
+
+export interface UnionPropItem {
+  name: string;
+  required: boolean;
+  type: {
+    name: 'union';
+    /**
+     * - string values will be wrapped in quotes (ie. `{ value: '"string"',`)
+     * - number values will be numbers (ie. `{ value: 10,`)
+     * - boolean values will be a boolean (ie. `{ value: false,`)
+     * - undefined values will be undefined (ie. `{ value: undefined,`)
+     * - other types are not currently handled, and will have an empty value
+     */
+    value: (
+      | {
+          value: string | number | undefined;
+          raw: string;
+          type: 'number' | 'string' | 'boolean' | 'undefined' | 'other';
+        }
+      | {
+          // currently not implemented due to recursive type issues
+          value?: PropItemType;
+          raw: string;
+          type: 'other';
+        }
+    )[];
     raw: string;
   };
   description: string;
@@ -183,5 +276,6 @@ export type PropItem =
   | ArrayOfPropItem
   | ShapePropItem
   | EnumPropItem
+  | UnionPropItem
   | NonBasicOrLiteralPropItem
   | JSDocTypeTagPropItem;

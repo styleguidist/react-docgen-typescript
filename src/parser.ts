@@ -9,7 +9,10 @@ import {
   ParentType,
   PropItem,
   PropItemType,
-  EnumPropItem
+  NumericEnumPropItem,
+  StringEnumPropItem,
+  UnionPropItem,
+  HeterogeneousEnumPropItem
 } from './PropItem';
 export { Props, ParentType, PropItem, PropItemType };
 
@@ -722,26 +725,86 @@ export class Parser {
     }
 
     if (propType.isUnion()) {
-      const value: EnumPropItem['type']['value'] = [];
+      const value: (EnumValue | UnionPropItem['type']['value'][number])[] = [];
+
+      let isUnion = false;
 
       propType.types.forEach(type => {
         let typeString = this.checker.typeToString(type);
+
         if (type.isStringLiteral()) {
           value.push({
             value: `"${type.value}"`,
-            raw: typeString
+            raw: typeString,
+            type: 'string'
           });
         } else if (type.isNumberLiteral()) {
-          return { value: type.value, raw: typeString };
+          value.push({ value: type.value, raw: typeString, type: 'number' });
+        } else if (typeString === 'false' || typeString === 'true') {
+          value.push({
+            value: typeString === 'true',
+            raw: typeString,
+            type: 'boolean'
+          });
+        } else if (typeString === 'undefined') {
+          value.push({
+            value: undefined,
+            raw: typeString,
+            type: 'undefined'
+          });
         } else {
-          value.push({ value: typeString, raw: typeString });
+          isUnion = true;
+          // until a strategy to avoid recursive types is implemented
+          // going deeper here is likely to result in recursion.
+
+          // const nestedValue: PropItemType = this.getDocgenType(
+          //   undefined,
+          //   type.symbol,
+          //   type,
+          //   false,
+          //   depth + 1,
+          //   debug
+          // );
+          value.push({ raw: typeString, type: 'other' });
         }
       });
+
+      const unionOrEnumMembersType = isUnion
+        ? 'union'
+        : (value as EnumValue[]).reduce(
+            (acc: EnumValue['type'] | 'heterogeneous' | undefined, current) => {
+              if (acc === undefined) {
+                return current.type;
+              }
+              if (current.type !== acc) {
+                return 'heterogeneous';
+              } else {
+                return acc;
+              }
+            },
+            undefined
+          )!;
+
+      if (unionOrEnumMembersType === 'union') {
+        return {
+          name: 'union' as const,
+          raw: propTypeString,
+          value: value as UnionPropItem['type']['value']
+        };
+      }
+
+      if (unionOrEnumMembersType === 'boolean') {
+        return {
+          name: 'bool' as const,
+          raw: propTypeString
+        };
+      }
 
       return {
         name: 'enum',
         raw: propTypeString,
-        value
+        membersType: unionOrEnumMembersType,
+        value: value as any
       };
     }
 
@@ -1150,6 +1213,18 @@ export class Parser {
 
     return propMap;
   }
+}
+
+type EnumValue =
+  | NumericEnumPropItem['type']['value'][number]
+  | StringEnumPropItem['type']['value'][number]
+  | HeterogeneousEnumPropItem['type']['value'][number];
+
+function isEnumValue(
+  value: EnumValue | UnionPropItem['type']['value'][number]
+): value is EnumValue {
+  // @ts-ignore
+  return value.type;
 }
 
 function statementIsClassDeclaration(
