@@ -20,6 +20,7 @@ export interface ComponentDoc {
   description: string;
   props: Props;
   methods: Method[];
+  tags?: {};
 }
 
 export interface Props extends StringIndexedObject<PropItem> {}
@@ -141,9 +142,7 @@ export function withCustomConfig(
 
   if (error !== undefined) {
     // tslint:disable-next-line: max-line-length
-    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${
-      error.code
-    }, message: ${error.messageText}`;
+    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${error.code}, message: ${error.messageText}`;
     throw new Error(errorText);
   }
 
@@ -231,9 +230,7 @@ export class Parser {
     this.savePropValueAsString = Boolean(savePropValueAsString);
   }
 
-  private getComponentFromExpression(
-    exp: ts.Symbol,
-  ) {
+  private getComponentFromExpression(exp: ts.Symbol) {
     const declaration = exp.valueDeclaration || exp.declarations![0];
     const type = this.checker.getTypeOfSymbolAtLocation(exp, declaration);
     const typeSymbol = type.symbol || type.aliasSymbol;
@@ -242,11 +239,11 @@ export class Parser {
       return exp;
     }
 
-    const symbolName = typeSymbol.getName()
+    const symbolName = typeSymbol.getName();
 
     if (
-      (symbolName === "MemoExoticComponent" ||
-        symbolName === "ForwardRefExoticComponent") &&
+      (symbolName === 'MemoExoticComponent' ||
+        symbolName === 'ForwardRefExoticComponent') &&
       exp.valueDeclaration &&
       ts.isExportAssignment(exp.valueDeclaration) &&
       ts.isCallExpression(exp.valueDeclaration.expression)
@@ -332,7 +329,9 @@ export class Parser {
     const resolvedComponentName = componentNameResolver(nameSource, source);
     const { description, tags } = this.findDocComment(commentSource);
     const displayName =
-      resolvedComponentName || tags.visibleName || computeComponentName(nameSource, source);
+      resolvedComponentName ||
+      tags.visibleName ||
+      computeComponentName(nameSource, source);
     const methods = this.getMethodsInfo(type);
 
     if (propsType) {
@@ -352,8 +351,8 @@ export class Parser {
           delete props[propName];
         }
       }
-
       return {
+        tags,
         description,
         displayName,
         methods,
@@ -361,6 +360,7 @@ export class Parser {
       };
     } else if (description && displayName) {
       return {
+        tags,
         description,
         displayName,
         methods,
@@ -817,9 +817,9 @@ export class Parser {
         let propMap = {};
 
         if (properties) {
-          propMap = this.getPropMap(properties as ts.NodeArray<
-            ts.PropertyAssignment
-          >);
+          propMap = this.getPropMap(
+            properties as ts.NodeArray<ts.PropertyAssignment>
+          );
         }
 
         return {
@@ -849,9 +849,9 @@ export class Parser {
           if (right) {
             const { properties } = right as ts.ObjectLiteralExpression;
             if (properties) {
-              propMap = this.getPropMap(properties as ts.NodeArray<
-                ts.PropertyAssignment
-              >);
+              propMap = this.getPropMap(
+                properties as ts.NodeArray<ts.PropertyAssignment>
+              );
             }
           }
         });
@@ -954,31 +954,26 @@ export class Parser {
   public getPropMap(
     properties: ts.NodeArray<ts.PropertyAssignment | ts.BindingElement>
   ): StringIndexedObject<string | boolean | number | null> {
-    const propMap = properties.reduce(
-      (acc, property) => {
-        if (ts.isSpreadAssignment(property) || !property.name) {
-          return acc;
-        }
-
-        const literalValue = this.getLiteralValueFromPropertyAssignment(
-          property
-        );
-        const propertyName = getPropertyName(property.name);
-
-        if (
-          (typeof literalValue === 'string' ||
-            typeof literalValue === 'number' ||
-            typeof literalValue === 'boolean' ||
-            literalValue === null) &&
-          propertyName !== null
-        ) {
-          acc[propertyName] = literalValue;
-        }
-
+    const propMap = properties.reduce((acc, property) => {
+      if (ts.isSpreadAssignment(property) || !property.name) {
         return acc;
-      },
-      {} as StringIndexedObject<string | boolean | number | null>
-    );
+      }
+
+      const literalValue = this.getLiteralValueFromPropertyAssignment(property);
+      const propertyName = getPropertyName(property.name);
+
+      if (
+        (typeof literalValue === 'string' ||
+          typeof literalValue === 'number' ||
+          typeof literalValue === 'boolean' ||
+          literalValue === null) &&
+        propertyName !== null
+      ) {
+        acc[propertyName] = literalValue;
+      }
+
+      return acc;
+    }, {} as StringIndexedObject<string | boolean | number | null>);
 
     return propMap;
   }
