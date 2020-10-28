@@ -741,11 +741,11 @@ describe('parser', () => {
     });
   });
 
-  it("should parse functional component component defined as function as default export", () => {
-    check("FunctionDeclarationAsDefaultExport", {
+  it('should parse functional component component defined as function as default export', () => {
+    check('FunctionDeclarationAsDefaultExport', {
       Jumbotron: {
-        prop1: { type: "string", required: true },
-      },
+        prop1: { type: 'string', required: true }
+      }
     });
   });
 
@@ -865,6 +865,35 @@ describe('parser', () => {
     it('should be taken from stateful component folder name if file name is "index"', () => {
       const [parsed] = parse(fixturePath('StatefulDisplayNameFolder/index'));
       assert.equal(parsed.displayName, 'StatefulDisplayNameFolder');
+    });
+  });
+
+  describe('sorting', () => {
+    it('sort props alphabetically', () => {
+      const [parsed] = parse(fixturePath('Unsorted'), { sort: true });
+      assert.deepEqual(Object.keys(parsed.props), ['a', 'm', 'z']);
+    });
+
+    it('sort props using custom sort function', () => {
+      const [parsed] = parse(fixturePath('Unsorted'), {
+        sort: props =>
+          props.sort((a, b) => {
+            if (a.required && b.required) {
+              return a.name.localeCompare(b.name);
+            }
+
+            if (a.required) {
+              return -1;
+            }
+
+            if (b.required) {
+              return 1;
+            }
+
+            return a.name.localeCompare(b.name);
+          })
+      });
+      assert.deepEqual(Object.keys(parsed.props), ['m', 'z', 'a']);
     });
   });
 

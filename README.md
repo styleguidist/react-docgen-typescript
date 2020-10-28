@@ -144,6 +144,24 @@ If set to false the docs for the `children` prop will be generated even without 
 
 If set to true, types that are optional will not display " | undefined" in the type.
 
+### `sort`: boolean (default: `false`)
+
+Either set to `true` to sort alphabetically or provide a function to control the sorting.
+This function should take an array of prop items and return them how you want the props sorted.
+
+```ts
+interface PropItem {
+  name: string;
+  required: boolean;
+  type: PropItemType;
+  description: string;
+  defaultValue: any;
+  parent?: ParentType;
+}
+
+(props: PropItem[]) => PropItem[];
+```
+
 ### `savePropValueAsString`: boolean
 
 If set to true, defaultValue to props will be string.

@@ -3,17 +3,12 @@ import * as path from 'path';
 import * as ts from 'typescript';
 
 import { buildFilter } from './buildFilter';
-import { symbol } from 'prop-types';
-import { check } from './__tests__/testUtils';
 
 // We'll use the currentDirectoryName to trim parent fileNames
 const currentDirectoryPath = process.cwd();
 const currentDirectoryParts = currentDirectoryPath.split(path.sep);
 const currentDirectoryName =
   currentDirectoryParts[currentDirectoryParts.length - 1];
-export interface StringIndexedObject<T> {
-  [key: string]: T;
-}
 
 export interface ComponentDoc {
   displayName: string;
@@ -22,7 +17,7 @@ export interface ComponentDoc {
   methods: Method[];
 }
 
-export interface Props extends StringIndexedObject<PropItem> {}
+export interface Props extends Record<string, PropItem> {}
 
 export interface PropItem {
   name: string;
@@ -77,6 +72,8 @@ export type ComponentNameResolver = (
   source: ts.SourceFile
 ) => string | undefined | null | false;
 
+type SortFunction = (prop: PropItem[]) => PropItem[];
+
 export interface ParserOptions {
   propFilter?: StaticPropFilter | PropFilter;
   componentNameResolver?: ComponentNameResolver;
@@ -85,6 +82,7 @@ export interface ParserOptions {
   shouldExtractValuesFromUnion?: boolean;
   skipChildrenPropWithoutDoc?: boolean;
   savePropValueAsString?: boolean;
+  sort?: true | SortFunction;
 }
 
 export interface StaticPropFilter {
@@ -142,9 +140,7 @@ export function withCustomConfig(
 
   if (error !== undefined) {
     // tslint:disable-next-line: max-line-length
-    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${
-      error.code
-    }, message: ${error.messageText}`;
+    const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${error.code}, message: ${error.messageText}`;
     throw new Error(errorText);
   }
 
@@ -196,7 +192,7 @@ const isOptional = (prop: ts.Symbol) =>
 interface JSDoc {
   description: string;
   fullComment: string;
-  tags: StringIndexedObject<string>;
+  tags: Record<string, string>;
 }
 
 const defaultJSDoc: JSDoc = {
@@ -205,6 +201,9 @@ const defaultJSDoc: JSDoc = {
   tags: {}
 };
 
+const defaultSort: SortFunction = (props: PropItem[]) =>
+  props.sort((a, b) => a.name.localeCompare(b.name));
+
 export class Parser {
   private checker: ts.TypeChecker;
   private propFilter: PropFilter;
@@ -212,13 +211,15 @@ export class Parser {
   private shouldExtractLiteralValuesFromEnum: boolean;
   private shouldExtractValuesFromUnion: boolean;
   private savePropValueAsString: boolean;
+  private sort: SortFunction;
 
   constructor(program: ts.Program, opts: ParserOptions) {
     const {
       savePropValueAsString,
       shouldExtractLiteralValuesFromEnum,
       shouldRemoveUndefinedFromOptional,
-      shouldExtractValuesFromUnion
+      shouldExtractValuesFromUnion,
+      sort
     } = opts;
     this.checker = program.getTypeChecker();
     this.propFilter = buildFilter(opts);
@@ -228,6 +229,10 @@ export class Parser {
     this.shouldRemoveUndefinedFromOptional = Boolean(
       shouldRemoveUndefinedFromOptional
     );
+    this.sort =
+      (sort === true && defaultSort) ||
+      (typeof sort === 'function' && sort) ||
+      ((props: PropItem[]) => props);
     this.shouldExtractValuesFromUnion = Boolean(shouldExtractValuesFromUnion);
     this.savePropValueAsString = Boolean(savePropValueAsString);
   }
@@ -585,7 +590,7 @@ export class Parser {
 
   public getPropsInfo(
     propsObj: ts.Symbol,
-    defaultProps: StringIndexedObject<string> = {}
+    defaultProps: Record<string, string> = {}
   ): Props {
     if (!propsObj.valueDeclaration) {
       return {};
@@ -622,7 +627,7 @@ export class Parser {
 
     const result: Props = {};
 
-    propertiesOfProps.forEach(prop => {
+    const allProps = propertiesOfProps.map(prop => {
       const propName = prop.getName();
 
       // Find type of prop by looking in context of the props object itself.
@@ -660,7 +665,7 @@ export class Parser {
           }
         : this.getDocgenType(propType, required);
 
-      result[propName] = {
+      return {
         defaultValue,
         description: jsDocComment.fullComment,
         name: propName,
@@ -668,6 +673,10 @@ export class Parser {
         required,
         type
       };
+    });
+
+    this.sort(allProps).forEach(prop => {
+      result[prop.name] = prop;
     });
 
     return result;
@@ -714,7 +723,7 @@ export class Parser {
     const tags = symbol.getJsDocTags() || [];
 
     const tagComments: string[] = [];
-    const tagMap: StringIndexedObject<string> = {};
+    const tagMap: Record<string, string> = {};
 
     tags.forEach(tag => {
       const trimmedText = (tag.text || '').trim();
@@ -818,9 +827,9 @@ export class Parser {
         let propMap = {};
 
         if (properties) {
-          propMap = this.getPropMap(properties as ts.NodeArray<
-            ts.PropertyAssignment
-          >);
+          propMap = this.getPropMap(
+            properties as ts.NodeArray<ts.PropertyAssignment>
+          );
         }
 
         return {
@@ -850,9 +859,9 @@ export class Parser {
           if (right) {
             const { properties } = right as ts.ObjectLiteralExpression;
             if (properties) {
-              propMap = this.getPropMap(properties as ts.NodeArray<
-                ts.PropertyAssignment
-              >);
+              propMap = this.getPropMap(
+                properties as ts.NodeArray<ts.PropertyAssignment>
+              );
             }
           }
         });
@@ -954,32 +963,27 @@ export class Parser {
 
   public getPropMap(
     properties: ts.NodeArray<ts.PropertyAssignment | ts.BindingElement>
-  ): StringIndexedObject<string | boolean | number | null> {
-    const propMap = properties.reduce(
-      (acc, property) => {
-        if (ts.isSpreadAssignment(property) || !property.name) {
-          return acc;
-        }
-
-        const literalValue = this.getLiteralValueFromPropertyAssignment(
-          property
-        );
-        const propertyName = getPropertyName(property.name);
-
-        if (
-          (typeof literalValue === 'string' ||
-            typeof literalValue === 'number' ||
-            typeof literalValue === 'boolean' ||
-            literalValue === null) &&
-          propertyName !== null
-        ) {
-          acc[propertyName] = literalValue;
-        }
-
+  ): Record<string, string | boolean | number | null> {
+    const propMap = properties.reduce((acc, property) => {
+      if (ts.isSpreadAssignment(property) || !property.name) {
         return acc;
-      },
-      {} as StringIndexedObject<string | boolean | number | null>
-    );
+      }
+
+      const literalValue = this.getLiteralValueFromPropertyAssignment(property);
+      const propertyName = getPropertyName(property.name);
+
+      if (
+        (typeof literalValue === 'string' ||
+          typeof literalValue === 'number' ||
+          typeof literalValue === 'boolean' ||
+          literalValue === null) &&
+        propertyName !== null
+      ) {
+        acc[propertyName] = literalValue;
+      }
+
+      return acc;
+    }, {} as Record<string, string | boolean | number | null>);
 
     return propMap;
   }
