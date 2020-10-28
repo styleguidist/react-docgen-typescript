@@ -10,7 +10,11 @@ export function buildFilter(opts: ParserOptions): PropFilter {
   return (prop: PropItem, component: Component) => {
     const { propFilter } = opts;
     // skip children property in case it has no custom documentation
-    if (prop.name === 'children' && prop.description.length === 0) {
+    if (
+      prop.name === 'children' &&
+      prop.description.length === 0 &&
+      opts.skipChildrenPropWithoutDoc !== false
+    ) {
       return false;
     }
     if (typeof propFilter === 'function') {
