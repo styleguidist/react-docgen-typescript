@@ -741,11 +741,11 @@ describe('parser', () => {
     });
   });
 
-  it("should parse functional component component defined as function as default export", () => {
-    check("FunctionDeclarationAsDefaultExport", {
+  it('should parse functional component component defined as function as default export', () => {
+    check('FunctionDeclarationAsDefaultExport', {
       Jumbotron: {
-        prop1: { type: "string", required: true },
-      },
+        prop1: { type: 'string', required: true }
+      }
     });
   });
 

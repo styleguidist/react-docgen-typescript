@@ -16,9 +16,9 @@ export interface StatelessWithDefaultPropsAsStringProps {
   sampleUndefined?: undefined;
 }
 
-export const StatelessWithDefaultPropsAsString: React.StatelessComponent<
-  StatelessWithDefaultPropsAsStringProps
-> = props => <div>test</div>;
+export const StatelessWithDefaultPropsAsString: React.StatelessComponent<StatelessWithDefaultPropsAsStringProps> = props => (
+  <div>test</div>
+);
 
 StatelessWithDefaultPropsAsString.defaultProps = {
   sampleFalse: false,

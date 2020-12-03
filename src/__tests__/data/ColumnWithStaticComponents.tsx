@@ -6,7 +6,9 @@ interface LabelProps {
 }
 
 /** Column.Label description */
-const SubComponent = (props: LabelProps) => <div>My Property = {props.title}</div>;
+const SubComponent = (props: LabelProps) => (
+  <div>My Property = {props.title}</div>
+);
 
 /**
  * Column properties.
@@ -24,8 +26,8 @@ export class Column extends React.Component<IColumnProps, {}> {
 
   /** Column.SubLabel description */
   public static SubLabel() {
-    return <div>sub</div>
-  };
+    return <div>sub</div>;
+  }
 
   public render() {
     const { prop1 } = this.props;

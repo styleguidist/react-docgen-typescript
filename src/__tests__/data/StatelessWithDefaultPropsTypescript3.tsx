@@ -31,9 +31,9 @@ export interface StatelessWithDefaultPropsProps {
 }
 
 /** StatelessWithDefaultProps description */
-export const StatelessWithDefaultProps: React.StatelessComponent<
-  StatelessWithDefaultPropsProps
-> = props => <div>test</div>;
+export const StatelessWithDefaultProps: React.StatelessComponent<StatelessWithDefaultPropsProps> = props => (
+  <div>test</div>
+);
 
 StatelessWithDefaultProps.defaultProps = {
   sampleEnum: enumSample.HELLO,
