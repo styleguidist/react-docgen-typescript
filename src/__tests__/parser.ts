@@ -12,8 +12,6 @@ import {
 import { check, checkComponent, fixturePath } from './testUtils';
 
 describe('parser', () => {
-  const children = { type: 'ReactNode', required: false, description: '' };
-
   it('should parse simple react class component', () => {
     check('Column', {
       Column: {
@@ -984,6 +982,39 @@ describe('parser', () => {
             { propFilter }
           );
         });
+      });
+
+      it('should allow filtering by parent interfaces', () => {
+        const propFilter: PropFilter = prop => {
+          if (prop.parents !== undefined && prop.parents.length > 0) {
+            const hasPropAdditionalDescription = prop.parents.find(parent => {
+              return !parent.fileName.includes('@types/react');
+            });
+
+            return Boolean(hasPropAdditionalDescription);
+          }
+
+          return true;
+        };
+
+        check(
+          'ButtonWithOnClickComponent',
+          {
+            ButtonWithOnClickComponent: {
+              onClick: {
+                type:
+                  '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void',
+                required: false,
+                description: 'onClick event handler'
+              }
+            }
+          },
+          true,
+          '',
+          {
+            propFilter
+          }
+        );
       });
 
       describe('skipPropsWithName', () => {

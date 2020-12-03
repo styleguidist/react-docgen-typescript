@@ -3,8 +3,6 @@ import * as path from 'path';
 import * as ts from 'typescript';
 
 import { buildFilter } from './buildFilter';
-import { symbol } from 'prop-types';
-import { check } from './__tests__/testUtils';
 
 // We'll use the currentDirectoryName to trim parent fileNames
 const currentDirectoryPath = process.cwd();
@@ -32,6 +30,7 @@ export interface PropItem {
   description: string;
   defaultValue: any;
   parent?: ParentType;
+  parents?: ParentType[];
 }
 
 export interface Method {
@@ -643,6 +642,7 @@ export class Parser {
       }
 
       const parent = getParentType(prop);
+      const parents = getParentsType(prop);
       const declarations = prop.declarations || [];
       const baseProp = baseProps.find(p => p.getName() === propName);
 
@@ -665,6 +665,7 @@ export class Parser {
         description: jsDocComment.fullComment,
         name: propName,
         parent,
+        parents,
         required,
         type
       };
@@ -1137,6 +1138,70 @@ export function getDefaultExportForFile(source: ts.SourceFile) {
   return identifier.length ? identifier : 'DefaultName';
 }
 
+function isTypeLiteral(node: ts.Node): node is ts.TypeLiteralNode {
+  return node.kind === ts.SyntaxKind.TypeLiteral;
+}
+
+function getParentsType(prop: ts.Symbol): ParentType[] | undefined {
+  const declarations = prop.getDeclarations();
+
+  if (declarations === undefined || declarations.length === 0) {
+    return undefined;
+  }
+
+  const parents: ParentType[] = [];
+
+  for (let declaration of declarations) {
+    const { parent } = declaration;
+
+    if (!isTypeLiteral(parent) && !isInterfaceOrTypeAliasDeclaration(parent)) {
+      continue;
+    }
+
+    type InterfaceOrTypeAlias =
+      | ts.TypeAliasDeclaration
+      | ts.InterfaceDeclaration;
+
+    const parentName =
+      'name' in parent
+        ? (parent as InterfaceOrTypeAlias).name.text
+        : 'TypeLiteral';
+    const { fileName } = (parent as
+      | InterfaceOrTypeAlias
+      | ts.TypeLiteralNode).getSourceFile();
+
+    parents.push({
+      fileName: trimFileName(fileName),
+      name: parentName
+    });
+  }
+
+  return parents;
+}
+
+function trimFileName(fileName: string) {
+  const fileNameParts = fileName.split('/');
+  const trimmedFileNameParts = fileNameParts.slice();
+
+  while (trimmedFileNameParts.length) {
+    if (trimmedFileNameParts[0] === currentDirectoryName) {
+      break;
+    }
+    trimmedFileNameParts.splice(0, 1);
+  }
+  let trimmedFileName;
+  if (trimmedFileNameParts.length) {
+    trimmedFileName = trimmedFileNameParts.join('/');
+  } else {
+    trimmedFileName = fileName;
+  }
+
+  return trimmedFileName;
+}
+
+/**
+ * @deprecated
+ */
 function getParentType(prop: ts.Symbol): ParentType | undefined {
   const declarations = prop.getDeclarations();
 
@@ -1154,24 +1219,8 @@ function getParentType(prop: ts.Symbol): ParentType | undefined {
   const parentName = parent.name.text;
   const { fileName } = parent.getSourceFile();
 
-  const fileNameParts = fileName.split('/');
-  const trimmedFileNameParts = fileNameParts.slice();
-
-  while (trimmedFileNameParts.length) {
-    if (trimmedFileNameParts[0] === currentDirectoryName) {
-      break;
-    }
-    trimmedFileNameParts.splice(0, 1);
-  }
-  let trimmedFileName;
-  if (trimmedFileNameParts.length) {
-    trimmedFileName = trimmedFileNameParts.join('/');
-  } else {
-    trimmedFileName = fileName;
-  }
-
   return {
-    fileName: trimmedFileName,
+    fileName: trimFileName(fileName),
     name: parentName
   };
 }
