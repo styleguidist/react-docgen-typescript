@@ -326,13 +326,13 @@ export class Parser {
       this.extractPropsFromTypeIfStatelessComponent(type) ||
       this.extractPropsFromTypeIfStatefulComponent(type);
 
-    const nameSource = originalName === 'default' ? rootExp : commentSource;
-    const resolvedComponentName = componentNameResolver(nameSource, source);
+    const resolvedComponentName = componentNameResolver(commentSource, source);
     const { description, tags } = this.findDocComment(commentSource);
+
     const displayName =
       resolvedComponentName ||
       tags.visibleName ||
-      computeComponentName(nameSource, source);
+      computeComponentName(commentSource, source);
     const methods = this.getMethodsInfo(type);
 
     if (propsType) {
