@@ -506,7 +506,7 @@ describe('parser', () => {
   it('should parse react stateless component with generic intersection + union overlap props - simple', () => {
     check('SimpleGenericUnionIntersection', {
       SimpleGenericUnionIntersection: {
-        as: { type: 'T', description: '' },
+        as: { type: 'any', description: '' },
         foo: {
           description:
             'The foo prop should not repeat the description\nThe foo prop should not repeat the description',
@@ -528,7 +528,7 @@ describe('parser', () => {
     check('ComplexGenericUnionIntersection', {
       ComplexGenericUnionIntersection: {
         as: {
-          type: 'E',
+          type: 'ElementType<any>',
           required: false,
           description: 'Render the component as another component'
         },
@@ -558,7 +558,7 @@ describe('parser', () => {
     check('ComplexGenericUnionIntersectionWithOmit', {
       ComplexGenericUnionIntersectionWithOmit: {
         as: {
-          type: 'E',
+          type: 'ElementType<any>',
           required: false,
           description: 'Render the component as another component'
         },
@@ -741,11 +741,11 @@ describe('parser', () => {
     });
   });
 
-  it("should parse functional component component defined as function as default export", () => {
-    check("FunctionDeclarationAsDefaultExport", {
+  it('should parse functional component component defined as function as default export', () => {
+    check('FunctionDeclarationAsDefaultExport', {
       Jumbotron: {
-        prop1: { type: "string", required: true },
-      },
+        prop1: { type: 'string', required: true }
+      }
     });
   });
 
@@ -1102,6 +1102,58 @@ describe('parser', () => {
           {
             shouldExtractLiteralValuesFromEnum: true
           }
+        );
+      });
+
+      it('Should infer types from constraint type (generic with extends)', () => {
+        check(
+          'GenericWithExtends',
+          {
+            GenericWithExtends: {
+              sampleUnionProp: {
+                raw: 'SampleUnion',
+                type: 'enum',
+                value: [
+                  {
+                    value: '"value 1"'
+                  },
+                  {
+                    value: '"value 2"'
+                  },
+                  {
+                    value: '"value 3"'
+                  },
+                  {
+                    value: '"value 4"'
+                  },
+                  {
+                    value: '"value n"'
+                  }
+                ]
+              },
+              sampleUnionNonGeneric: {
+                type: 'SampleUnionNonGeneric'
+              },
+              sampleObjectProp: {
+                type: 'SampleObject'
+              },
+              sampleNumberProp: {
+                type: 'number'
+              },
+              sampleGenericArray: {
+                type: 'number[]'
+              },
+              sampleGenericObject: {
+                type: '{ prop1: number; }'
+              },
+              sampleInlineObject: {
+                type: '{ propA: string; }'
+              }
+            }
+          },
+          true,
+          null,
+          { shouldExtractLiteralValuesFromEnum: true }
         );
       });
     });
