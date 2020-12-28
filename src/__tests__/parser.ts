@@ -984,12 +984,41 @@ describe('parser', () => {
         });
       });
 
-      it('should allow filtering by parent interfaces', () => {
+      it('should collect all `onClick prop` parent declarations', done => {
+        assert.doesNotThrow(() => {
+          withDefaultConfig({
+            propFilter: prop => {
+              if (prop.name === 'onClick') {
+                assert.deepEqual(prop.declarations, [
+                  {
+                    fileName:
+                      'react-docgen-typescript/node_modules/@types/react/index.d.ts',
+                    name: 'DOMAttributes'
+                  },
+                  {
+                    fileName:
+                      'react-docgen-typescript/src/__tests__/data/ButtonWithOnClickComponent.tsx',
+                    name: 'TypeLiteral'
+                  }
+                ]);
+
+                done();
+              }
+
+              return true;
+            }
+          }).parse(fixturePath('ButtonWithOnClickComponent'));
+        });
+      });
+
+      it('should allow filtering by parent declarations', () => {
         const propFilter: PropFilter = prop => {
-          if (prop.parents !== undefined && prop.parents.length > 0) {
-            const hasPropAdditionalDescription = prop.parents.find(parent => {
-              return !parent.fileName.includes('@types/react');
-            });
+          if (prop.declarations !== undefined && prop.declarations.length > 0) {
+            const hasPropAdditionalDescription = prop.declarations.find(
+              declaration => {
+                return !declaration.fileName.includes('@types/react');
+              }
+            );
 
             return Boolean(hasPropAdditionalDescription);
           }

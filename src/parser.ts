@@ -9,6 +9,10 @@ const currentDirectoryPath = process.cwd();
 const currentDirectoryParts = currentDirectoryPath.split(path.sep);
 const currentDirectoryName =
   currentDirectoryParts[currentDirectoryParts.length - 1];
+
+type InterfaceOrTypeAliasDeclaration =
+  | ts.TypeAliasDeclaration
+  | ts.InterfaceDeclaration;
 export interface StringIndexedObject<T> {
   [key: string]: T;
 }
@@ -30,7 +34,7 @@ export interface PropItem {
   description: string;
   defaultValue: any;
   parent?: ParentType;
-  parents?: ParentType[];
+  declarations?: ParentType[];
 }
 
 export interface Method {
@@ -642,7 +646,7 @@ export class Parser {
       }
 
       const parent = getParentType(prop);
-      const parents = getParentsType(prop);
+      const parents = getDeclarations(prop);
       const declarations = prop.declarations || [];
       const baseProp = baseProps.find(p => p.getName() === propName);
 
@@ -665,7 +669,7 @@ export class Parser {
         description: jsDocComment.fullComment,
         name: propName,
         parent,
-        parents,
+        declarations: parents,
         required,
         type
       };
@@ -1142,7 +1146,7 @@ function isTypeLiteral(node: ts.Node): node is ts.TypeLiteralNode {
   return node.kind === ts.SyntaxKind.TypeLiteral;
 }
 
-function getParentsType(prop: ts.Symbol): ParentType[] | undefined {
+function getDeclarations(prop: ts.Symbol): ParentType[] | undefined {
   const declarations = prop.getDeclarations();
 
   if (declarations === undefined || declarations.length === 0) {
@@ -1158,16 +1162,13 @@ function getParentsType(prop: ts.Symbol): ParentType[] | undefined {
       continue;
     }
 
-    type InterfaceOrTypeAlias =
-      | ts.TypeAliasDeclaration
-      | ts.InterfaceDeclaration;
-
     const parentName =
       'name' in parent
-        ? (parent as InterfaceOrTypeAlias).name.text
+        ? (parent as InterfaceOrTypeAliasDeclaration).name.text
         : 'TypeLiteral';
+
     const { fileName } = (parent as
-      | InterfaceOrTypeAlias
+      | InterfaceOrTypeAliasDeclaration
       | ts.TypeLiteralNode).getSourceFile();
 
     parents.push({
@@ -1199,9 +1200,6 @@ function trimFileName(fileName: string) {
   return trimmedFileName;
 }
 
-/**
- * @deprecated
- */
 function getParentType(prop: ts.Symbol): ParentType | undefined {
   const declarations = prop.getDeclarations();
 
