@@ -109,9 +109,9 @@ type PropFilter = (prop: PropItem, component: Component) => boolean;
 
 const options = {
   propFilter: (prop: PropItem, component: Component) => {
-    if (prop.parents !== undefined && prop.parents.length > 0) {
-      const hasPropAdditionalDescription = prop.parents.find((parent) => {
-        return !parent.fileName.includes("node_modules");
+    if (prop.declarations !== undefined && prop.declarations.length > 0) {
+      const hasPropAdditionalDescription = prop.declarations.find((declaration) => {
+        return !declaration.fileName.includes("node_modules");
       });
 
       return Boolean(hasPropAdditionalDescription);
