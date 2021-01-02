@@ -548,6 +548,12 @@ export class Parser {
   }
 
   public getDocgenType(propType: ts.Type, isRequired: boolean): PropItemType {
+    // When we are going to process the type, we check if this type has a constraint (is a generic type with constraint)
+    if (propType.getConstraint()) {
+      // If so, we assing the property the type that is the constraint
+      propType = propType.getConstraint()!;
+    }
+
     let propTypeString = this.checker.typeToString(propType);
 
     if (propType.isUnion()) {
