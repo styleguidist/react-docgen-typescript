@@ -7,6 +7,5 @@ export interface StatelessProps {
 }
 
 /** StatelessIntersectionExternalProps description */
-export const StatelessIntersectionExternalProps: React.SFC<
-  StatelessProps & ExternalOptionalComponentProps
-> = props => <div />;
+export const StatelessIntersectionExternalProps: React.SFC<StatelessProps &
+  ExternalOptionalComponentProps> = props => <div />;

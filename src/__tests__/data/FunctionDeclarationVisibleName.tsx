@@ -8,7 +8,7 @@ export interface JumbotronProps {
 
 /**
  * Awesome Jumbotron description
- * 
+ *
  * @visibleName Awesome Jumbotron
  */
 export function Jumbotron(props: JumbotronProps) {

@@ -7,8 +7,7 @@ export interface HOCProps {
 }
 
 /** HOCIntersectionProps description */
-export const HOCIntersectionProps: React.SFC<
-  HOCProps & HOCInjectedProps
-> = props => <div />;
+export const HOCIntersectionProps: React.SFC<HOCProps &
+  HOCInjectedProps> = props => <div />;
 
 export default withHOC({})(HOCIntersectionProps);

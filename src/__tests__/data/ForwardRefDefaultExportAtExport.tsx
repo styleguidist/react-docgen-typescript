@@ -6,8 +6,9 @@ export interface ForwardRefDefaultExportProps {
 }
 
 /** ForwardRefDefaultExport description */
-const ForwardRefDefaultExport = (props: ForwardRefDefaultExportProps, ref: React.Ref<HTMLDivElement>) => (
-  <div ref={ref}>My Property = {props.myProp}</div>
-)
+const ForwardRefDefaultExport = (
+  props: ForwardRefDefaultExportProps,
+  ref: React.Ref<HTMLDivElement>
+) => <div ref={ref}>My Property = {props.myProp}</div>;
 
 export default React.forwardRef(ForwardRefDefaultExport);

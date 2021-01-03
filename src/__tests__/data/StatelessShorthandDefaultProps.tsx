@@ -10,9 +10,9 @@ export interface StatelessShorthandDefaultPropsProps {
 }
 
 /** StatelessShorthandDefaultProps description */
-export const StatelessShorthandDefaultProps: React.SFC<
-  StatelessShorthandDefaultPropsProps
-> = props => <div />;
+export const StatelessShorthandDefaultProps: React.SFC<StatelessShorthandDefaultPropsProps> = props => (
+  <div />
+);
 
 const shorthandProp = 123;
 

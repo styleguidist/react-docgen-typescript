@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 
 interface LabelProps {
   /** title description */
@@ -6,7 +6,9 @@ interface LabelProps {
 }
 
 /** StatelessStaticComponents.Label description */
-const SubComponent = (props: LabelProps) => <div>My Property = {props.title}</div>;
+const SubComponent = (props: LabelProps) => (
+  <div>My Property = {props.title}</div>
+);
 
 interface StatelessStaticComponentsProps {
   /** myProp description */
@@ -14,8 +16,8 @@ interface StatelessStaticComponentsProps {
 }
 
 /** StatelessStaticComponents description */
-export const StatelessStaticComponents = (props: StatelessStaticComponentsProps) => (
-  <div>My Property = {props.myProp}</div>
-);
+export const StatelessStaticComponents = (
+  props: StatelessStaticComponentsProps
+) => <div>My Property = {props.myProp}</div>;
 
 StatelessStaticComponents.Label = SubComponent;

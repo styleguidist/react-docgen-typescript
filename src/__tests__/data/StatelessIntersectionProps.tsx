@@ -11,6 +11,5 @@ export interface StatelessMoreProps {
 }
 
 /** StatelessIntersectionProps description */
-export const StatelessIntersectionProps: React.SFC<
-  StatelessProps & StatelessMoreProps
-> = props => <div />;
+export const StatelessIntersectionProps: React.SFC<StatelessProps &
+  StatelessMoreProps> = props => <div />;

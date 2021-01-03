@@ -5,6 +5,6 @@ export interface StatelessWithDefaultOnlyJsDocProps {
   myProp: string;
 }
 /** StatelessWithDefaultOnlyJsDoc description */
-export const StatelessWithDefaultOnlyJsDoc: React.StatelessComponent<
-  StatelessWithDefaultOnlyJsDocProps
-> = props => <div>My Property = {props.myProp}</div>;
+export const StatelessWithDefaultOnlyJsDoc: React.StatelessComponent<StatelessWithDefaultOnlyJsDocProps> = props => (
+  <div>My Property = {props.myProp}</div>
+);
