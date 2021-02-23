@@ -1,6 +1,11 @@
 //In our case we have a component that works like the foolowing
 
 type SampleUnion = 'value 1' | 'value 2' | 'value 3' | 'value 4' | 'value n';
+enum SampleEnum {
+  A,
+  B,
+  C = 'c'
+}
 type SampleObject = {
   propA: string;
   propB: object;
@@ -15,11 +20,14 @@ class SampleUnionNonGeneric extends Base {
 
 export const GenericWithExtends = <
   G extends SampleUnion,
+  E extends SampleEnum,
   A extends number[],
   O extends { prop1: number }
 >(props: {
   /** sampleUnionProp description */
   sampleUnionProp: G;
+  /** sampleEnumProp description */
+  sampleEnumProp: E;
   /** sampleUnionNonGeneric description */
   sampleUnionNonGeneric: SampleUnionNonGeneric;
   /** sampleObjectProp description */

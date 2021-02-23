@@ -566,7 +566,10 @@ export class Parser {
           propType.types.every(
             type =>
               type.getFlags() &
-              (ts.TypeFlags.EnumLiteral | ts.TypeFlags.Undefined)
+              (ts.TypeFlags.StringLiteral |
+                ts.TypeFlags.NumberLiteral |
+                ts.TypeFlags.EnumLiteral |
+                ts.TypeFlags.Undefined)
           ))
       ) {
         return {
