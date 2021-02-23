@@ -560,26 +560,20 @@ export class Parser {
     let propTypeString = this.checker.typeToString(propType);
 
     if (propType.isUnion()) {
-      if (this.shouldExtractValuesFromUnion) {
-        return {
-          name: 'enum',
-          raw: propTypeString,
-          value: propType.types.map(type => ({
-            value: this.getValuesFromUnionType(type)
-          }))
-        };
-      }
       if (
-        this.shouldExtractLiteralValuesFromEnum &&
-        propType.types.every(type => type.isStringLiteral())
+        this.shouldExtractValuesFromUnion ||
+        (this.shouldExtractLiteralValuesFromEnum &&
+          propType.types.every(
+            type =>
+              type.getFlags() &
+              (ts.TypeFlags.EnumLiteral | ts.TypeFlags.Undefined)
+          ))
       ) {
         return {
           name: 'enum',
           raw: propTypeString,
           value: propType.types.map(type => ({
-            value: type.isStringLiteral()
-              ? `"${type.value}"`
-              : this.checker.typeToString(type)
+            value: this.getValuesFromUnionType(type)
           }))
         };
       }
