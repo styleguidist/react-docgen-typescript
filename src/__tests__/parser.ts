@@ -213,6 +213,28 @@ describe('parser', () => {
     });
   });
 
+  it('should parse static sub components on default function exports', () => {
+    check('StatelessStaticComponentsDefaultFunctionExport', {
+      StatelessStaticComponentsDefaultFunctionExport: {
+        myProp: { type: 'string' }
+      },
+      'StatelessStaticComponentsDefaultFunctionExport.Label': {
+        title: { type: 'string' }
+      }
+    });
+  });
+
+  it.only('should parse static sub components on default exports', () => {
+    check('StatelessStaticComponentsDefaultExport', {
+      StatelessStaticComponentsDefaultExport: {
+        myProp: { type: 'string' }
+      },
+      'StatelessStaticComponentsDefaultExport.Label': {
+        title: { type: 'string' }
+      }
+    });
+  });
+
   it('should parse react component with properties extended from an external .tsx file', () => {
     check('ExtendsExternalPropsComponent', {
       ExtendsExternalPropsComponent: {
@@ -741,11 +763,11 @@ describe('parser', () => {
     });
   });
 
-  it("should parse functional component component defined as function as default export", () => {
-    check("FunctionDeclarationAsDefaultExport", {
+  it('should parse functional component component defined as function as default export', () => {
+    check('FunctionDeclarationAsDefaultExport', {
       Jumbotron: {
-        prop1: { type: "string", required: true },
-      },
+        prop1: { type: 'string', required: true }
+      }
     });
   });
 
