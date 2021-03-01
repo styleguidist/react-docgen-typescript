@@ -1191,6 +1191,21 @@ describe('parser', () => {
                   }
                 ]
               },
+              sampleEnumProp: {
+                raw: 'SampleEnum',
+                type: 'enum',
+                value: [
+                  {
+                    value: '0'
+                  },
+                  {
+                    value: '1'
+                  },
+                  {
+                    value: '"c"'
+                  }
+                ]
+              },
               sampleUnionNonGeneric: {
                 type: 'SampleUnionNonGeneric'
               },
