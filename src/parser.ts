@@ -35,6 +35,7 @@ export interface PropItem {
   defaultValue: any;
   parent?: ParentType;
   declarations?: ParentType[];
+  tags?: {};
 }
 
 export interface Method {
@@ -89,6 +90,7 @@ export interface ParserOptions {
   shouldExtractValuesFromUnion?: boolean;
   skipChildrenPropWithoutDoc?: boolean;
   savePropValueAsString?: boolean;
+  shouldIncludePropTagMap?: boolean;
 }
 
 export interface StaticPropFilter {
@@ -214,13 +216,15 @@ export class Parser {
   private shouldExtractLiteralValuesFromEnum: boolean;
   private shouldExtractValuesFromUnion: boolean;
   private savePropValueAsString: boolean;
+  private shouldIncludePropTagMap: boolean;
 
   constructor(program: ts.Program, opts: ParserOptions) {
     const {
       savePropValueAsString,
       shouldExtractLiteralValuesFromEnum,
       shouldRemoveUndefinedFromOptional,
-      shouldExtractValuesFromUnion
+      shouldExtractValuesFromUnion,
+      shouldIncludePropTagMap
     } = opts;
     this.checker = program.getTypeChecker();
     this.propFilter = buildFilter(opts);
@@ -232,6 +236,7 @@ export class Parser {
     );
     this.shouldExtractValuesFromUnion = Boolean(shouldExtractValuesFromUnion);
     this.savePropValueAsString = Boolean(savePropValueAsString);
+    this.shouldIncludePropTagMap = Boolean(shouldIncludePropTagMap);
   }
 
   private getComponentFromExpression(exp: ts.Symbol) {
@@ -670,14 +675,22 @@ export class Parser {
           }
         : this.getDocgenType(propType, required);
 
+      const propTags = this.shouldIncludePropTagMap
+        ? { tags: jsDocComment.tags }
+        : {};
+      const description = this.shouldIncludePropTagMap
+        ? jsDocComment.description.replace(/\r\n/g, '\n')
+        : jsDocComment.fullComment.replace(/\r\n/g, '\n');
+
       result[propName] = {
         defaultValue,
-        description: jsDocComment.fullComment,
+        description: description,
         name: propName,
         parent,
         declarations: parents,
         required,
-        type
+        type,
+        ...propTags
       };
     });
 
@@ -719,7 +732,7 @@ export class Parser {
     );
 
     if (mainComment) {
-      mainComment = mainComment.replace('\r\n', '\n');
+      mainComment = mainComment.replace(/\r\n/g, '\n');
     }
 
     const tags = symbol.getJsDocTags() || [];

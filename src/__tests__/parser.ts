@@ -1526,4 +1526,30 @@ describe('parser', () => {
       );
     });
   });
+
+  it.only("should parse prop's JSDoc/TSDoc tags", () => {
+    check(
+      'ExtractPropTags',
+      {
+        ExtractPropTags: {
+          prop1: {
+            type: 'Pick<Todo, "title" | "completed">',
+            required: false,
+            tags: {
+              ignore: 'ignoreMe',
+              kind: 'category 2',
+              custom123: 'something'
+            }
+          },
+          prop2: {
+            type: 'string',
+            tags: { internal: 'some internal prop', kind: 'category 1' }
+          }
+        }
+      },
+      true,
+      null,
+      { shouldIncludePropTagMap: true }
+    );
+  });
 });
