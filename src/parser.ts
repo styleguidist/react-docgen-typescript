@@ -569,7 +569,17 @@ export class Parser {
               (ts.TypeFlags.StringLiteral |
                 ts.TypeFlags.NumberLiteral |
                 ts.TypeFlags.EnumLiteral |
+                ts.TypeFlags.BooleanLiteral |
                 ts.TypeFlags.Undefined)
+          ) &&
+          // `boolean` is parsed identically to `true | false`, so we make sure one of the types
+          // is something other than boolean or undefined before considering it an enum/union
+          propType.types.some(
+            type =>
+              !(
+                type.getFlags() &
+                (ts.TypeFlags.BooleanLiteral | ts.TypeFlags.Undefined)
+              )
           ))
       ) {
         return {

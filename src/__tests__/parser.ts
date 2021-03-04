@@ -1272,19 +1272,20 @@ describe('parser', () => {
           false,
           null,
           {
-            shouldExtractValuesFromUnion: true
+            shouldExtractLiteralValuesFromEnum: true
           }
         );
       });
-      it('extracts numbers and strings from a mixed union', () => {
+      it('extracts literal values from a mixed union', () => {
         check(
           'ExtractLiteralValuesFromUnion',
           {
             ExtractLiteralValuesFromUnion: {
               sampleMixedUnion: {
-                raw: '"string1" | "string2" | 1 | 2',
+                raw: 'false | "string1" | "string2" | 1 | 2',
                 type: 'enum',
                 value: [
+                  { value: 'false' },
                   { value: '"string1"' },
                   { value: '"string2"' },
                   { value: '1' },
@@ -1296,7 +1297,7 @@ describe('parser', () => {
           false,
           null,
           {
-            shouldExtractValuesFromUnion: true
+            shouldExtractLiteralValuesFromEnum: true
           }
         );
       });

@@ -8,7 +8,7 @@ interface ExtractLiteralValuesFromUnionProps {
   /** sampleComplexUnion description */
   sampleComplexUnion: number | 'string1' | 'string2';
   /** sampleMixedUnion description */
-  sampleMixedUnion: 1 | 2 | 'string1' | 'string2';
+  sampleMixedUnion: false | 1 | 2 | 'string1' | 'string2';
 }
 
 export const Stateless: React.StatelessComponent<ExtractLiteralValuesFromUnionProps> = props => (

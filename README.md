@@ -134,11 +134,29 @@ If a string is returned, then the component will use that name. Else it will fal
 
 ### `shouldExtractLiteralValuesFromEnum`: boolean
 
-If set to true, string enums and unions will be converted to docgen enum format. Useful if you use Storybook and want to generate knobs automatically using [addon-smart-knobs](https://github.com/storybookjs/addon-smart-knobs).
+If set to true, enums and unions of literal values will be converted to docgen enum format. Useful if you use Storybook and want to generate knobs automatically using [addon-smart-knobs](https://github.com/storybookjs/addon-smart-knobs). For example:
+
+```ts
+export function MyComponent(props: { myUnion: true | "a" | 1 }) {}
+
+// The type of `myUnion` with `shouldExtractLiteralValuesFromEnum: false`:
+{ name: 'true | "a" | 1' }
+
+// With `shouldExtractLiteralValuesFromEnum: true`:
+{
+  name: 'enum',
+  raw: 'true | "a" | 1',
+  value: [
+    { value: 'true' },
+    { value: '"a"' },
+    { value: '1' }
+  ]
+}
+```
 
 ### `shouldExtractValuesFromUnion`: boolean
 
-If set to true, every unions will be converted to docgen enum format.
+If set to true, all unions will be converted to docgen enum format.
 
 ### `skipChildrenPropWithoutDoc`: boolean (default: `true`)
 
