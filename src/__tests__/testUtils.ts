@@ -27,6 +27,9 @@ export interface ExpectedProp {
   };
   raw?: string;
   value?: any;
+  tags?: {
+    [key: string]: string;
+  };
 }
 
 export function fixturePath(componentName: string) {
@@ -179,6 +182,15 @@ export function checkComponent(
             `Property '${compName}.${expectedPropName}' value is different - expected: ${JSON.stringify(
               expectedValue
             )}, actual: ${JSON.stringify(prop.type.value)}`
+          );
+        }
+        const expectedPropTags = expectedProp.tags;
+        const propTags = prop.tags;
+        if (expectedPropTags && !isEqual(expectedPropTags, propTags)) {
+          errors.push(
+            `Property '${compName}.${expectedPropName}' tags are different - expected: ${JSON.stringify(
+              expectedPropTags
+            )}, actual: ${JSON.stringify(propTags)}`
           );
         }
       }
