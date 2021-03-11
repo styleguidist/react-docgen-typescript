@@ -1290,9 +1290,11 @@ function parseWithProgramProvider(
           parserOpts.componentNameResolver
         );
 
-        if (doc) {
-          componentDocs.push(doc);
+        if (!doc) {
+          return;
         }
+
+        componentDocs.push(doc);
 
         if (!exp.exports) {
           return;
@@ -1313,16 +1315,16 @@ function parseWithProgramProvider(
             }
           }
 
-          const doc = parser.getComponentInfo(
+          const subDoc = parser.getComponentInfo(
             symbol,
             sourceFile,
             parserOpts.componentNameResolver
           );
 
-          if (doc) {
+          if (subDoc) {
             componentDocs.push({
-              ...doc,
-              displayName: `${exp.escapedName}.${symbol.escapedName}`
+              ...subDoc,
+              displayName: `${doc.displayName}.${symbol.escapedName}`
             });
           }
         });
