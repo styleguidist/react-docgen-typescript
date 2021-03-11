@@ -180,6 +180,18 @@ describe('parser', () => {
     );
   });
 
+  it('should find name for default export', () => {
+    check(
+      'switch',
+      {
+        Switch: {
+          isActive: { type: 'boolean' }
+        }
+      },
+      false
+    );
+  });
+
   it('should parse react component with properties defined in external file', () => {
     check('ExternalPropsComponent', {
       ExternalPropsComponent: {
@@ -768,34 +780,6 @@ describe('parser', () => {
     );
   });
 
-  it('should parse functional component component defined as const as default export', () => {
-    check(
-      'FunctionalComponentAsConstAsDefaultExport',
-      {
-        // in this case the component name is taken from the file name
-        FunctionalComponentAsConstAsDefaultExport: {
-          prop1: { type: 'string', required: true }
-        }
-      },
-      true,
-      'Jumbotron description'
-    );
-  });
-
-  it('should parse React.SFC component defined as const as default export', () => {
-    check(
-      'ReactSFCAsConstAsDefaultExport',
-      {
-        // in this case the component name is taken from the file name
-        ReactSFCAsConstAsDefaultExport: {
-          prop1: { type: 'string', required: true }
-        }
-      },
-      true,
-      'Jumbotron description'
-    );
-  });
-
   it('should parse functional component component defined as const as named export', () => {
     check(
       'FunctionalComponentAsConstAsNamedExport',
@@ -814,7 +798,6 @@ describe('parser', () => {
     check(
       'ReactSFCAsConstAsNamedExport',
       {
-        // in this case the component name is taken from the file name
         Jumbotron: {
           prop1: { type: 'string', required: true }
         }
