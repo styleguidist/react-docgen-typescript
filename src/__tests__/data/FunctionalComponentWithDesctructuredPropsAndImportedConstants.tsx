@@ -23,8 +23,8 @@ type Props = {
   prop5?: boolean;
 };
 
-/** FunctionalComponentWithDesctructuredProps description */
-const FunctionalComponentWithDesctructuredProps: React.FC<Props> = ({
+/** FunctionalComponentWithDesctructuredPropsImportedConstants description */
+const FunctionalComponentWithDesctructuredPropsImportedConstants: React.FC<Props> = ({
   prop1 = PROPERTY1_DEFAULT,
   prop2 = PROPERTY2_DEFAULT,
   prop3 = PROPERTY3_DEFAULT,
@@ -32,4 +32,4 @@ const FunctionalComponentWithDesctructuredProps: React.FC<Props> = ({
   prop5 = PROPERTY5_DEFAULT
 }) => <div />;
 
-export default FunctionalComponentWithDesctructuredProps;
+export default FunctionalComponentWithDesctructuredPropsImportedConstants;
