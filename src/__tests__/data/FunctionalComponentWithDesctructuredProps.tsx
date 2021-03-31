@@ -1,12 +1,10 @@
 import * as React from 'react';
 
-import {
-  PROPERTY1_DEFAULT,
-  PROPERTY2_DEFAULT,
-  PROPERTY3_DEFAULT,
-  PROPERTY4_DEFAULT,
-  PROPERTY5_DEFAULT
-} from './FunctionalComponentWithDesctructuredPropsImportedConstants';
+const PROPERTY1_DEFAULT = 'hello';
+const PROPERTY2_DEFAULT = 'goodbye';
+const PROPERTY3_DEFAULT = 10;
+const PROPERTY4_DEFAULT = 'this is a string';
+const PROPERTY5_DEFAULT = true;
 
 type Property1Type = 'hello' | 'world';
 

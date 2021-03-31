@@ -6,7 +6,7 @@ import {
   PROPERTY3_DEFAULT,
   PROPERTY4_DEFAULT,
   PROPERTY5_DEFAULT
-} from './FunctionalComponentWithDesctructuredPropsImportedConstants';
+} from './FunctionalComponentWithDesctructuredProps.constants';
 
 type Property1Type = 'hello' | 'world';
 
@@ -23,8 +23,8 @@ type Props = {
   prop5?: boolean;
 };
 
-/** FunctionalComponentWithDesctructuredPropsImportedConstants description */
-const FunctionalComponentWithDesctructuredPropsImportedConstants: React.FC<Props> = ({
+/** FunctionalComponentWithDesctructuredPropsAndImportedConstants description */
+const FunctionalComponentWithDesctructuredPropsAndImportedConstants: React.FC<Props> = ({
   prop1 = PROPERTY1_DEFAULT,
   prop2 = PROPERTY2_DEFAULT,
   prop3 = PROPERTY3_DEFAULT,
@@ -32,4 +32,4 @@ const FunctionalComponentWithDesctructuredPropsImportedConstants: React.FC<Props
   prop5 = PROPERTY5_DEFAULT
 }) => <div />;
 
-export default FunctionalComponentWithDesctructuredPropsImportedConstants;
+export default FunctionalComponentWithDesctructuredPropsAndImportedConstants;
