@@ -742,9 +742,9 @@ describe('parser', () => {
           defaultValue: 'goodbye'
         },
         prop4: {
-          type: 'number',
+          type: 'boolean',
           required: false,
-          defaultValue: 100
+          defaultValue: true
         }
       }
     });
