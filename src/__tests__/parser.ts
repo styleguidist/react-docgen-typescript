@@ -723,6 +723,33 @@ describe('parser', () => {
     });
   });
 
+  it('should parse functional component component defined as const with default value assignments in immediately destructured props', () => {
+    check('FunctionalComponentWithDesctructuredProps', {
+      FunctionalComponentWithDesctructuredProps: {
+        prop1: {
+          type: '"hello" | "world"',
+          required: false,
+          defaultValue: 'hello'
+        },
+        prop2: {
+          type: 'number',
+          required: false,
+          defaultValue: 10
+        },
+        prop3: {
+          type: 'string',
+          required: false,
+          defaultValue: 'goodbye'
+        },
+        prop4: {
+          type: 'number',
+          required: false,
+          defaultValue: 100
+        }
+      }
+    });
+  });
+
   it('should parse functional component component defined as const', () => {
     check('FunctionDeclarationVisibleName', {
       'Awesome Jumbotron': {

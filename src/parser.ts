@@ -943,10 +943,21 @@ export class Parser {
       case ts.SyntaxKind.NullKeyword:
         return this.savePropValueAsString ? 'null' : null;
       case ts.SyntaxKind.Identifier:
-        // can potentially find other identifiers in the source and map those in the future
-        return (initializer as ts.Identifier).text === 'undefined'
-          ? 'undefined'
-          : null;
+        if ((initializer as ts.Identifier).text === 'undefined') {
+          return 'undefined';
+        }
+
+        const symbol = this.checker.getSymbolAtLocation(
+          initializer as ts.Identifier
+        );
+
+        if (symbol && symbol.declarations && symbol.declarations.length) {
+          return this.getLiteralValueFromPropertyAssignment(
+            symbol.declarations[0] as ts.BindingElement
+          );
+        }
+
+        return null;
       case ts.SyntaxKind.PropertyAccessExpression: {
         const symbol = this.checker.getSymbolAtLocation(
           initializer as ts.PropertyAccessExpression
