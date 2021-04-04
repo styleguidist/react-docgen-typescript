@@ -723,6 +723,70 @@ describe('parser', () => {
     });
   });
 
+  it('should parse functional component defined as const with default value assignments in immediately destructured props', () => {
+    check('FunctionalComponentWithDesctructuredProps', {
+      FunctionalComponentWithDesctructuredProps: {
+        prop1: {
+          type: 'Property1Type',
+          required: false,
+          defaultValue: 'hello'
+        },
+        prop2: {
+          type: '"goodbye" | "farewell"',
+          required: false,
+          defaultValue: 'goodbye'
+        },
+        prop3: {
+          type: 'number',
+          required: false,
+          defaultValue: 10
+        },
+        prop4: {
+          type: 'string',
+          required: false,
+          defaultValue: 'this is a string'
+        },
+        prop5: {
+          type: 'boolean',
+          required: false,
+          defaultValue: true
+        }
+      }
+    });
+  });
+
+  it('should parse functional component defined as const with default value (imported from a separate file) assignments in immediately destructured props', () => {
+    check('FunctionalComponentWithDesctructuredPropsAndImportedConstants', {
+      FunctionalComponentWithDesctructuredPropsAndImportedConstants: {
+        prop1: {
+          type: 'Property1Type',
+          required: false,
+          defaultValue: 'hello'
+        },
+        prop2: {
+          type: '"goodbye" | "farewell"',
+          required: false,
+          defaultValue: 'goodbye'
+        },
+        prop3: {
+          type: 'number',
+          required: false,
+          defaultValue: 10
+        },
+        prop4: {
+          type: 'string',
+          required: false,
+          defaultValue: 'this is a string'
+        },
+        prop5: {
+          type: 'boolean',
+          required: false,
+          defaultValue: true
+        }
+      }
+    });
+  });
+
   it('should parse functional component component defined as const', () => {
     check('FunctionDeclarationVisibleName', {
       'Awesome Jumbotron': {

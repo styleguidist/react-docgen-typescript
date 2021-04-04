@@ -911,6 +911,33 @@ export class Parser {
     }, {});
   }
 
+  public getLiteralValueFromImportSpecifier(
+    property: ts.ImportSpecifier
+  ): string | boolean | number | null | undefined {
+    if (ts.isImportSpecifier(property)) {
+      const symbol = this.checker.getSymbolAtLocation(property.name);
+
+      if (!symbol) {
+        return null;
+      }
+
+      const aliasedSymbol = this.checker.getAliasedSymbol(symbol);
+      if (
+        aliasedSymbol &&
+        aliasedSymbol.declarations &&
+        aliasedSymbol.declarations.length
+      ) {
+        return this.getLiteralValueFromPropertyAssignment(
+          aliasedSymbol.declarations[0] as ts.BindingElement
+        );
+      }
+
+      return null;
+    }
+
+    return null;
+  }
+
   public getLiteralValueFromPropertyAssignment(
     property: ts.PropertyAssignment | ts.BindingElement
   ): string | boolean | number | null | undefined {
@@ -952,10 +979,27 @@ export class Parser {
       case ts.SyntaxKind.NullKeyword:
         return this.savePropValueAsString ? 'null' : null;
       case ts.SyntaxKind.Identifier:
-        // can potentially find other identifiers in the source and map those in the future
-        return (initializer as ts.Identifier).text === 'undefined'
-          ? 'undefined'
-          : null;
+        if ((initializer as ts.Identifier).text === 'undefined') {
+          return 'undefined';
+        }
+
+        const symbol = this.checker.getSymbolAtLocation(
+          initializer as ts.Identifier
+        );
+
+        if (symbol && symbol.declarations && symbol.declarations.length) {
+          if (ts.isImportSpecifier(symbol.declarations[0])) {
+            return this.getLiteralValueFromImportSpecifier(
+              symbol.declarations[0] as ts.ImportSpecifier
+            );
+          }
+
+          return this.getLiteralValueFromPropertyAssignment(
+            symbol.declarations[0] as ts.BindingElement
+          );
+        }
+
+        return null;
       case ts.SyntaxKind.PropertyAccessExpression: {
         const symbol = this.checker.getSymbolAtLocation(
           initializer as ts.PropertyAccessExpression
