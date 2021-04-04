@@ -91,6 +91,7 @@ export interface ParserOptions {
   skipChildrenPropWithoutDoc?: boolean;
   savePropValueAsString?: boolean;
   shouldIncludePropTagMap?: boolean;
+  customComponentTypes?: string[];
 }
 
 export interface StaticPropFilter {
@@ -272,7 +273,8 @@ export class Parser {
   public getComponentInfo(
     exp: ts.Symbol,
     source: ts.SourceFile,
-    componentNameResolver: ComponentNameResolver = () => undefined
+    componentNameResolver: ComponentNameResolver = () => undefined,
+    customComponentTypes: ParserOptions['customComponentTypes'] = []
   ): ComponentDoc | null {
     if (!!exp.declarations && exp.declarations.length === 0) {
       return null;
@@ -299,15 +301,22 @@ export class Parser {
         rootExp = typeSymbol;
         const expName = rootExp.getName();
 
-        if (
-          expName === '__function' ||
-          expName === 'StatelessComponent' ||
-          expName === 'Stateless' ||
-          expName === 'StyledComponentClass' ||
-          expName === 'StyledComponent' ||
-          expName === 'FunctionComponent' ||
-          expName === 'ForwardRefExoticComponent'
-        ) {
+        const defaultComponentTypes = [
+          '__function',
+          'StatelessComponent',
+          'Stateless',
+          'StyledComponentClass',
+          'StyledComponent',
+          'FunctionComponent',
+          'ForwardRefExoticComponent'
+        ];
+
+        const supportedComponentTypes = [
+          ...defaultComponentTypes,
+          ...customComponentTypes
+        ];
+
+        if (supportedComponentTypes.indexOf(expName) !== -1) {
           commentSource = this.checker.getAliasedSymbol(commentSource);
         } else {
           commentSource = rootExp;
@@ -340,7 +349,7 @@ export class Parser {
     const displayName =
       resolvedComponentName ||
       tags.visibleName ||
-      computeComponentName(nameSource, source);
+      computeComponentName(nameSource, source, customComponentTypes);
     const methods = this.getMethodsInfo(type);
 
     if (propsType) {
@@ -1109,7 +1118,11 @@ function getTextValueOfFunctionProperty(
   return textValue || '';
 }
 
-function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
+function computeComponentName(
+  exp: ts.Symbol,
+  source: ts.SourceFile,
+  customComponentTypes: ParserOptions['customComponentTypes'] = []
+) {
   const exportName = exp.getName();
 
   const statelessDisplayName = getTextValueOfFunctionProperty(
@@ -1127,16 +1140,23 @@ function computeComponentName(exp: ts.Symbol, source: ts.SourceFile) {
     return statelessDisplayName || statefulDisplayName || '';
   }
 
-  if (
-    exportName === 'default' ||
-    exportName === '__function' ||
-    exportName === 'Stateless' ||
-    exportName === 'StyledComponentClass' ||
-    exportName === 'StyledComponent' ||
-    exportName === 'FunctionComponent' ||
-    exportName === 'StatelessComponent' ||
-    exportName === 'ForwardRefExoticComponent'
-  ) {
+  const defaultComponentTypes = [
+    'default',
+    '__function',
+    'Stateless',
+    'StyledComponentClass',
+    'StyledComponent',
+    'FunctionComponent',
+    'StatelessComponent',
+    'ForwardRefExoticComponent'
+  ];
+
+  const supportedComponentTypes = [
+    ...defaultComponentTypes,
+    ...customComponentTypes
+  ];
+
+  if (supportedComponentTypes.indexOf(exportName) !== -1) {
     return getDefaultExportForFile(source);
   } else {
     return exportName;
@@ -1287,7 +1307,8 @@ function parseWithProgramProvider(
         const doc = parser.getComponentInfo(
           exp,
           sourceFile,
-          parserOpts.componentNameResolver
+          parserOpts.componentNameResolver,
+          parserOpts.customComponentTypes
         );
 
         if (doc) {
@@ -1316,7 +1337,8 @@ function parseWithProgramProvider(
           const doc = parser.getComponentInfo(
             symbol,
             sourceFile,
-            parserOpts.componentNameResolver
+            parserOpts.componentNameResolver,
+            parserOpts.customComponentTypes
           );
 
           if (doc) {

@@ -1567,5 +1567,27 @@ describe('parser', () => {
         ''
       );
     });
+
+    it('should return prop types for custom component type', () => {
+      check(
+        'Issue320',
+        {
+          Issue320: {
+            color: {
+              type: 'string',
+              required: false,
+              description: ''
+            },
+            text: { type: 'string', required: true, description: '' }
+          }
+        },
+        true,
+        null,
+        {
+          customComponentTypes: ['OverridableComponent'],
+          savePropValueAsString: true
+        }
+      );
+    });
   });
 });
