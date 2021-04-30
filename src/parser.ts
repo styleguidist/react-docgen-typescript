@@ -19,6 +19,7 @@ export interface StringIndexedObject<T> {
 
 export interface ComponentDoc {
   displayName: string;
+  filePath: string;
   description: string;
   props: Props;
   methods: Method[];
@@ -287,6 +288,7 @@ export class Parser {
     let commentSource = rootExp;
     const typeSymbol = type.symbol || type.aliasSymbol;
     const originalName = rootExp.getName();
+    const filePath = source.fileName;
 
     if (!rootExp.valueDeclaration) {
       if (
@@ -371,6 +373,7 @@ export class Parser {
       }
       return {
         tags,
+        filePath,
         description,
         displayName,
         methods,
@@ -379,6 +382,7 @@ export class Parser {
     } else if (description && displayName) {
       return {
         tags,
+        filePath,
         description,
         displayName,
         methods,
