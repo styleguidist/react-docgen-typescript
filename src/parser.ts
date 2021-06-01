@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as ts from 'typescript';
 
 import { buildFilter } from './buildFilter';
+import { SymbolDisplayPart } from 'typescript';
 
 // We'll use the currentDirectoryName to trim parent fileNames
 const currentDirectoryPath = process.cwd();
@@ -479,7 +480,9 @@ export class Parser {
       const returnType = this.checker.typeToString(
         callSignature.getReturnType()
       );
-      const returnDescription = this.getReturnDescription(member);
+      const returnDescription = ts.displayPartsToString(
+        this.getReturnDescription(member)
+      );
       const modifiers = this.getModifiers(member);
 
       methods.push({
@@ -556,14 +559,16 @@ export class Parser {
     return Boolean(jsDocTags.find(tag => tag.name === 'public'));
   }
 
-  public getReturnDescription(symbol: ts.Symbol) {
+  public getReturnDescription(
+    symbol: ts.Symbol
+  ): SymbolDisplayPart[] | undefined {
     const tags = symbol.getJsDocTags();
     const returnTag = tags.find(tag => tag.name === 'returns');
     if (!returnTag || !Array.isArray(returnTag.text)) {
-      return null;
+      return;
     }
 
-    return returnTag.text.map(text => text.text).join('') || null;
+    return returnTag.text;
   }
 
   private getValuesFromUnionType(type: ts.Type): string | number {
@@ -755,10 +760,7 @@ export class Parser {
     const tagMap: StringIndexedObject<string> = {};
 
     tags.forEach(tag => {
-      console.log('#### tag', tag);
-      console.log('#### text', tag.text);
-      const text = tag.text?.map(text => text.text).join('') || '';
-      const trimmedText = text.trim();
+      const trimmedText = ts.displayPartsToString(tag.text).trim();
       const currentValue = tagMap[tag.name];
       tagMap[tag.name] = currentValue
         ? currentValue + '\n' + trimmedText
@@ -1103,7 +1105,7 @@ function getPropertyName(
 function formatTag(tag: ts.JSDocTagInfo) {
   let result = '@' + tag.name;
   if (tag.text) {
-    result += ' ' + tag.text;
+    result += ' ' + ts.displayPartsToString(tag.text);
   }
   return result;
 }

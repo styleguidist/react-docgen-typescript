@@ -504,10 +504,9 @@ describe('parser', () => {
   it('should parse react stateless component with generic intersection + union overlap props - simple', () => {
     check('SimpleGenericUnionIntersection', {
       SimpleGenericUnionIntersection: {
-        as: { type: 'any', description: '' },
+        as: { type: 'unknown', description: '' },
         foo: {
-          description:
-            'The foo prop should not repeat the description\nThe foo prop should not repeat the description',
+          description: 'The foo prop should not repeat the description',
           required: false,
           type: '"red" | "blue"'
         },
@@ -546,7 +545,7 @@ describe('parser', () => {
           description:
             'The space between children\nYou cannot use gap when using a "space" justify property',
           required: false,
-          type: 'ReactText'
+          type: 'string | number'
         }
       }
     });
@@ -576,7 +575,7 @@ describe('parser', () => {
           description:
             'The space between children\nYou cannot use gap when using a "space" justify property',
           required: false,
-          type: 'ReactText'
+          type: 'string | number'
         }
       }
     });
@@ -1095,8 +1094,7 @@ describe('parser', () => {
           {
             ButtonWithOnClickComponent: {
               onClick: {
-                type:
-                  '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void',
+                type: 'MouseEventHandler<HTMLButtonElement>',
                 required: false,
                 description: 'onClick event handler'
               }
