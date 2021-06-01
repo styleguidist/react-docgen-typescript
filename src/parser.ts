@@ -117,7 +117,8 @@ export const defaultOptions: ts.CompilerOptions = {
 
 /**
  * Parses a file with default TS options
- * @param filePath component file that should be parsed
+ * @param filePathOrPaths component file that should be parsed
+ * @param parserOpts options used to parse the files
  */
 export function parse(
   filePathOrPaths: string | string[],
@@ -211,13 +212,13 @@ const defaultJSDoc: JSDoc = {
 };
 
 export class Parser {
-  private checker: ts.TypeChecker;
-  private propFilter: PropFilter;
-  private shouldRemoveUndefinedFromOptional: boolean;
-  private shouldExtractLiteralValuesFromEnum: boolean;
-  private shouldExtractValuesFromUnion: boolean;
-  private savePropValueAsString: boolean;
-  private shouldIncludePropTagMap: boolean;
+  private readonly checker: ts.TypeChecker;
+  private readonly propFilter: PropFilter;
+  private readonly shouldRemoveUndefinedFromOptional: boolean;
+  private readonly shouldExtractLiteralValuesFromEnum: boolean;
+  private readonly shouldExtractValuesFromUnion: boolean;
+  private readonly savePropValueAsString: boolean;
+  private readonly shouldIncludePropTagMap: boolean;
 
   constructor(program: ts.Program, opts: ParserOptions) {
     const {
@@ -501,6 +502,10 @@ export class Parser {
 
   public getModifiers(member: ts.Symbol) {
     const modifiers: string[] = [];
+    if (!member.valueDeclaration) {
+      return modifiers;
+    }
+
     const flags = ts.getCombinedModifierFlags(member.valueDeclaration);
     const isStatic = (flags & ts.ModifierFlags.Static) !== 0; // tslint:disable-line no-bitwise
 
@@ -515,9 +520,13 @@ export class Parser {
     return callSignature.parameters.map(param => {
       const paramType = this.checker.getTypeOfSymbolAtLocation(
         param,
-        param.valueDeclaration
+        param.valueDeclaration!
       );
-      const paramDeclaration = this.checker.symbolToParameterDeclaration(param);
+      const paramDeclaration = this.checker.symbolToParameterDeclaration(
+        param,
+        undefined,
+        undefined
+      );
       const isOptionalParam: boolean = !!(
         paramDeclaration && paramDeclaration.questionToken
       );
@@ -544,18 +553,17 @@ export class Parser {
 
   public isTaggedPublic(symbol: ts.Symbol) {
     const jsDocTags = symbol.getJsDocTags();
-    const isPublic = Boolean(jsDocTags.find(tag => tag.name === 'public'));
-    return isPublic;
+    return Boolean(jsDocTags.find(tag => tag.name === 'public'));
   }
 
   public getReturnDescription(symbol: ts.Symbol) {
     const tags = symbol.getJsDocTags();
     const returnTag = tags.find(tag => tag.name === 'returns');
-    if (!returnTag) {
+    if (!returnTag || !Array.isArray(returnTag.text)) {
       return null;
     }
 
-    return returnTag.text || null;
+    return returnTag.text.map(text => text.text).join('') || null;
   }
 
   private getValuesFromUnionType(type: ts.Type): string | number {
@@ -747,7 +755,10 @@ export class Parser {
     const tagMap: StringIndexedObject<string> = {};
 
     tags.forEach(tag => {
-      const trimmedText = (tag.text || '').trim();
+      console.log('#### tag', tag);
+      console.log('#### text', tag.text);
+      const text = tag.text?.map(text => text.text).join('') || '';
+      const trimmedText = text.trim();
       const currentValue = tagMap[tag.name];
       tagMap[tag.name] = currentValue
         ? currentValue + '\n' + trimmedText
@@ -1029,7 +1040,7 @@ export class Parser {
   public getPropMap(
     properties: ts.NodeArray<ts.PropertyAssignment | ts.BindingElement>
   ): StringIndexedObject<string | boolean | number | null> {
-    const propMap = properties.reduce((acc, property) => {
+    return properties.reduce((acc, property) => {
       if (ts.isSpreadAssignment(property) || !property.name) {
         return acc;
       }
@@ -1049,8 +1060,6 @@ export class Parser {
 
       return acc;
     }, {} as StringIndexedObject<string | boolean | number | null>);
-
-    return propMap;
   }
 }
 
