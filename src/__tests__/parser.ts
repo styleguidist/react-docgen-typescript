@@ -46,10 +46,7 @@ describe('parser', () => {
   });
 
   it('should parse mulitple files', () => {
-    const result = parse([
-      fixturePath('Column'),
-      fixturePath('ColumnWithDefaultExportOnly')
-    ]);
+    const result = parse([fixturePath('Column'), fixturePath('ColumnWithDefaultExportOnly')]);
 
     checkComponent(
       result,
@@ -273,8 +270,7 @@ describe('parser', () => {
         ExportsPropTypes: {
           foo: {
             parent: {
-              fileName:
-                'react-docgen-typescript/src/__tests__/data/ExportsPropTypeImport.tsx',
+              fileName: 'react-docgen-typescript/src/__tests__/data/ExportsPropTypeImport.tsx',
               name: 'ExportsPropTypesProps'
             },
             type: 'any'
@@ -971,8 +967,7 @@ describe('parser', () => {
 
       describe('propsFilter method', () => {
         it('should apply filter function and filter components accordingly', () => {
-          const propFilter: PropFilter = (prop, component) =>
-            prop.name !== 'prop1';
+          const propFilter: PropFilter = (prop, component) => prop.name !== 'prop1';
           check(
             'Column',
             {
@@ -1048,15 +1043,14 @@ describe('parser', () => {
         });
       });
 
-      it('should collect all `onClick prop` parent declarations', done => {
+      it('should collect all `onClick prop` parent declarations', (done) => {
         assert.doesNotThrow(() => {
           withDefaultConfig({
-            propFilter: prop => {
+            propFilter: (prop) => {
               if (prop.name === 'onClick') {
                 assert.deepEqual(prop.declarations, [
                   {
-                    fileName:
-                      'react-docgen-typescript/node_modules/@types/react/index.d.ts',
+                    fileName: 'react-docgen-typescript/node_modules/@types/react/index.d.ts',
                     name: 'DOMAttributes'
                   },
                   {
@@ -1076,13 +1070,11 @@ describe('parser', () => {
       });
 
       it('should allow filtering by parent declarations', () => {
-        const propFilter: PropFilter = prop => {
+        const propFilter: PropFilter = (prop) => {
           if (prop.declarations !== undefined && prop.declarations.length > 0) {
-            const hasPropAdditionalDescription = prop.declarations.find(
-              declaration => {
-                return !declaration.fileName.includes('@types/react');
-              }
-            );
+            const hasPropAdditionalDescription = prop.declarations.find((declaration) => {
+              return !declaration.fileName.includes('@types/react');
+            });
 
             return Boolean(hasPropAdditionalDescription);
           }
@@ -1095,8 +1087,7 @@ describe('parser', () => {
           {
             ButtonWithOnClickComponent: {
               onClick: {
-                type:
-                  '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void',
+                type: '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void',
                 required: false,
                 description: 'onClick event handler'
               }
@@ -1212,11 +1203,7 @@ describe('parser', () => {
               sampleEnum: {
                 raw: 'sampleEnum',
                 type: 'enum',
-                value: [
-                  { value: '"one"' },
-                  { value: '"two"' },
-                  { value: '"three"' }
-                ]
+                value: [{ value: '"one"' }, { value: '"two"' }, { value: '"three"' }]
               },
               sampleString: { type: 'string' }
             }
@@ -1306,11 +1293,7 @@ describe('parser', () => {
               sampleComplexUnion: {
                 raw: 'number | "string1" | "string2"',
                 type: 'enum',
-                value: [
-                  { value: 'number' },
-                  { value: '"string1"' },
-                  { value: '"string2"' }
-                ]
+                value: [{ value: 'number' }, { value: '"string1"' }, { value: '"string2"' }]
               }
             }
           },
@@ -1454,6 +1437,70 @@ describe('parser', () => {
     });
   });
 
+  describe('typescript strict mode', () => {
+    // typescript strict mode adds an extra `undefined` to enums
+    // may have other funky behavior
+    describe('remove undefined from optional', () => {
+      const options = {
+        shouldExtractLiteralValuesFromEnum: true,
+        shouldRemoveUndefinedFromOptional: true,
+        savePropValueAsString: true
+      };
+      const parser = withCustomConfig(
+        // tsconfig with strict: true
+        path.join(__dirname, '../../src/__tests__/data/tsconfig.json'),
+        options
+      );
+      it('removes undefined from enums', () => {
+        const result = parser.parse(fixturePath('RemoveOptionalValuesFromEnum'));
+        const expected = {
+          RemoveOptionalValuesFromEnum: {
+            sampleBoolean: { type: 'boolean', required: false },
+            sampleEnum: {
+              raw: 'sampleEnum',
+              required: false,
+              type: 'enum',
+              value: [{ value: '"one"' }, { value: '"two"' }, { value: '"three"' }]
+            },
+            sampleString: { type: 'string', required: false }
+          }
+        };
+        checkComponent(result, expected, false);
+      });
+      it('removes undefined from unions', () => {
+        const result = parser.parse(fixturePath('RemoveOptionalValuesFromUnion'));
+        const expected = {
+          RemoveOptionalValuesFromUnion: {
+            sampleStringUnion: {
+              required: false,
+              raw: '"string1" | "string2"',
+              type: 'enum',
+              value: [{ value: '"string1"' }, { value: '"string2"' }]
+            },
+            sampleNumberUnion: {
+              required: false,
+              raw: '1 | 2 | 3',
+              type: 'enum',
+              value: [{ value: '1' }, { value: '2' }, { value: '3' }]
+            },
+            sampleMixedUnion: {
+              required: false,
+              raw: '"string1" | "string2" | 1 | 2',
+              type: 'enum',
+              value: [
+                { value: '"string1"' },
+                { value: '"string2"' },
+                { value: '1' },
+                { value: '2' }
+              ]
+            }
+          }
+        };
+        check('RemoveOptionalValuesFromUnion', expected, false, null, options);
+      });
+    });
+  });
+
   describe('parseWithProgramProvider', () => {
     it('should accept existing ts.Program instance', () => {
       let programProviderInvoked = false;
@@ -1462,13 +1509,10 @@ describe('parser', () => {
       const programProvider = () => {
         // need to navigate to root because tests run on compiled tests
         // and tsc does not include json files
-        const tsconfigPath = path.join(
-          __dirname,
-          '../../src/__tests__/data/tsconfig.json'
-        );
+        const tsconfigPath = path.join(__dirname, '../../src/__tests__/data/tsconfig.json');
         const basePath = path.dirname(tsconfigPath);
 
-        const { config, error } = ts.readConfigFile(tsconfigPath, filename =>
+        const { config, error } = ts.readConfigFile(tsconfigPath, (filename) =>
           fs.readFileSync(filename, 'utf8')
         );
         assert.isUndefined(error);
@@ -1505,24 +1549,17 @@ describe('parser', () => {
 
   describe('componentNameResolver', () => {
     it('should override default behavior', () => {
-      const [parsed] = parse(
-        fixturePath('StatelessDisplayNameStyledComponent'),
-        {
-          componentNameResolver: (exp, source) =>
-            exp.getName() === 'StyledComponentClass' &&
-            getDefaultExportForFile(source)
-        }
-      );
+      const [parsed] = parse(fixturePath('StatelessDisplayNameStyledComponent'), {
+        componentNameResolver: (exp, source) =>
+          exp.getName() === 'StyledComponentClass' && getDefaultExportForFile(source)
+      });
       assert.equal(parsed.displayName, 'StatelessDisplayNameStyledComponent');
     });
 
     it('should fallback to default behavior without a match', () => {
-      const [parsed] = parse(
-        fixturePath('StatelessDisplayNameStyledComponent'),
-        {
-          componentNameResolver: () => false
-        }
-      );
+      const [parsed] = parse(fixturePath('StatelessDisplayNameStyledComponent'), {
+        componentNameResolver: () => false
+      });
       assert.equal(parsed.displayName, 'StatelessDisplayNameStyledComponent');
     });
   });
@@ -1581,10 +1618,7 @@ describe('parser', () => {
     it('should not parse functions not marked with @public', () => {
       const [parsed] = parse(fixturePath('ColumnWithMethods'));
       const methods = parsed.methods;
-      assert.equal(
-        Boolean(methods.find(method => method.name === 'myPrivateFunction')),
-        false
-      );
+      assert.equal(Boolean(methods.find((method) => method.name === 'myPrivateFunction')), false);
     });
   });
 
