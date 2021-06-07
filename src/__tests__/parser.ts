@@ -1482,6 +1482,78 @@ describe('parser', () => {
     });
   });
 
+  describe('typescript strict mode', () => {
+    // typescript strict mode adds an extra `undefined` to enums
+    // may have other funky behavior
+    describe('remove undefined from optional', () => {
+      const options = {
+        shouldExtractLiteralValuesFromEnum: true,
+        shouldRemoveUndefinedFromOptional: true,
+        savePropValueAsString: true
+      };
+      const parser = withCustomConfig(
+        // tsconfig with strict: true
+        path.join(__dirname, '../../src/__tests__/data/tsconfig.json'),
+        options
+      );
+      it('removes undefined from enums', () => {
+        const result = parser.parse(
+          fixturePath('RemoveOptionalValuesFromEnum')
+        );
+        const expected = {
+          RemoveOptionalValuesFromEnum: {
+            sampleBoolean: { type: 'boolean', required: false },
+            sampleEnum: {
+              raw: 'sampleEnum',
+              required: false,
+              type: 'enum',
+              value: [
+                { value: '"one"' },
+                { value: '"two"' },
+                { value: '"three"' }
+              ]
+            },
+            sampleString: { type: 'string', required: false }
+          }
+        };
+        checkComponent(result, expected, false);
+      });
+      it('removes undefined from unions', () => {
+        const result = parser.parse(
+          fixturePath('RemoveOptionalValuesFromUnion')
+        );
+        const expected = {
+          RemoveOptionalValuesFromUnion: {
+            sampleStringUnion: {
+              required: false,
+              raw: '"string1" | "string2"',
+              type: 'enum',
+              value: [{ value: '"string1"' }, { value: '"string2"' }]
+            },
+            sampleNumberUnion: {
+              required: false,
+              raw: '1 | 2 | 3',
+              type: 'enum',
+              value: [{ value: '1' }, { value: '2' }, { value: '3' }]
+            },
+            sampleMixedUnion: {
+              required: false,
+              raw: '"string1" | "string2" | 1 | 2',
+              type: 'enum',
+              value: [
+                { value: '"string1"' },
+                { value: '"string2"' },
+                { value: '1' },
+                { value: '2' }
+              ]
+            }
+          }
+        };
+        check('RemoveOptionalValuesFromUnion', expected, false, null, options);
+      });
+    });
+  });
+
   describe('parseWithProgramProvider', () => {
     it('should accept existing ts.Program instance', () => {
       let programProviderInvoked = false;

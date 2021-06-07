@@ -576,6 +576,9 @@ export class Parser {
     }
 
     let propTypeString = this.checker.typeToString(propType);
+    if (this.shouldRemoveUndefinedFromOptional && !isRequired) {
+      propTypeString = propTypeString.replace(' | undefined', '');
+    }
 
     if (propType.isUnion()) {
       if (
@@ -590,12 +593,18 @@ export class Parser {
                 ts.TypeFlags.Undefined)
           ))
       ) {
+        let value = propType.types.map(type => ({
+          value: this.getValuesFromUnionType(type)
+        }));
+
+        if (this.shouldRemoveUndefinedFromOptional && !isRequired) {
+          value = value.filter(option => option.value != 'undefined');
+        }
+
         return {
           name: 'enum',
           raw: propTypeString,
-          value: propType.types.map(type => ({
-            value: this.getValuesFromUnionType(type)
-          }))
+          value
         };
       }
     }
