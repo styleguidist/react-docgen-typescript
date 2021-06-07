@@ -45,6 +45,34 @@ describe('parser', () => {
     });
   });
 
+  describe('file path', () => {
+    it('should return the correct filepath for a parsed component', () => {
+      const results = parse([fixturePath('FilePathCheck')]);
+      results.forEach(result => {
+        assert.equal(
+          result.filePath,
+          path.resolve('src/__tests__/data/FilePathCheck.tsx')
+        );
+      });
+    });
+
+    it('should return the correct filepath for multiple parsed components', () => {
+      const results = parse([
+        fixturePath('FilePathCheck'),
+        fixturePath('Column'),
+        fixturePath('ColumnWithDefaultExportOnly')
+      ]);
+      const paths = [
+        path.resolve('src/__tests__/data/FilePathCheck.tsx'),
+        path.resolve('src/__tests__/data/Column.tsx'),
+        path.resolve('src/__tests__/data/ColumnWithDefaultExportOnly.tsx')
+      ];
+      results.forEach((result, index) => {
+        assert.equal(result.filePath, paths[index]);
+      });
+    });
+  });
+
   it('should parse mulitple files', () => {
     const result = parse([
       fixturePath('Column'),
