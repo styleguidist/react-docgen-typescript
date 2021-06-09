@@ -23,7 +23,7 @@
   },
   "license": "MIT",
   "peerDependencies": {
-    "typescript": ">= 3.x"
+    "typescript": ">= 4.3.x"
   },
   "devDependencies": {
     "@types/chai": "^4.1.0",
