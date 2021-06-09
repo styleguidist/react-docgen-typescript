@@ -922,7 +922,11 @@ export class Parser {
       const functionStatement = this.getFunctionStatement(statement);
 
       // Extracting default values from props destructuring
-      if (functionStatement && functionStatement.parameters.length) {
+      if (
+        functionStatement &&
+        functionStatement.parameters &&
+        functionStatement.parameters.length
+      ) {
         const { name } = functionStatement.parameters[0];
 
         if (ts.isObjectBindingPattern(name)) {
