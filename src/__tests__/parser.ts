@@ -269,6 +269,32 @@ describe('parser', () => {
     });
   });
 
+  it('should parse default button color', () => {
+    check('DefaultPropValue', {
+      DefaultPropValueComponent: {
+        color: {
+          defaultValue: 'blue',
+          description: 'Button color.',
+          required: true,
+          type: 'enum',
+          value: [{ value: '"blue"' }, { value: '"green"' }]
+        },
+        counter: {
+          defaultValue: 123,
+          description: 'Button counter.',
+          required: false,
+          type: 'number'
+        },
+        disabled: {
+          defaultValue: false,
+          description: 'Button disabled.',
+          required: false,
+          type: 'boolean'
+        }
+      }
+    });
+  });
+
   it('should parse default interface export', () => {
     check('ExportsDefaultInterface', {
       Component: {
