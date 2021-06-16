@@ -931,6 +931,13 @@ describe('parser', () => {
       assert.equal(parsed.displayName, 'StatelessDisplayNameDefaultExport');
     });
 
+    it("should be taken from stateless component `displayName` property (using default export) even if file name doesn't match", () => {
+      const [parsed] = parse(
+        fixturePath('StatelessDisplayNameDefaultExportDifferentFilename')
+      );
+      assert.equal(parsed.displayName, 'ThisNameIsNotTheSameAsThisFilename');
+    });
+
     it('should be taken from stateful component `displayName` property (using default export)', () => {
       const [parsed] = parse(fixturePath('StatefulDisplayNameDefaultExport'));
       assert.equal(parsed.displayName, 'StatefulDisplayNameDefaultExport');
