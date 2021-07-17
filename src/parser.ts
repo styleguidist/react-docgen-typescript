@@ -773,7 +773,7 @@ export class Parser {
     const tagMap: StringIndexedObject<string> = {};
 
     tags.forEach(tag => {
-      const trimmedText = ts.displayPartsToString(tag.text).trim();
+      const trimmedText = (tag.text || '').trim();
       const currentValue = tagMap[tag.name];
       tagMap[tag.name] = currentValue
         ? currentValue + '\n' + trimmedText
