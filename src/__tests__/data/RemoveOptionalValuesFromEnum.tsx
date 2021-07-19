@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 enum sampleEnum {
+  /** test comment */
   ONE = 'one',
   TWO = 'two',
   THREE = 'three'
