@@ -863,8 +863,28 @@ export class Parser {
             const declarations = defaultPropsReference.getDeclarations();
 
             if (declarations) {
-              initializer = (declarations[0] as ts.VariableDeclaration)
-                .initializer;
+              if (ts.isImportSpecifier(declarations[0])) {
+                var symbol = this.checker.getSymbolAtLocation(
+                  declarations[0].name
+                );
+                if (!symbol) {
+                  continue;
+                }
+                var aliasedSymbol = this.checker.getAliasedSymbol(symbol);
+                if (
+                  aliasedSymbol &&
+                  aliasedSymbol.declarations &&
+                  aliasedSymbol.declarations.length
+                ) {
+                  initializer = (aliasedSymbol
+                    .declarations[0] as ts.VariableDeclaration).initializer;
+                } else {
+                  continue;
+                }
+              } else {
+                initializer = (declarations[0] as ts.VariableDeclaration)
+                  .initializer;
+              }
               properties = (initializer as ts.ObjectLiteralExpression)
                 .properties;
             }
