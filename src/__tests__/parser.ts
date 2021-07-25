@@ -1758,5 +1758,23 @@ describe('parser', () => {
         }
       );
     });
+
+    it('should parse imported default props for class component', () => {
+      check(
+        'ComponentWithImportedDefaultProps',
+        {
+          ComponentWithImportedDefaultProps: {
+            name: {
+              type: 'string',
+              defaultValue: 'Node',
+              required: false,
+              description: ''
+            }
+          }
+        },
+        false,
+        ''
+      );
+    });
   });
 });
