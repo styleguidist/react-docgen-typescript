@@ -1168,15 +1168,6 @@ function getTextValueOfFunctionProperty(
       );
     })
     .filter(statement => {
-      const expr = (statement as ts.ExpressionStatement)
-        .expression as ts.BinaryExpression;
-
-      return (
-        ((expr.left as ts.PropertyAccessExpression).expression as ts.Identifier)
-          .escapedText === exp.getName()
-      );
-    })
-    .filter(statement => {
       return ts.isStringLiteral(
         ((statement as ts.ExpressionStatement)
           .expression as ts.BinaryExpression).right
