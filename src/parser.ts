@@ -621,9 +621,7 @@ export class Parser {
                 ts.TypeFlags.Undefined)
           ))
       ) {
-        let value = propType.types.map(type => ({
-          ...this.getInfoFromUnionType(type)
-        }));
+        let value = propType.types.map(type => this.getInfoFromUnionType(type));
 
         if (this.shouldRemoveUndefinedFromOptional && !isRequired) {
           value = value.filter(option => option.value != 'undefined');
