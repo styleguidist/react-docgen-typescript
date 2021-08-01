@@ -581,6 +581,21 @@ export class Parser {
     return this.checker.typeToString(type);
   }
 
+  private getInfoFromUnionType(
+    type: ts.Type
+  ): {
+    value: string | number;
+  } & Partial<JSDoc> {
+    let commentInfo = {};
+    if (type.getSymbol()) {
+      commentInfo = { ...this.getFullJsDocComment(type.getSymbol()!) };
+    }
+    return {
+      value: this.getValuesFromUnionType(type),
+      ...commentInfo
+    };
+  }
+
   public getDocgenType(propType: ts.Type, isRequired: boolean): PropItemType {
     // When we are going to process the type, we check if this type has a constraint (is a generic type with constraint)
     if (propType.getConstraint()) {
@@ -606,9 +621,7 @@ export class Parser {
                 ts.TypeFlags.Undefined)
           ))
       ) {
-        let value = propType.types.map(type => ({
-          value: this.getValuesFromUnionType(type)
-        }));
+        let value = propType.types.map(type => this.getInfoFromUnionType(type));
 
         if (this.shouldRemoveUndefinedFromOptional && !isRequired) {
           value = value.filter(option => option.value != 'undefined');

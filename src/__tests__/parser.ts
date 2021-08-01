@@ -1246,9 +1246,24 @@ describe('parser', () => {
                 raw: 'sampleEnum',
                 type: 'enum',
                 value: [
-                  { value: '"one"' },
-                  { value: '"two"' },
-                  { value: '"three"' }
+                  {
+                    value: '"one"',
+                    description: '',
+                    fullComment: '',
+                    tags: {}
+                  },
+                  {
+                    value: '"two"',
+                    description: '',
+                    fullComment: '',
+                    tags: {}
+                  },
+                  {
+                    value: '"three"',
+                    description: '',
+                    fullComment: '',
+                    tags: {}
+                  }
                 ]
               },
               sampleString: { type: 'string' }
@@ -1292,15 +1307,9 @@ describe('parser', () => {
                 raw: 'SampleEnum',
                 type: 'enum',
                 value: [
-                  {
-                    value: '0'
-                  },
-                  {
-                    value: '1'
-                  },
-                  {
-                    value: '"c"'
-                  }
+                  { value: '0', description: '', fullComment: '', tags: {} },
+                  { value: '1', description: '', fullComment: '', tags: {} },
+                  { value: '"c"', description: '', fullComment: '', tags: {} }
                 ]
               },
               sampleUnionNonGeneric: {
@@ -1513,9 +1522,14 @@ describe('parser', () => {
               required: false,
               type: 'enum',
               value: [
-                { value: '"one"' },
-                { value: '"two"' },
-                { value: '"three"' }
+                {
+                  value: '"one"',
+                  description: 'test comment',
+                  fullComment: 'test comment',
+                  tags: {}
+                },
+                { value: '"two"', description: '', fullComment: '', tags: {} },
+                { value: '"three"', description: '', fullComment: '', tags: {} }
               ]
             },
             sampleString: { type: 'string', required: false }
