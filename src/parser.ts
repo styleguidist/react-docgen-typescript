@@ -293,11 +293,7 @@ export class Parser {
     const filePath = source.fileName;
 
     if (!rootExp.valueDeclaration) {
-      if (
-        originalName === 'default' &&
-        !typeSymbol &&
-        (rootExp.flags & ts.SymbolFlags.Alias) !== 0
-      ) {
+      if (!typeSymbol && (rootExp.flags & ts.SymbolFlags.Alias) !== 0) {
         commentSource = this.checker.getAliasedSymbol(commentSource);
       } else if (!typeSymbol) {
         return null;
