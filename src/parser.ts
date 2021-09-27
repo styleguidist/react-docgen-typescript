@@ -159,7 +159,10 @@ export function withCustomConfig(
   );
 
   if (errors && errors.length) {
-    throw errors[0];
+    if (errors[0] instanceof Error) throw errors[0];
+    else if (errors[0].messageText)
+      throw new Error(`TS${errors[0].code}: ${errors[0].messageText}`);
+    else throw new Error(JSON.stringify(errors[0]));
   }
 
   return withCompilerOptions(options, parserOpts);
