@@ -726,6 +726,19 @@ describe('parser', () => {
     });
   });
 
+  it('should parse components with unioned types when re-exported as named export', () => {
+    check(
+      'OnlyDefaultExportUnionAsExport',
+      {
+        OnlyDefaultExportUnion: {
+          content: { description: 'The content', type: 'string' }
+        }
+      },
+      true,
+      'OnlyDefaultExportUnion description'
+    );
+  });
+
   it('should parse jsdocs with the @default tag and no description', () => {
     check('StatelessWithDefaultOnlyJsDoc', {
       StatelessWithDefaultOnlyJsDoc: {
