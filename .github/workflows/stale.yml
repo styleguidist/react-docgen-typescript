@@ -21,8 +21,10 @@ jobs:
     - uses: actions/stale@v3
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        days-before-stale: 150
-        stale-issue-message: 'There was no activity for a long time. Closing this issue as obsolete. In case it is still valid, please,  open a new one.'
-        stale-pr-message: 'There was no activity for a long time. Closing this PR as obsolete.'
+        days-before-stale: 180
+        stale-issue-message: 'There was no activity for a long time. The issue will be closed soon.'
+        stale-pr-message: 'There was no activity for a long time. The PR will be closed soon.'
+        close-issue-message: Closing this issue as obsolete.
+        close-pr-message: Closing this PR as obsolete.
         stale-issue-label: 'stale'
         stale-pr-label: 'stale'
