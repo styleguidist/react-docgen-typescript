@@ -21,6 +21,8 @@ jobs:
       run: npm install
       env:
         CI: true
+    - name: pwd
+      run: pwd
     - name: test
       run: npm test
       env:
