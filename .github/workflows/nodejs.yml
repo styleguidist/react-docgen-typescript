@@ -23,7 +23,11 @@ jobs:
         CI: true
     - name: pwd
       run: pwd
-    - name: test
-      run: npm test
-      env:
-        CI: true
+    - name: ls
+      run: ls -ahl
+    - name: ls_parent
+      run: ls -ahl ../
+#     - name: test
+#       run: npm test
+#       env:
+#         CI: true
