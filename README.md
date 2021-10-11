@@ -1,6 +1,6 @@
 # react-docgen-typescript
 
-[![Build Status](https://travis-ci.org/styleguidist/react-docgen-typescript.svg)](https://travis-ci.org/styleguidist/react-docgen-typescript)
+[![Build Status](https://github.com/styleguidist/react-docgen-typescript/actions/workflows/nodejs.yml/badge.svg)](https://github.com/styleguidist/react-docgen-typescript/actions/workflows/nodejs.yml)
 
 ![](https://nodei.co/npm/react-docgen-typescript.png?downloadRank=true&downloads=true)
 
