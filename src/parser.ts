@@ -4,12 +4,7 @@ import * as ts from 'typescript';
 
 import { buildFilter } from './buildFilter';
 import { SymbolDisplayPart } from 'typescript';
-
-// We'll use the currentDirectoryName to trim parent fileNames
-const currentDirectoryPath = process.cwd();
-const currentDirectoryParts = currentDirectoryPath.split(path.sep);
-const currentDirectoryName =
-  currentDirectoryParts[currentDirectoryParts.length - 1];
+import { trimFileName } from './utils';
 
 type InterfaceOrTypeAliasDeclaration =
   | ts.TypeAliasDeclaration
@@ -1309,26 +1304,6 @@ function getDeclarations(prop: ts.Symbol): ParentType[] | undefined {
   }
 
   return parents;
-}
-
-function trimFileName(fileName: string) {
-  const fileNameParts = fileName.split('/');
-  const trimmedFileNameParts = fileNameParts.slice();
-
-  while (trimmedFileNameParts.length) {
-    if (trimmedFileNameParts[0] === currentDirectoryName) {
-      break;
-    }
-    trimmedFileNameParts.splice(0, 1);
-  }
-  let trimmedFileName;
-  if (trimmedFileNameParts.length) {
-    trimmedFileName = trimmedFileNameParts.join('/');
-  } else {
-    trimmedFileName = fileName;
-  }
-
-  return trimmedFileName;
 }
 
 function getParentType(prop: ts.Symbol): ParentType | undefined {
