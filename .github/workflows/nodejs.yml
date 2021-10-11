@@ -21,13 +21,7 @@ jobs:
       run: npm install
       env:
         CI: true
-    - name: pwd
-      run: pwd
-    - name: ls
-      run: ls -ahl
-    - name: ls_parent
-      run: ls -ahl ../
-#     - name: test
-#       run: npm test
-#       env:
-#         CI: true
+    - name: test
+      run: npm test
+      env:
+        CI: true
