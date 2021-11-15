@@ -977,6 +977,55 @@ describe('parser', () => {
     });
   });
 
+  describe('expression name', () => {
+    it('should match the stateless component identifier (using named export)', () => {
+      const [parsed] = parse(fixturePath('StatelessDisplayName'));
+      assert.equal(parsed.expression.getName(), 'Stateless');
+    });
+
+    it('should match the stateful component identifier (using named export)', () => {
+      const [parsed] = parse(fixturePath('StatefulDisplayName'));
+      assert.equal(parsed.expression.getName(), 'Stateful');
+    });
+
+    it('should match the stateless component identifier (using default export)', () => {
+      const [parsed] = parse(fixturePath('StatelessDisplayNameDefaultExport'));
+      assert.equal(parsed.expression.getName(), 'default');
+    });
+
+    it("should be taken from stateless component identifier (using default export) even if file name doesn't match", () => {
+      const [parsed] = parse(
+        fixturePath('StatelessDisplayNameDefaultExportDifferentFilename')
+      );
+      assert.equal(parsed.expression.getName(), 'default');
+    });
+
+    it('should be taken from stateful component identifier (using default export)', () => {
+      const [parsed] = parse(fixturePath('StatefulDisplayNameDefaultExport'));
+      assert.equal(parsed.expression.getName(), 'default');
+    });
+
+    it('should be taken from the wrapped component identifier when default export is an HOC', () => {
+      const [parsed] = parse(fixturePath('StatelessDisplayNameHOC'));
+      assert.equal(parsed.expression.getName(), 'Stateless');
+    });
+
+    it('should be taken from the wrapped component identifier when default export is an HOC', () => {
+      const [parsed] = parse(fixturePath('StatefulDisplayNameHOC'));
+      assert.equal(parsed.expression.getName(), 'Stateful');
+    });
+
+    it('should be taken from stateless component identifier if file name is "index"', () => {
+      const [parsed] = parse(fixturePath('StatelessDisplayNameFolder/index'));
+      assert.equal(parsed.expression.getName(), 'default');
+    });
+
+    it('should be taken from stateful component identifier if file name is "index"', () => {
+      const [parsed] = parse(fixturePath('StatefulDisplayNameFolder/index'));
+      assert.equal(parsed.expression.getName(), 'default');
+    });
+  });
+
   describe('Parser options', () => {
     describe('Property filtering', () => {
       describe('children', () => {

@@ -14,6 +14,7 @@ export interface StringIndexedObject<T> {
 }
 
 export interface ComponentDoc {
+  expression: ts.Symbol;
   displayName: string;
   filePath: string;
   description: string;
@@ -373,6 +374,7 @@ export class Parser {
         description,
         displayName,
         methods,
+        expression: rootExp,
         props
       };
     } else if (description && displayName) {
@@ -382,6 +384,7 @@ export class Parser {
         description,
         displayName,
         methods,
+        expression: rootExp,
         props: {}
       };
     }
