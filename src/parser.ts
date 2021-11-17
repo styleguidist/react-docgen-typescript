@@ -19,7 +19,7 @@ export interface ComponentDoc {
   description: string;
   props: Props;
   methods: Method[];
-  tags?: {};
+  tags?: StringIndexedObject<string>;
 }
 
 export interface Props extends StringIndexedObject<PropItem> {}
