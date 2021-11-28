@@ -14,7 +14,7 @@ export interface StringIndexedObject<T> {
 }
 
 export interface ComponentDoc {
-  expression: ts.Symbol;
+  expression?: ts.Symbol;
   displayName: string;
   filePath: string;
   description: string;
@@ -89,6 +89,7 @@ export interface ParserOptions {
   skipChildrenPropWithoutDoc?: boolean;
   savePropValueAsString?: boolean;
   shouldIncludePropTagMap?: boolean;
+  shouldIncludeExpression?: boolean;
   customComponentTypes?: string[];
 }
 
@@ -220,6 +221,7 @@ export class Parser {
   private readonly shouldExtractValuesFromUnion: boolean;
   private readonly savePropValueAsString: boolean;
   private readonly shouldIncludePropTagMap: boolean;
+  private readonly shouldIncludeExpression: boolean;
 
   constructor(program: ts.Program, opts: ParserOptions) {
     const {
@@ -227,7 +229,8 @@ export class Parser {
       shouldExtractLiteralValuesFromEnum,
       shouldRemoveUndefinedFromOptional,
       shouldExtractValuesFromUnion,
-      shouldIncludePropTagMap
+      shouldIncludePropTagMap,
+      shouldIncludeExpression
     } = opts;
     this.checker = program.getTypeChecker();
     this.propFilter = buildFilter(opts);
@@ -240,6 +243,7 @@ export class Parser {
     this.shouldExtractValuesFromUnion = Boolean(shouldExtractValuesFromUnion);
     this.savePropValueAsString = Boolean(savePropValueAsString);
     this.shouldIncludePropTagMap = Boolean(shouldIncludePropTagMap);
+    this.shouldIncludeExpression = Boolean(shouldIncludeExpression);
   }
 
   private getComponentFromExpression(exp: ts.Symbol) {
@@ -351,6 +355,7 @@ export class Parser {
       computeComponentName(nameSource, source, customComponentTypes);
     const methods = this.getMethodsInfo(type);
 
+    let result: ComponentDoc | null = null;
     if (propsType) {
       if (!commentSource.valueDeclaration) {
         return null;
@@ -368,28 +373,30 @@ export class Parser {
           delete props[propName];
         }
       }
-      return {
+      result = {
         tags,
         filePath,
         description,
         displayName,
         methods,
-        expression: rootExp,
         props
       };
     } else if (description && displayName) {
-      return {
+      result = {
         tags,
         filePath,
         description,
         displayName,
         methods,
-        expression: rootExp,
         props: {}
       };
     }
 
-    return null;
+    if (result !== null && this.shouldIncludeExpression) {
+      result.expression = rootExp;
+    }
+
+    return result;
   }
 
   public extractPropsFromTypeIfStatelessComponent(
