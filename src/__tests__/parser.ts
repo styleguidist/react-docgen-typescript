@@ -1494,6 +1494,20 @@ describe('parser', () => {
         );
       });
     });
+
+    describe('shouldIncludeExpression', () => {
+      it('should be disabled by default', () => {
+        const [parsed] = parse(fixturePath('StatelessDisplayName'));
+        assert.equal(parsed.expression, undefined);
+      });
+
+      it('should cause the parser to return the component expression when set to true', () => {
+        const [parsed] = parse(fixturePath('StatelessDisplayName'), {
+          shouldIncludeExpression: true
+        });
+        assert.equal(parsed.expression!.name, 'Stateless');
+      });
+    });
   });
 
   describe('withCustomConfig', () => {
