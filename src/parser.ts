@@ -4,7 +4,7 @@ import * as ts from 'typescript';
 
 import { buildFilter } from './buildFilter';
 import { SymbolDisplayPart } from 'typescript';
-import { trimFileName } from './utils';
+import { trimFileName } from './trimFileName';
 
 type InterfaceOrTypeAliasDeclaration =
   | ts.TypeAliasDeclaration
