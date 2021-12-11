@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { trimFileName } from '../trimFileName';
 
-describe.only('trimFileName', () => {
+describe('trimFileName', () => {
   describe('posix', () => {
     const cwd = '/home/user/projects/react-docgen-typescript';
     const platform = 'posix';
