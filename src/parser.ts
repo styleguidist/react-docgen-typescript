@@ -1422,9 +1422,12 @@ function parseWithProgramProvider(
           );
 
           if (doc) {
+            const prefix =
+              exp.escapedName === 'default' ? '' : `${symbol.escapedName}.`;
+
             componentDocs.push({
               ...doc,
-              displayName: `${exp.escapedName}.${symbol.escapedName}`
+              displayName: `${prefix}${symbol.escapedName}`
             });
           }
         });
