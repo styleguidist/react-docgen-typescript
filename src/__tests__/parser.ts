@@ -859,6 +859,20 @@ describe('parser', () => {
     });
   });
 
+  it('should parse functional component component defined as const thats been wrapped in React.memo', () => {
+    check(
+      'FunctionDeclarationAsConstAsDefaultExportWithMemo',
+      {
+        // in this case the component name is taken from the file name
+        FunctionDeclarationAsConstAsDefaultExportWithMemo: {
+          prop1: { type: 'string', required: true }
+        }
+      },
+      true,
+      'Jumbotron description'
+    );
+  });
+
   it('should parse JSDoc correctly', () => {
     check(
       'JSDocWithParam',
