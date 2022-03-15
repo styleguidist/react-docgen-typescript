@@ -311,7 +311,8 @@ export class Parser {
           'StyledComponentClass',
           'StyledComponent',
           'FunctionComponent',
-          'ForwardRefExoticComponent'
+          'ForwardRefExoticComponent',
+          'MemoExoticComponent'
         ];
 
         const supportedComponentTypes = [
@@ -1248,7 +1249,8 @@ function computeComponentName(
     'StyledComponent',
     'FunctionComponent',
     'StatelessComponent',
-    'ForwardRefExoticComponent'
+    'ForwardRefExoticComponent',
+    'MemoExoticComponent'
   ];
 
   const supportedComponentTypes = [
