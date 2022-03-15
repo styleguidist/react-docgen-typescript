@@ -1817,5 +1817,31 @@ describe('parser', () => {
         ''
       );
     });
+
+    it.only('should handle when parameters are assigned to default exports (subcomponents)', () => {
+      check(
+        'SubComponent',
+        {
+          Root: {
+            name: {
+              type: 'string',
+              defaultValue: undefined,
+              required: true,
+              description: ''
+            }
+          },
+          Sub: {
+            name: {
+              type: 'string',
+              defaultValue: undefined,
+              required: true,
+              description: ''
+            }
+          }
+        },
+        false,
+        ''
+      );
+    });
   });
 });
