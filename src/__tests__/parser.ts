@@ -1832,7 +1832,7 @@ describe('parser', () => {
       );
     });
 
-    it.only('should handle when parameters are assigned to default exports (subcomponents)', () => {
+    it('should handle when parameters are assigned to default exports (subcomponents)', () => {
       check(
         'SubComponent',
         {

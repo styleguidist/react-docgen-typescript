@@ -1425,7 +1425,7 @@ function parseWithProgramProvider(
 
           if (doc) {
             const prefix =
-              exp.escapedName === 'default' ? '' : `${symbol.escapedName}.`;
+              exp.escapedName === 'default' ? '' : `${exp.escapedName}.`;
 
             componentDocs.push({
               ...doc,
