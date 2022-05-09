@@ -15,6 +15,7 @@ export interface StringIndexedObject<T> {
 
 export interface ComponentDoc {
   expression?: ts.Symbol;
+  rawExpression?: ts.Symbol;
   displayName: string;
   filePath: string;
   description: string;
@@ -395,6 +396,7 @@ export class Parser {
 
     if (result !== null && this.shouldIncludeExpression) {
       result.expression = rootExp;
+      result.rawExpression = exp;
     }
 
     return result;
