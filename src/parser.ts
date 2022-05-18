@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
+import * as JSON5 from 'json5';
 
 import { buildFilter } from './buildFilter';
 import { SymbolDisplayPart } from 'typescript';
@@ -1087,7 +1088,11 @@ export class Parser {
       case ts.SyntaxKind.ObjectLiteralExpression:
       default:
         try {
-          return initializer.getText();
+          const text = initializer.getText();
+          if (initializer.kind === 192 || initializer.kind === 193) {
+            return JSON5.parse(text);
+          }
+          return text;
         } catch (e) {
           return null;
         }
@@ -1109,6 +1114,9 @@ export class Parser {
         (typeof literalValue === 'string' ||
           typeof literalValue === 'number' ||
           typeof literalValue === 'boolean' ||
+          Array.isArray(literalValue) ||
+          // Object.prototype.toString.call(literalValue) === '[object Object]' ||
+          typeof literalValue === 'object' ||
           literalValue === null) &&
         propertyName !== null
       ) {
