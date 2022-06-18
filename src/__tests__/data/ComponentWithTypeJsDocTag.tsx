@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 /** IComponentWithTypeJsDocTag props */
 export interface IComponentWithTypeJsDocTag {
@@ -10,10 +10,7 @@ export interface IComponentWithTypeJsDocTag {
 }
 
 /** ComponentWithTypeJsDocTag description */
-export class ComponentWithTypeJsDocTag extends React.Component<
-  IComponentWithTypeJsDocTag,
-  {}
-> {
+export class ComponentWithTypeJsDocTag extends React.Component<IComponentWithTypeJsDocTag> {
   public render() {
     return <div>test</div>;
   }

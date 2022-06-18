@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 export interface StatelessProps {
   /** myProp description */
@@ -11,5 +11,6 @@ export interface StatelessMoreProps {
 }
 
 /** StatelessIntersectionProps description */
-export const StatelessIntersectionProps: React.SFC<StatelessProps &
-  StatelessMoreProps> = props => <div />;
+export const StatelessIntersectionProps: React.SFC<
+  StatelessProps & StatelessMoreProps
+> = (props) => <div />;

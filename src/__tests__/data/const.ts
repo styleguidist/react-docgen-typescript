@@ -1,3 +1,3 @@
 export const defaultProps = {
-  name: 'Node'
+  name: "Node",
 };

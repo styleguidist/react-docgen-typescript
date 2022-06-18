@@ -1,3 +1,3 @@
-import * as React from 'react';
+import * as React from "react";
 
-export const Stateless: React.FC = props => <div />;
+export const Stateless: React.FC = (props) => <div />;

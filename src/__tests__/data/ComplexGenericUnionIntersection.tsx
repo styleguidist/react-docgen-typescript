@@ -11,7 +11,7 @@ type BoxProps<E extends React.ElementType, P = any> = P &
 
 interface StackBaseProps {
   /** The flex "align" property */
-  align?: 'stretch' | 'center' | 'flex-start' | 'flex-end';
+  align?: "stretch" | "center" | "flex-start" | "flex-end";
 }
 
 interface StackJustifyProps {
@@ -19,7 +19,7 @@ interface StackJustifyProps {
    * Use flex 'space-between' | 'space-around' | 'space-evenly' and
    * flex will space the children.
    */
-  justify?: 'space-between' | 'space-around' | 'space-evenly';
+  justify?: "space-between" | "space-around" | "space-evenly";
   /** You cannot use gap when using a "space" justify property */
   gap?: never;
 }
@@ -29,14 +29,14 @@ interface StackGapProps {
    * Use flex 'center' | 'flex-start' | 'flex-end' | 'stretch' with
    * a gap between each child.
    */
-  justify?: 'center' | 'flex-start' | 'flex-end' | 'stretch';
+  justify?: "center" | "flex-start" | "flex-end" | "stretch";
   /** The space between children */
   gap?: number | string;
 }
 
 type StackProps = StackBaseProps & (StackGapProps | StackJustifyProps);
 
-const defaultElement = 'div' as const;
+const defaultElement = "div" as const;
 
 /** ComplexGenericUnionIntersection description */
 export const ComplexGenericUnionIntersection = <

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 export interface StatelessProps {
   /** myProp description */
@@ -6,10 +6,10 @@ export interface StatelessProps {
 }
 
 /** Stateless description */
-const Stateless: React.SFC<StatelessProps> = props => (
+const Stateless: React.SFC<StatelessProps> = (props) => (
   <div>My Property = {props.myProp}</div>
 );
 
-Stateless.displayName = 'StatelessDisplayNameDefaultExport';
+Stateless.displayName = "StatelessDisplayNameDefaultExport";
 
 export default Stateless;

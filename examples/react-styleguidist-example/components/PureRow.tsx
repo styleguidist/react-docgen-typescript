@@ -19,7 +19,7 @@ export interface IRowProps {
 /**
  * Form row.
  */
-export class PureRow extends React.PureComponent<IRowProps, {}> {
+export class PureRow extends React.PureComponent<IRowProps> {
   render() {
     return <div>Test</div>;
   }

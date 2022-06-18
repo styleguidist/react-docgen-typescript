@@ -1,9 +1,9 @@
-import * as React from 'react';
+import * as React from "react";
 
 enum sampleEnum {
-  ONE = 'one',
-  TWO = 'two',
-  THREE = 'three'
+  ONE = "one",
+  TWO = "two",
+  THREE = "three",
 }
 
 interface ExtractLiteralValuesFromEnumProps {
@@ -15,6 +15,6 @@ interface ExtractLiteralValuesFromEnumProps {
   sampleEnum: sampleEnum;
 }
 
-export const Stateless: React.StatelessComponent<ExtractLiteralValuesFromEnumProps> = props => (
-  <div>test</div>
-);
+export const Stateless: React.StatelessComponent<
+  ExtractLiteralValuesFromEnumProps
+> = (props) => <div>test</div>;

@@ -1,5 +1,5 @@
-import * as React from 'react';
-import withHOC, { HOCInjectedProps } from './withHOC';
+import * as React from "react";
+import withHOC, { HOCInjectedProps } from "./withHOC";
 
 export interface HOCProps {
   /** myProp description */
@@ -7,7 +7,8 @@ export interface HOCProps {
 }
 
 /** HOCIntersectionProps description */
-export const HOCIntersectionProps: React.SFC<HOCProps &
-  HOCInjectedProps> = props => <div />;
+export const HOCIntersectionProps: React.SFC<HOCProps & HOCInjectedProps> = (
+  props
+) => <div />;
 
 export default withHOC({})(HOCIntersectionProps);

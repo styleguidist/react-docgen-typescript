@@ -5,14 +5,14 @@ interface StackBaseProps<T> {
 
 interface StackJustifyProps {
   /** The foo prop should not repeat the description */
-  foo?: 'blue';
+  foo?: "blue";
   /** You cannot use gap when using a "space" justify property */
   gap?: never;
 }
 
 interface StackGapProps {
   /** The foo prop should not repeat the description */
-  foo?: 'red';
+  foo?: "red";
   /** The space between children */
   gap?: number;
 }
@@ -20,6 +20,6 @@ interface StackGapProps {
 type StackProps<T> = StackBaseProps<T> & (StackGapProps | StackJustifyProps);
 
 /** SimpleGenericUnionIntersection description */
-export const SimpleGenericUnionIntersection = <T extends any>(
+export const SimpleGenericUnionIntersection = <T extends any>( // eslint-disable-line @typescript-eslint/no-unnecessary-type-constraint
   props: StackProps<T>
 ) => <div />;

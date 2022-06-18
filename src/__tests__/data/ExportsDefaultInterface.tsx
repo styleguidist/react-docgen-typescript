@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 export default interface Props {
   /** foo description */
@@ -8,4 +8,4 @@ export default interface Props {
 /**
  * Component description
  */
-export const Component: React.SFC<Props> = props => <div />;
+export const Component: React.SFC<Props> = (props) => <div />;

@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { ParentProps } from './ExtendsExternalPropsComponentParentProps';
+import * as React from "react";
+import { ParentProps } from "./ExtendsExternalPropsComponentParentProps";
 
 interface ExtendsExternalPropsComponentProps extends ParentProps {
   /** prop2 */
@@ -9,10 +9,7 @@ interface ExtendsExternalPropsComponentProps extends ParentProps {
 /**
  * ExtendsExternalPropsComponent description
  */
-export class ExtendsExternalPropsComponent extends React.Component<
-  ExtendsExternalPropsComponentProps,
-  {}
-> {
+export class ExtendsExternalPropsComponent extends React.Component<ExtendsExternalPropsComponentProps> {
   public render() {
     return <div>ExtendsExternalPropsComponent</div>;
   }

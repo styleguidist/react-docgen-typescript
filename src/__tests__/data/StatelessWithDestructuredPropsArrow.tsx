@@ -1,8 +1,8 @@
-import * as React from 'react';
+import * as React from "react";
 
 export enum enumSample {
-  HELLO = 'hi',
-  BYE = 'bye'
+  HELLO = "hi",
+  BYE = "bye",
 }
 
 /** StatelessWithDefaultProps props */
@@ -11,7 +11,7 @@ export interface StatelessWithDefaultPropsProps {
    * sample with default value
    * @default hello
    */
-  sampleDefaultFromJSDoc: 'hello' | 'goodbye';
+  sampleDefaultFromJSDoc: "hello" | "goodbye";
   /** sampleTrue description */
   sampleTrue?: boolean;
   /** sampleFalse description */
@@ -31,14 +31,16 @@ export interface StatelessWithDefaultPropsProps {
 }
 
 /** StatelessWithDefaultProps description */
-export const StatelessWithDefaultProps: React.StatelessComponent<StatelessWithDefaultPropsProps> = ({
+export const StatelessWithDefaultProps: React.StatelessComponent<
+  StatelessWithDefaultPropsProps
+> = ({
   sampleEnum = enumSample.HELLO,
   sampleFalse = false,
   sampleNull = null,
   sampleNumber = -1,
   // prettier-ignore
   sampleObject = { a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } },
-  sampleString = 'hello',
+  sampleString = "hello",
   sampleTrue = true,
-  sampleUndefined
+  sampleUndefined,
 }) => <div>test</div>;

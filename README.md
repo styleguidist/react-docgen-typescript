@@ -215,7 +215,7 @@ export interface IColumnProps {
 /**
  * Form column.
  */
-export class Column extends Component<IColumnProps, {}> {
+export class Column extends Component<IColumnProps> {
   render() {
     return <div>Test</div>;
   }

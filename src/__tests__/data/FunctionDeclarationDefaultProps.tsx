@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 interface FunctionDeclarationDefaultPropsProps {
   id?: number;
@@ -12,5 +12,5 @@ export const FunctionDeclarationDefaultProps = (
 };
 
 FunctionDeclarationDefaultProps.defaultProps = {
-  id: 1
+  id: 1,
 };

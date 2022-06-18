@@ -10,8 +10,8 @@ import {
   Props,
   withCompilerOptions,
   withCustomConfig,
-  withDefaultConfig
-} from './parser';
+  withDefaultConfig,
+} from "./parser";
 
 export {
   parse,
@@ -25,5 +25,5 @@ export {
   ParserOptions,
   Props,
   PropItem,
-  PropItemType
+  PropItemType,
 };

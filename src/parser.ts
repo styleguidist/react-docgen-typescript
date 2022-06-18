@@ -1,10 +1,10 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as ts from 'typescript';
+import * as fs from "fs";
+import * as path from "path";
+import * as ts from "typescript";
+import { SymbolDisplayPart } from "typescript";
 
-import { buildFilter } from './buildFilter';
-import { SymbolDisplayPart } from 'typescript';
-import { trimFileName } from './trimFileName';
+import { buildFilter } from "./buildFilter";
+import { trimFileName } from "./trimFileName";
 
 type InterfaceOrTypeAliasDeclaration =
   | ts.TypeAliasDeclaration
@@ -23,7 +23,7 @@ export interface ComponentDoc {
   tags?: StringIndexedObject<string>;
 }
 
-export interface Props extends StringIndexedObject<PropItem> {}
+export type Props = StringIndexedObject<PropItem>;
 
 export interface PropItem {
   name: string;
@@ -33,7 +33,7 @@ export interface PropItem {
   defaultValue: any;
   parent?: ParentType;
   declarations?: ParentType[];
-  tags?: {};
+  tags?: StringIndexedObject<string>;
 }
 
 export interface Method {
@@ -111,7 +111,7 @@ export interface FileParser {
 export const defaultOptions: ts.CompilerOptions = {
   jsx: ts.JsxEmit.React,
   module: ts.ModuleKind.CommonJS,
-  target: ts.ScriptTarget.Latest
+  target: ts.ScriptTarget.Latest,
 };
 
 /**
@@ -143,8 +143,8 @@ export function withCustomConfig(
   parserOpts: ParserOptions
 ): FileParser {
   const basePath = path.dirname(tsconfigPath);
-  const { config, error } = ts.readConfigFile(tsconfigPath, filename =>
-    fs.readFileSync(filename, 'utf8')
+  const { config, error } = ts.readConfigFile(tsconfigPath, (filename) =>
+    fs.readFileSync(filename, "utf8")
   );
 
   if (error !== undefined) {
@@ -193,7 +193,7 @@ export function withCompilerOptions(
         parserOpts,
         programProvider
       );
-    }
+    },
   };
 }
 
@@ -208,9 +208,9 @@ interface JSDoc {
 }
 
 const defaultJSDoc: JSDoc = {
-  description: '',
-  fullComment: '',
-  tags: {}
+  description: "",
+  fullComment: "",
+  tags: {},
 };
 
 export class Parser {
@@ -230,7 +230,7 @@ export class Parser {
       shouldRemoveUndefinedFromOptional,
       shouldExtractValuesFromUnion,
       shouldIncludePropTagMap,
-      shouldIncludeExpression
+      shouldIncludeExpression,
     } = opts;
     this.checker = program.getTypeChecker();
     this.propFilter = buildFilter(opts);
@@ -258,8 +258,8 @@ export class Parser {
     const symbolName = typeSymbol.getName();
 
     if (
-      (symbolName === 'MemoExoticComponent' ||
-        symbolName === 'ForwardRefExoticComponent') &&
+      (symbolName === "MemoExoticComponent" ||
+        symbolName === "ForwardRefExoticComponent") &&
       exp.valueDeclaration &&
       ts.isExportAssignment(exp.valueDeclaration) &&
       ts.isCallExpression(exp.valueDeclaration.expression)
@@ -280,7 +280,7 @@ export class Parser {
     exp: ts.Symbol,
     source: ts.SourceFile,
     componentNameResolver: ComponentNameResolver = () => undefined,
-    customComponentTypes: ParserOptions['customComponentTypes'] = []
+    customComponentTypes: ParserOptions["customComponentTypes"] = []
   ): ComponentDoc | null {
     if (!!exp.declarations && exp.declarations.length === 0) {
       return null;
@@ -305,19 +305,19 @@ export class Parser {
         const expName = rootExp.getName();
 
         const defaultComponentTypes = [
-          '__function',
-          'StatelessComponent',
-          'Stateless',
-          'StyledComponentClass',
-          'StyledComponent',
-          'FunctionComponent',
-          'ForwardRefExoticComponent',
-          'MemoExoticComponent'
+          "__function",
+          "StatelessComponent",
+          "Stateless",
+          "StyledComponentClass",
+          "StyledComponent",
+          "FunctionComponent",
+          "ForwardRefExoticComponent",
+          "MemoExoticComponent",
         ];
 
         const supportedComponentTypes = [
           ...defaultComponentTypes,
-          ...customComponentTypes
+          ...customComponentTypes,
         ];
 
         if (supportedComponentTypes.indexOf(expName) !== -1) {
@@ -337,8 +337,8 @@ export class Parser {
     // Skip over PropTypes that are exported
     if (
       typeSymbol &&
-      (typeSymbol.getEscapedName() === 'Requireable' ||
-        typeSymbol.getEscapedName() === 'Validator')
+      (typeSymbol.getEscapedName() === "Requireable" ||
+        typeSymbol.getEscapedName() === "Validator")
     ) {
       return null;
     }
@@ -347,7 +347,7 @@ export class Parser {
       this.extractPropsFromTypeIfStatelessComponent(type) ||
       this.extractPropsFromTypeIfStatefulComponent(type);
 
-    const nameSource = originalName === 'default' ? rootExp : commentSource;
+    const nameSource = originalName === "default" ? rootExp : commentSource;
     const resolvedComponentName = componentNameResolver(nameSource, source);
     const { description, tags } = this.findDocComment(commentSource);
     const displayName =
@@ -380,7 +380,7 @@ export class Parser {
         description,
         displayName,
         methods,
-        props
+        props,
       };
     } else if (description && displayName) {
       result = {
@@ -389,7 +389,7 @@ export class Parser {
         description,
         displayName,
         methods,
-        props: {}
+        props: {},
       };
     }
 
@@ -417,7 +417,7 @@ export class Parser {
         // Maybe we could check return type instead,
         // but not sure if Element, ReactElement<T> are all possible values
         const propsParam = params[0];
-        if (propsParam.name === 'props' || params.length === 1) {
+        if (propsParam.name === "props" || params.length === 1) {
           return propsParam;
         }
       }
@@ -437,7 +437,7 @@ export class Parser {
 
       for (const sig of constructSignatures) {
         const instanceType = sig.getReturnType();
-        const props = instanceType.getProperty('props');
+        const props = instanceType.getProperty("props");
 
         if (props) {
           return props;
@@ -455,7 +455,7 @@ export class Parser {
      * Need to loop over properties first so we capture any
      * static methods. static methods aren't captured in type.symbol.members
      */
-    type.getProperties().forEach(property => {
+    type.getProperties().forEach((property) => {
       // Only add members, don't add non-member properties
       if (this.getCallSignature(property)) {
         methodSymbols.push(property);
@@ -463,7 +463,7 @@ export class Parser {
     });
 
     if (type.symbol && type.symbol.members) {
-      type.symbol.members.forEach(member => {
+      type.symbol.members.forEach((member) => {
         methodSymbols.push(member);
       });
     }
@@ -474,7 +474,7 @@ export class Parser {
   public getMethodsInfo(type: ts.Type): Method[] {
     const members = this.extractMembersFromType(type);
     const methods: Method[] = [];
-    members.forEach(member => {
+    members.forEach((member) => {
       if (!this.isTaggedPublic(member)) {
         return;
       }
@@ -503,9 +503,9 @@ export class Parser {
         returns: returnDescription
           ? {
               description: returnDescription,
-              type: returnType
+              type: returnType,
             }
-          : null
+          : null,
       });
     });
 
@@ -522,14 +522,14 @@ export class Parser {
     const isStatic = (flags & ts.ModifierFlags.Static) !== 0; // tslint:disable-line no-bitwise
 
     if (isStatic) {
-      modifiers.push('static');
+      modifiers.push("static");
     }
 
     return modifiers;
   }
 
   public getParameterInfo(callSignature: ts.Signature): MethodParameter[] {
-    return callSignature.parameters.map(param => {
+    return callSignature.parameters.map((param) => {
       const paramType = this.checker.getTypeOfSymbolAtLocation(
         param,
         param.valueDeclaration!
@@ -539,7 +539,7 @@ export class Parser {
         undefined,
         undefined
       );
-      const isOptionalParam: boolean = !!(
+      const isOptionalParam = !!(
         paramDeclaration && paramDeclaration.questionToken
       );
 
@@ -548,8 +548,8 @@ export class Parser {
           ts.displayPartsToString(
             param.getDocumentationComment(this.checker)
           ) || null,
-        name: param.getName() + (isOptionalParam ? '?' : ''),
-        type: { name: this.checker.typeToString(paramType) }
+        name: param.getName() + (isOptionalParam ? "?" : ""),
+        type: { name: this.checker.typeToString(paramType) },
       };
     });
   }
@@ -565,14 +565,14 @@ export class Parser {
 
   public isTaggedPublic(symbol: ts.Symbol) {
     const jsDocTags = symbol.getJsDocTags();
-    return Boolean(jsDocTags.find(tag => tag.name === 'public'));
+    return Boolean(jsDocTags.find((tag) => tag.name === "public"));
   }
 
   public getReturnDescription(
     symbol: ts.Symbol
   ): SymbolDisplayPart[] | undefined {
     const tags = symbol.getJsDocTags();
-    const returnTag = tags.find(tag => tag.name === 'returns');
+    const returnTag = tags.find((tag) => tag.name === "returns");
     if (!returnTag || !Array.isArray(returnTag.text)) {
       return;
     }
@@ -586,9 +586,7 @@ export class Parser {
     return this.checker.typeToString(type);
   }
 
-  private getInfoFromUnionType(
-    type: ts.Type
-  ): {
+  private getInfoFromUnionType(type: ts.Type): {
     value: string | number;
   } & Partial<JSDoc> {
     let commentInfo = {};
@@ -597,7 +595,7 @@ export class Parser {
     }
     return {
       value: this.getValuesFromUnionType(type),
-      ...commentInfo
+      ...commentInfo,
     };
   }
 
@@ -610,7 +608,7 @@ export class Parser {
 
     let propTypeString = this.checker.typeToString(propType);
     if (this.shouldRemoveUndefinedFromOptional && !isRequired) {
-      propTypeString = propTypeString.replace(' | undefined', '');
+      propTypeString = propTypeString.replace(" | undefined", "");
     }
 
     if (propType.isUnion()) {
@@ -618,7 +616,7 @@ export class Parser {
         this.shouldExtractValuesFromUnion ||
         (this.shouldExtractLiteralValuesFromEnum &&
           propType.types.every(
-            type =>
+            (type) =>
               type.getFlags() &
               (ts.TypeFlags.StringLiteral |
                 ts.TypeFlags.NumberLiteral |
@@ -626,22 +624,24 @@ export class Parser {
                 ts.TypeFlags.Undefined)
           ))
       ) {
-        let value = propType.types.map(type => this.getInfoFromUnionType(type));
+        let value = propType.types.map((type) =>
+          this.getInfoFromUnionType(type)
+        );
 
         if (this.shouldRemoveUndefinedFromOptional && !isRequired) {
-          value = value.filter(option => option.value != 'undefined');
+          value = value.filter((option) => option.value != "undefined");
         }
 
         return {
-          name: 'enum',
+          name: "enum",
           raw: propTypeString,
-          value
+          value,
         };
       }
     }
 
     if (this.shouldRemoveUndefinedFromOptional && !isRequired) {
-      propTypeString = propTypeString.replace(' | undefined', '');
+      propTypeString = propTypeString.replace(" | undefined", "");
     }
 
     return { name: propTypeString };
@@ -665,17 +665,17 @@ export class Parser {
     if (propsType.isUnionOrIntersection()) {
       propertiesOfProps = [
         // Resolve extra properties in the union/intersection
-        ...(propertiesOfProps = (this
-          .checker as any).getAllPossiblePropertiesOfTypes(propsType.types)),
+        ...(propertiesOfProps = (
+          this.checker as any
+        ).getAllPossiblePropertiesOfTypes(propsType.types)),
         // But props we already have override those as they are already correct.
-        ...baseProps
+        ...baseProps,
       ];
 
       if (!propertiesOfProps.length) {
         const subTypes = (this.checker as any).getAllPossiblePropertiesOfTypes(
           propsType.types.reduce<ts.Symbol[]>(
-            // @ts-ignore
-            (all, t) => [...all, ...(t.types || [])],
+            (all: ts.Symbol[], t) => [...all, ...((t as any).types || [])],
             []
           )
         );
@@ -686,7 +686,7 @@ export class Parser {
 
     const result: Props = {};
 
-    propertiesOfProps.forEach(prop => {
+    propertiesOfProps.forEach((prop) => {
       const propName = prop.getName();
 
       // Find type of prop by looking in context of the props object itself.
@@ -708,20 +708,20 @@ export class Parser {
 
       const parent = getParentType(prop);
       const parents = getDeclarations(prop);
-      const declarations = prop.declarations || [];
-      const baseProp = baseProps.find(p => p.getName() === propName);
+      const declarations: (ts.Declaration & { questionToken?: unknown })[] =
+        prop.declarations || [];
+      const baseProp = baseProps.find((p) => p.getName() === propName);
 
       const required =
         !isOptional(prop) &&
         !hasCodeBasedDefault &&
         // If in a intersection or union check original declaration for "?"
-        // @ts-ignore
-        declarations.every(d => !d.questionToken) &&
+        declarations.every((d) => !d.questionToken) &&
         (!baseProp || !isOptional(baseProp));
 
       const type = jsDocComment.tags.type
         ? {
-            name: jsDocComment.tags.type
+            name: jsDocComment.tags.type,
           }
         : this.getDocgenType(propType, required);
 
@@ -729,8 +729,8 @@ export class Parser {
         ? { tags: jsDocComment.tags }
         : {};
       const description = this.shouldIncludePropTagMap
-        ? jsDocComment.description.replace(/\r\n/g, '\n')
-        : jsDocComment.fullComment.replace(/\r\n/g, '\n');
+        ? jsDocComment.description.replace(/\r\n/g, "\n")
+        : jsDocComment.fullComment.replace(/\r\n/g, "\n");
 
       result[propName] = {
         defaultValue,
@@ -740,7 +740,7 @@ export class Parser {
         declarations: parents,
         required,
         type,
-        ...propTags
+        ...propTags,
       };
     });
 
@@ -755,9 +755,9 @@ export class Parser {
 
     const rootSymbols = this.checker.getRootSymbols(symbol);
     const commentsOnRootSymbols = rootSymbols
-      .filter(x => x !== symbol)
-      .map(x => this.getFullJsDocComment(x))
-      .filter(x => !!x.fullComment || !!comment.tags.default);
+      .filter((x) => x !== symbol)
+      .map((x) => this.getFullJsDocComment(x))
+      .filter((x) => !!x.fullComment || !!comment.tags.default);
 
     if (commentsOnRootSymbols.length) {
       return commentsOnRootSymbols[0];
@@ -782,7 +782,7 @@ export class Parser {
     );
 
     if (mainComment) {
-      mainComment = mainComment.replace(/\r\n/g, '\n');
+      mainComment = mainComment.replace(/\r\n/g, "\n");
     }
 
     const tags = symbol.getJsDocTags() || [];
@@ -790,22 +790,22 @@ export class Parser {
     const tagComments: string[] = [];
     const tagMap: StringIndexedObject<string> = {};
 
-    tags.forEach(tag => {
+    tags.forEach((tag) => {
       const trimmedText = ts.displayPartsToString(tag.text).trim();
       const currentValue = tagMap[tag.name];
       tagMap[tag.name] = currentValue
-        ? currentValue + '\n' + trimmedText
+        ? currentValue + "\n" + trimmedText
         : trimmedText;
 
-      if (['default', 'type'].indexOf(tag.name) < 0) {
+      if (["default", "type"].indexOf(tag.name) < 0) {
         tagComments.push(formatTag(tag));
       }
     });
 
     return {
       description: mainComment,
-      fullComment: (mainComment + '\n' + tagComments.join('\n')).trim(),
-      tags: tagMap
+      fullComment: (mainComment + "\n" + tagComments.join("\n")).trim(),
+      tags: tagMap,
     };
   }
 
@@ -822,7 +822,7 @@ export class Parser {
       // Look at forwardRef function argument
       if (initializer && ts.isCallExpression(initializer)) {
         const symbol = this.checker.getSymbolAtLocation(initializer.expression);
-        if (!symbol || symbol.getName() !== 'forwardRef') return;
+        if (!symbol || symbol.getName() !== "forwardRef") return;
         initializer = initializer.arguments[0];
       }
 
@@ -840,26 +840,26 @@ export class Parser {
     symbol: ts.Symbol,
     source: ts.SourceFile
   ) {
-    let possibleStatements = [
+    const possibleStatements = [
       ...source.statements
         // ensure that name property is available
-        .filter(stmt => !!(stmt as ts.ClassDeclaration).name)
+        .filter((stmt) => !!(stmt as ts.ClassDeclaration).name)
         .filter(
-          stmt =>
+          (stmt) =>
             this.checker.getSymbolAtLocation(
               (stmt as ts.ClassDeclaration).name!
             ) === symbol
         ),
       ...source.statements.filter(
-        stmt => ts.isExpressionStatement(stmt) || ts.isVariableStatement(stmt)
-      )
+        (stmt) => ts.isExpressionStatement(stmt) || ts.isVariableStatement(stmt)
+      ),
     ];
 
     return possibleStatements.reduce((res, statement) => {
       if (statementIsClassDeclaration(statement) && statement.members.length) {
         const possibleDefaultProps = statement.members.filter(
-          member =>
-            member.name && getPropertyName(member.name) === 'defaultProps'
+          (member) =>
+            member.name && getPropertyName(member.name) === "defaultProps"
         );
 
         if (!possibleDefaultProps.length) {
@@ -882,20 +882,21 @@ export class Parser {
 
             if (declarations) {
               if (ts.isImportSpecifier(declarations[0])) {
-                var symbol = this.checker.getSymbolAtLocation(
+                const symbol = this.checker.getSymbolAtLocation(
                   declarations[0].name
                 );
                 if (!symbol) {
                   continue;
                 }
-                var aliasedSymbol = this.checker.getAliasedSymbol(symbol);
+                const aliasedSymbol = this.checker.getAliasedSymbol(symbol);
                 if (
                   aliasedSymbol &&
                   aliasedSymbol.declarations &&
                   aliasedSymbol.declarations.length
                 ) {
-                  initializer = (aliasedSymbol
-                    .declarations[0] as ts.VariableDeclaration).initializer;
+                  initializer = (
+                    aliasedSymbol.declarations[0] as ts.VariableDeclaration
+                  ).initializer;
                 } else {
                   continue;
                 }
@@ -919,11 +920,11 @@ export class Parser {
 
         return {
           ...res,
-          ...propMap
+          ...propMap,
         };
       } else if (statementIsStatelessWithDefaultProps(statement)) {
         let propMap = {};
-        (statement as ts.ExpressionStatement).getChildren().forEach(child => {
+        (statement as ts.ExpressionStatement).getChildren().forEach((child) => {
           let { right } = child as ts.BinaryExpression;
 
           if (right && ts.isIdentifier(right)) {
@@ -952,11 +953,9 @@ export class Parser {
         });
         return {
           ...res,
-          ...propMap
+          ...propMap,
         };
-      } else {
       }
-
       const functionStatement = this.getFunctionStatement(statement);
 
       // Extracting default values from props destructuring
@@ -970,7 +969,7 @@ export class Parser {
         if (ts.isObjectBindingPattern(name)) {
           return {
             ...res,
-            ...this.getPropMap(name.elements)
+            ...this.getPropMap(name.elements),
           };
         }
       }
@@ -1031,9 +1030,9 @@ export class Parser {
     // Literal values
     switch (initializer.kind) {
       case ts.SyntaxKind.FalseKeyword:
-        return this.savePropValueAsString ? 'false' : false;
+        return this.savePropValueAsString ? "false" : false;
       case ts.SyntaxKind.TrueKeyword:
-        return this.savePropValueAsString ? 'true' : true;
+        return this.savePropValueAsString ? "true" : true;
       case ts.SyntaxKind.StringLiteral:
         return (initializer as ts.StringLiteral).text.trim();
       case ts.SyntaxKind.PrefixUnaryExpression:
@@ -1045,12 +1044,12 @@ export class Parser {
           ? `${(initializer as ts.NumericLiteral).text}`
           : Number((initializer as ts.NumericLiteral).text);
       case ts.SyntaxKind.NullKeyword:
-        return this.savePropValueAsString ? 'null' : null;
+        return this.savePropValueAsString ? "null" : null;
       case ts.SyntaxKind.Identifier:
-        if ((initializer as ts.Identifier).text === 'undefined') {
-          return 'undefined';
+        if ((initializer as ts.Identifier).text === "undefined") {
+          return "undefined";
         }
-
+        // eslint-disable-next-line no-case-declarations
         const symbol = this.checker.getSymbolAtLocation(
           initializer as ts.Identifier
         );
@@ -1088,7 +1087,7 @@ export class Parser {
       default:
         try {
           return initializer.getText();
-        } catch (e) {
+        } catch {
           return null;
         }
     }
@@ -1106,9 +1105,9 @@ export class Parser {
       const propertyName = getPropertyName(property.name);
 
       if (
-        (typeof literalValue === 'string' ||
-          typeof literalValue === 'number' ||
-          typeof literalValue === 'boolean' ||
+        (typeof literalValue === "string" ||
+          typeof literalValue === "number" ||
+          typeof literalValue === "boolean" ||
           literalValue === null) &&
         propertyName !== null
       ) {
@@ -1134,7 +1133,7 @@ function statementIsStatelessWithDefaultProps(
     const { left } = child as ts.BinaryExpression;
     if (left) {
       const { name } = left as ts.PropertyAccessExpression;
-      if (name && name.escapedText === 'defaultProps') {
+      if (name && name.escapedText === "defaultProps") {
         return true;
       }
     }
@@ -1158,9 +1157,9 @@ function getPropertyName(
 }
 
 function formatTag(tag: ts.JSDocTagInfo) {
-  let result = '@' + tag.name;
+  let result = "@" + tag.name;
   if (tag.text) {
-    result += ' ' + ts.displayPartsToString(tag.text);
+    result += " " + ts.displayPartsToString(tag.text);
   }
   return result;
 }
@@ -1173,19 +1172,19 @@ function getTextValueOfClassMember(
   const [textValue] =
     classDeclarationMembers &&
     classDeclarationMembers
-      .filter(member => ts.isPropertyDeclaration(member))
-      .filter(member => {
+      .filter((member) => ts.isPropertyDeclaration(member))
+      .filter((member) => {
         const name = ts.getNameOfDeclaration(member) as ts.Identifier;
         return name && name.text === memberName;
       })
-      .map(member => {
+      .map((member) => {
         const property = member as ts.PropertyDeclaration;
         return (
           property.initializer && (property.initializer as ts.Identifier).text
         );
       });
 
-  return textValue || '';
+  return textValue || "";
 }
 
 function getTextValueOfFunctionProperty(
@@ -1194,8 +1193,8 @@ function getTextValueOfFunctionProperty(
   propertyName: string
 ) {
   const [textValue] = source.statements
-    .filter(statement => ts.isExpressionStatement(statement))
-    .filter(statement => {
+    .filter((statement) => ts.isExpressionStatement(statement))
+    .filter((statement) => {
       const expr = (statement as ts.ExpressionStatement)
         .expression as ts.BinaryExpression;
       return (
@@ -1205,57 +1204,63 @@ function getTextValueOfFunctionProperty(
           propertyName
       );
     })
-    .filter(statement => {
+    .filter((statement) => {
       return ts.isStringLiteral(
-        ((statement as ts.ExpressionStatement)
-          .expression as ts.BinaryExpression).right
+        (
+          (statement as ts.ExpressionStatement)
+            .expression as ts.BinaryExpression
+        ).right
       );
     })
-    .map(statement => {
-      return (((statement as ts.ExpressionStatement)
-        .expression as ts.BinaryExpression).right as ts.Identifier).text;
+    .map((statement) => {
+      return (
+        (
+          (statement as ts.ExpressionStatement)
+            .expression as ts.BinaryExpression
+        ).right as ts.Identifier
+      ).text;
     });
 
-  return textValue || '';
+  return textValue || "";
 }
 
 function computeComponentName(
   exp: ts.Symbol,
   source: ts.SourceFile,
-  customComponentTypes: ParserOptions['customComponentTypes'] = []
+  customComponentTypes: ParserOptions["customComponentTypes"] = []
 ) {
   const exportName = exp.getName();
 
   const statelessDisplayName = getTextValueOfFunctionProperty(
     exp,
     source,
-    'displayName'
+    "displayName"
   );
 
   const statefulDisplayName =
     exp.valueDeclaration &&
     ts.isClassDeclaration(exp.valueDeclaration) &&
-    getTextValueOfClassMember(exp.valueDeclaration, 'displayName');
+    getTextValueOfClassMember(exp.valueDeclaration, "displayName");
 
   if (statelessDisplayName || statefulDisplayName) {
-    return statelessDisplayName || statefulDisplayName || '';
+    return statelessDisplayName || statefulDisplayName || "";
   }
 
   const defaultComponentTypes = [
-    'default',
-    '__function',
-    'Stateless',
-    'StyledComponentClass',
-    'StyledComponent',
-    'FunctionComponent',
-    'StatelessComponent',
-    'ForwardRefExoticComponent',
-    'MemoExoticComponent'
+    "default",
+    "__function",
+    "Stateless",
+    "StyledComponentClass",
+    "StyledComponent",
+    "FunctionComponent",
+    "StatelessComponent",
+    "ForwardRefExoticComponent",
+    "MemoExoticComponent",
   ];
 
   const supportedComponentTypes = [
     ...defaultComponentTypes,
-    ...customComponentTypes
+    ...customComponentTypes,
   ];
 
   if (supportedComponentTypes.indexOf(exportName) !== -1) {
@@ -1269,15 +1274,15 @@ function computeComponentName(
 export function getDefaultExportForFile(source: ts.SourceFile) {
   const name = path.basename(source.fileName, path.extname(source.fileName));
   const filename =
-    name === 'index' ? path.basename(path.dirname(source.fileName)) : name;
+    name === "index" ? path.basename(path.dirname(source.fileName)) : name;
 
   // JS identifiers must starts with a letter, and contain letters and/or numbers
   // So, you could not take filename as is
   const identifier = filename
-    .replace(/^[^A-Z]*/gi, '')
-    .replace(/[^A-Z0-9]*/gi, '');
+    .replace(/^[^A-Z]*/gi, "")
+    .replace(/[^A-Z0-9]*/gi, "");
 
-  return identifier.length ? identifier : 'DefaultName';
+  return identifier.length ? identifier : "DefaultName";
 }
 
 function isTypeLiteral(node: ts.Node): node is ts.TypeLiteralNode {
@@ -1293,7 +1298,7 @@ function getDeclarations(prop: ts.Symbol): ParentType[] | undefined {
 
   const parents: ParentType[] = [];
 
-  for (let declaration of declarations) {
+  for (const declaration of declarations) {
     const { parent } = declaration;
 
     if (!isTypeLiteral(parent) && !isInterfaceOrTypeAliasDeclaration(parent)) {
@@ -1301,17 +1306,17 @@ function getDeclarations(prop: ts.Symbol): ParentType[] | undefined {
     }
 
     const parentName =
-      'name' in parent
+      "name" in parent
         ? (parent as InterfaceOrTypeAliasDeclaration).name.text
-        : 'TypeLiteral';
+        : "TypeLiteral";
 
-    const { fileName } = (parent as
-      | InterfaceOrTypeAliasDeclaration
-      | ts.TypeLiteralNode).getSourceFile();
+    const { fileName } = (
+      parent as InterfaceOrTypeAliasDeclaration | ts.TypeLiteralNode
+    ).getSourceFile();
 
     parents.push({
       fileName: trimFileName(fileName),
-      name: parentName
+      name: parentName,
     });
   }
 
@@ -1337,7 +1342,7 @@ function getParentType(prop: ts.Symbol): ParentType | undefined {
 
   return {
     fileName: trimFileName(fileName),
-    name: parentName
+    name: parentName,
   };
 }
 
@@ -1369,10 +1374,10 @@ function parseWithProgramProvider(
   const checker = program.getTypeChecker();
 
   return filePaths
-    .map(filePath => program.getSourceFile(filePath))
+    .map((filePath) => program.getSourceFile(filePath))
     .filter(
       (sourceFile): sourceFile is ts.SourceFile =>
-        typeof sourceFile !== 'undefined'
+        typeof sourceFile !== "undefined"
     )
     .reduce<ComponentDoc[]>((docs, sourceFile) => {
       const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
@@ -1385,7 +1390,7 @@ function parseWithProgramProvider(
       const componentDocs: ComponentDoc[] = [];
 
       // First document all components
-      components.forEach(exp => {
+      components.forEach((exp) => {
         const doc = parser.getComponentInfo(
           exp,
           sourceFile,
@@ -1402,7 +1407,7 @@ function parseWithProgramProvider(
         }
 
         // Then document any static sub-components
-        exp.exports.forEach(symbol => {
+        exp.exports.forEach((symbol) => {
           if (symbol.flags & ts.SymbolFlags.Prototype) {
             return;
           }
@@ -1411,7 +1416,7 @@ function parseWithProgramProvider(
             const signature = parser.getCallSignature(symbol);
             const returnType = checker.typeToString(signature.getReturnType());
 
-            if (returnType !== 'Element') {
+            if (returnType !== "Element") {
               return;
             }
           }
@@ -1425,11 +1430,11 @@ function parseWithProgramProvider(
 
           if (doc) {
             const prefix =
-              exp.escapedName === 'default' ? '' : `${exp.escapedName}.`;
+              exp.escapedName === "default" ? "" : `${exp.escapedName}.`;
 
             componentDocs.push({
               ...doc,
-              displayName: `${prefix}${symbol.escapedName}`
+              displayName: `${prefix}${symbol.escapedName}`,
             });
           }
         });
@@ -1438,7 +1443,7 @@ function parseWithProgramProvider(
       // Remove any duplicates (for HOC where the names are the same)
       const componentDocsNoDuplicates = componentDocs.reduce(
         (prevVal, comp) => {
-          const duplicate = prevVal.find(compDoc => {
+          const duplicate = prevVal.find((compDoc) => {
             return compDoc!.displayName === comp!.displayName;
           });
           if (duplicate) return prevVal;
@@ -1451,7 +1456,7 @@ function parseWithProgramProvider(
         (comp, index, comps) =>
           comps
             .slice(index + 1)
-            .every(innerComp => innerComp!.displayName !== comp!.displayName)
+            .every((innerComp) => innerComp!.displayName !== comp!.displayName)
       );
 
       return [...docs, ...filteredComponentDocs];

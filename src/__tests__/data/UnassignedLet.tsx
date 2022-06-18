@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 /**
  * A repro props interface
@@ -11,14 +11,14 @@ export interface IReproProps {
 /**
  * My Repro Component
  */
-export class Repro extends React.Component<IReproProps, {}> {
+export class Repro extends React.Component<IReproProps> {
   constructor(props) {
     super(props);
   }
 
   repro() {
     let repro;
-    repro = 1;
+    repro = 1; // eslint-disable-line prefer-const
   }
 
   render() {

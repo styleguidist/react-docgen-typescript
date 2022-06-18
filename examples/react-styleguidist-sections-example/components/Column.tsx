@@ -20,7 +20,7 @@ export interface IColumnProps extends React.HTMLAttributes<any> {
 /**
  * Form column.
  */
-export class Column extends Component<IColumnProps, {}> {
+export class Column extends Component<IColumnProps> {
   render() {
     return <div>Column</div>;
   }

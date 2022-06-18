@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 /** IAppMenuProps props */
 export interface IAppMenuProps {
@@ -15,7 +15,7 @@ export class AppMenu extends React.Component<IAppMenuProps, IAppMenuState> {
   constructor(props, context) {
     super(props, context);
     this.state = {
-      menu: this.props.menu
+      menu: this.props.menu,
     };
 
     this.handleClick = this.handleClick.bind(this);

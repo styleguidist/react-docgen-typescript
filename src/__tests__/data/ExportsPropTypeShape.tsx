@@ -1,5 +1,5 @@
-import * as PropTypes from 'prop-types';
-import * as React from 'react';
+import * as PropTypes from "prop-types";
+import * as React from "react";
 
 export const SomeShape = PropTypes.shape({});
 
@@ -14,10 +14,7 @@ export interface ExportsPropTypesProps {
 /**
  * ExportsPropTypes description
  */
-export class ExportsPropTypes extends React.Component<
-  ExportsPropTypesProps,
-  {}
-> {
+export class ExportsPropTypes extends React.Component<ExportsPropTypesProps> {
   render() {
     return <div />;
   }

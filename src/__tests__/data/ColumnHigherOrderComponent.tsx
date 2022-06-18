@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { externalHoc } from './ColumnHigherOrderComponentHoc';
+import * as React from "react";
+import { externalHoc } from "./ColumnHigherOrderComponentHoc";
 /**
  * Column properties.
  */
@@ -11,9 +11,9 @@ export interface IColumnProps {
 /**
  * Form column.
  */
-class Column extends React.Component<IColumnProps, {}> {
+class Column extends React.Component<IColumnProps> {
   public static defaultProps: Partial<IColumnProps> = {
-    prop1: 'prop1'
+    prop1: "prop1",
   };
 
   public render() {
@@ -44,7 +44,7 @@ const Row = (props: IRowProps) => {
 };
 
 function hoc<T>(C: T): T {
-  return ((props => <div>{C}</div>) as any) as T;
+  return ((props) => <div>{C}</div>) as any as T;
 }
 
 /** ColumnHigherOrderComponent1 description */

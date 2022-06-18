@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 /**
  * Column properties.
@@ -13,9 +13,9 @@ export interface IColumnProps extends React.HTMLAttributes<any> {
 /**
  * Column description
  */
-export class Column extends React.Component<IColumnProps, {}> {
+export class Column extends React.Component<IColumnProps> {
   public static defaultProps: Partial<IColumnProps> = {
-    prop1: 'prop1'
+    prop1: "prop1",
   };
 
   public render() {

@@ -1,5 +1,5 @@
-import * as React from 'react';
-import MyExternalType from './ColumnWithPropsWithExternalType.MyExternalType';
+import * as React from "react";
+import MyExternalType from "./ColumnWithPropsWithExternalType.MyExternalType";
 
 /**
  * ColumnWithPropsWithExternalType properties.
@@ -18,10 +18,7 @@ export interface IColumnWithPropsWithExternalTypeProps {
 /**
  * ColumnWithPropsWithExternalType description
  */
-export class ColumnWithPropsWithExternalType extends React.Component<
-  IColumnWithPropsWithExternalTypeProps,
-  {}
-> {
+export class ColumnWithPropsWithExternalType extends React.Component<IColumnWithPropsWithExternalTypeProps> {
   public render() {
     const { prop1 } = this.props;
     return <div>{prop1}</div>;

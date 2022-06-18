@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 interface Todo {
   title: string;
@@ -14,7 +14,7 @@ export interface ExtractPropTagsProps {
    * @kind category 2
    * @custom123 something
    */
-  prop1?: Pick<Todo, 'title' | 'completed'>;
+  prop1?: Pick<Todo, "title" | "completed">;
   /** prop2 description
    * @internal some internal prop
    * @kind category 1

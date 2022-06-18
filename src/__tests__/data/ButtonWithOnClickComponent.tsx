@@ -1,13 +1,13 @@
-import { FC, PropsWithRef } from 'react';
+import { FC, PropsWithRef } from "react";
 
-type HTMLButtonProps = JSX.IntrinsicElements['button'];
+type HTMLButtonProps = JSX.IntrinsicElements["button"];
 
 type Props = HTMLButtonProps & {
   /** onClick event handler */
-  onClick?: HTMLButtonProps['onClick'];
+  onClick?: HTMLButtonProps["onClick"];
 };
 
-const ButtonWithOnClickComponent: FC<Props> = props => {
+const ButtonWithOnClickComponent: FC<Props> = (props) => {
   return <button {...props} />;
 };
 

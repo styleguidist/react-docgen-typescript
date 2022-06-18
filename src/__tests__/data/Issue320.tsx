@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 /**
  * that example is copied from MaterialUI
@@ -7,7 +7,7 @@ import * as React from 'react';
  */
 
 export interface OverridableTypeMap {
-  props: {};
+  props: any;
 }
 
 interface Props {
@@ -15,7 +15,7 @@ interface Props {
 }
 
 export interface OverridableComponent<M extends OverridableTypeMap> {
-  (props: M['props'] & { color?: string }): JSX.Element;
+  (props: M["props"] & { color?: string }): JSX.Element;
   (props: M): JSX.Element;
 }
 
@@ -25,10 +25,10 @@ export type ComponentTypeMap = {
   };
 };
 
-const Component: OverridableComponent<ComponentTypeMap> = () => ({
-  text
-}: Props) => {
-  return <div>{text}</div>;
-};
+const Component: OverridableComponent<ComponentTypeMap> =
+  () =>
+  ({ text }: Props) => {
+    return <div>{text}</div>;
+  };
 
 export default Component;

@@ -1,8 +1,8 @@
-import * as React from 'react';
+import * as React from "react";
 
 const defaultProps = {
   id: 123,
-  disabled: false
+  disabled: false,
 };
 
 interface SeparateDefaultPropsProps {

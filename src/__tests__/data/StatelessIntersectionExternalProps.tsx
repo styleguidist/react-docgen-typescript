@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { ExternalOptionalComponentProps } from './ExternalPropsComponentProps';
+import * as React from "react";
+import { ExternalOptionalComponentProps } from "./ExternalPropsComponentProps";
 
 export interface StatelessProps {
   /** myProp description */
@@ -7,5 +7,6 @@ export interface StatelessProps {
 }
 
 /** StatelessIntersectionExternalProps description */
-export const StatelessIntersectionExternalProps: React.SFC<StatelessProps &
-  ExternalOptionalComponentProps> = props => <div />;
+export const StatelessIntersectionExternalProps: React.SFC<
+  StatelessProps & ExternalOptionalComponentProps
+> = (props) => <div />;

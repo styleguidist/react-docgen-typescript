@@ -1,10 +1,10 @@
-import * as React from 'react';
+import * as React from "react";
 
 enum sampleEnum {
   /** test comment */
-  ONE = 'one',
-  TWO = 'two',
-  THREE = 'three'
+  ONE = "one",
+  TWO = "two",
+  THREE = "three",
 }
 
 interface RemoveOptionalValuesFromEnumProps {
@@ -17,8 +17,10 @@ interface RemoveOptionalValuesFromEnumProps {
 }
 
 /** RemoveOptionalValuesFromEnum description */
-export const Stateless: React.StatelessComponent<RemoveOptionalValuesFromEnumProps> = ({
-  sampleString = 'hello',
+export const Stateless: React.StatelessComponent<
+  RemoveOptionalValuesFromEnumProps
+> = ({
+  sampleString = "hello",
   sampleBoolean = true,
-  sampleEnum = 'three'
+  sampleEnum = "three",
 }) => <div>test</div>;

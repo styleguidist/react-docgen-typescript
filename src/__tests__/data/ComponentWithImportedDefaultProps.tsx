@@ -1,13 +1,11 @@
-import * as React from 'react';
-import { defaultProps } from './const';
+import * as React from "react";
+import { defaultProps } from "./const";
 
 interface ComponentWithImportedDefaultPropsProps {
   name: string;
 }
 
-export class ComponentWithImportedDefaultProps extends React.Component<
-  ComponentWithImportedDefaultPropsProps
-> {
+export class ComponentWithImportedDefaultProps extends React.Component<ComponentWithImportedDefaultPropsProps> {
   static defaultProps = defaultProps;
 
   constructor(props: ComponentWithImportedDefaultPropsProps) {

@@ -1,11 +1,11 @@
-import * as React from 'react';
+import * as React from "react";
 
 export interface HOCInjectedProps {
   /** injected description */
   injected: boolean;
 }
 
-type HOCWrapper = <P = {}>(
+type HOCWrapper = <P>(
   Component: React.ComponentType<P & HOCInjectedProps>
 ) => React.ComponentType<P>;
 

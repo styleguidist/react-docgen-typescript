@@ -1,12 +1,12 @@
-import * as React from 'react';
+import * as React from "react";
 
 const defaultProps2 = {
-  id: 123
+  id: 123,
 };
 
 const defaultProps = {
   id: defaultProps2.id,
-  disabled: false
+  disabled: false,
 };
 
 interface SeparateDefaultPropsIndividualProps {
@@ -21,5 +21,5 @@ export const SeparateDefaultPropsIndividual = (
 
 SeparateDefaultPropsIndividual.defaultProps = {
   id: defaultProps.id,
-  disabled: defaultProps.disabled
+  disabled: defaultProps.disabled,
 };

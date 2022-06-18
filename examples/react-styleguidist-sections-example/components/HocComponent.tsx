@@ -19,7 +19,7 @@ export interface IRowProps {
 /**
  * Form row.
  */
-class Component extends React.Component<IRowProps, {}> {
+class Component extends React.Component<IRowProps> {
   render() {
     return <div>Test</div>;
   }

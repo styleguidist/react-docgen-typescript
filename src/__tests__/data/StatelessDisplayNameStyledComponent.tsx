@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 export interface StyledComponentClassProps {
   /** myProp description */
@@ -6,7 +6,7 @@ export interface StyledComponentClassProps {
 }
 
 /** Stateless description */
-const StyledComponentClass: React.SFC<StyledComponentClassProps> = props => (
+const StyledComponentClass: React.SFC<StyledComponentClassProps> = (props) => (
   <div>My Property = {props.myProp}</div>
 );
 

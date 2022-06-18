@@ -1,3 +1,3 @@
-import * as PropTypes from 'prop-types';
+import * as PropTypes from "prop-types";
 
 export const SomeShape = PropTypes.shape({});

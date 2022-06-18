@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 /** JumbotronProps props */
 export interface JumbotronProps {
@@ -9,7 +9,7 @@ export interface JumbotronProps {
 /**
  * Jumbotron description
  */
-const Jumbotron: React.SFC<JumbotronProps> = props => {
+const Jumbotron: React.SFC<JumbotronProps> = (props) => {
   return <div>Test</div>;
 };
 

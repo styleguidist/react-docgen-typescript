@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 /** StatelessWithDefaultProps props */
 export interface StatelessWithDefaultPropsAsStringProps {
@@ -16,9 +16,9 @@ export interface StatelessWithDefaultPropsAsStringProps {
   sampleUndefined?: undefined;
 }
 
-export const StatelessWithDefaultPropsAsString: React.StatelessComponent<StatelessWithDefaultPropsAsStringProps> = props => (
-  <div>test</div>
-);
+export const StatelessWithDefaultPropsAsString: React.StatelessComponent<
+  StatelessWithDefaultPropsAsStringProps
+> = (props) => <div>test</div>;
 
 StatelessWithDefaultPropsAsString.defaultProps = {
   sampleFalse: false,
@@ -26,5 +26,5 @@ StatelessWithDefaultPropsAsString.defaultProps = {
   sampleNumber: 1,
   sampleNumberWithPrefix: -1,
   sampleTrue: true,
-  sampleUndefined: undefined
+  sampleUndefined: undefined,
 };

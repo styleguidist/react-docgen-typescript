@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 /** IComponentWithDefaultPropsProps props */
 export interface IComponentWithDefaultPropsProps {
@@ -6,7 +6,7 @@ export interface IComponentWithDefaultPropsProps {
    * sample with default value
    * @default hello
    */
-  sampleDefaultFromJSDoc: 'hello' | 'goodbye';
+  sampleDefaultFromJSDoc: "hello" | "goodbye";
   /** sampleTrue description */
   sampleTrue?: boolean;
   /** sampleFalse description */
@@ -29,21 +29,17 @@ const defaultProps: Partial<IComponentWithDefaultPropsProps> = {
   sampleNumber: -1,
   // prettier-ignore
   sampleObject: { a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } },
-  sampleString: 'hello',
+  sampleString: "hello",
   sampleTrue: true,
-  sampleUndefined: undefined
+  sampleUndefined: undefined,
 };
 
 const defaultPropsReference = defaultProps;
 
 /** ComponentWithDefaultProps description */
-export class ComponentWithDefaultProps extends React.Component<
-  IComponentWithDefaultPropsProps,
-  {}
-> {
-  static defaultProps: Partial<
-    IComponentWithDefaultPropsProps
-  > = defaultPropsReference;
+export class ComponentWithDefaultProps extends React.Component<IComponentWithDefaultPropsProps> {
+  static defaultProps: Partial<IComponentWithDefaultPropsProps> =
+    defaultPropsReference;
 
   public render() {
     return <div>test</div>;

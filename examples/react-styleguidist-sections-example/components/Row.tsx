@@ -20,7 +20,7 @@ export interface IRowProps {
 /**
  * Form Row.
  */
-export class Row extends Component<IRowProps, {}> {
+export class Row extends Component<IRowProps> {
   render() {
     return <div>Row</div>;
   }

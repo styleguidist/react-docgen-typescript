@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 /**
  * Row properties.
@@ -13,7 +13,7 @@ export interface IRowProps {
 /**
  * Row description
  */
-export class Row extends React.PureComponent<IRowProps, {}> {
+export class Row extends React.PureComponent<IRowProps> {
   public render() {
     return <div>Test</div>;
   }

@@ -1,7 +1,7 @@
-const PROPERTY1_DEFAULT = 'hello';
-const PROPERTY2_DEFAULT = 'goodbye';
+const PROPERTY1_DEFAULT = "hello";
+const PROPERTY2_DEFAULT = "goodbye";
 const PROPERTY3_DEFAULT = 10;
-const PROPERTY4_DEFAULT = 'this is a string';
+const PROPERTY4_DEFAULT = "this is a string";
 const PROPERTY5_DEFAULT = true;
 
 export {
@@ -9,5 +9,5 @@ export {
   PROPERTY2_DEFAULT,
   PROPERTY3_DEFAULT,
   PROPERTY4_DEFAULT,
-  PROPERTY5_DEFAULT
+  PROPERTY5_DEFAULT,
 };

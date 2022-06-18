@@ -1,11 +1,11 @@
-import * as path from 'path';
+import * as path from "path";
 
 const slashRegex = /[\\/]/g;
 
 export function trimFileName(
   fileName: string,
   cwd: string = process.cwd(),
-  platform?: 'posix' | 'win32'
+  platform?: "posix" | "win32"
 ) {
   // This allows tests to run regardless of current platform
   const pathLib = platform ? path[platform] : path;

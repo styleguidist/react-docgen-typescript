@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 export interface OnlyDefaultExportUnionProps {
   /** The content */
@@ -8,8 +8,8 @@ export interface OnlyDefaultExportUnionProps {
 /** OnlyDefaultExportUnion description */
 const OnlyDefaultExportUnion: React.FC<OnlyDefaultExportUnionProps> & {
   handledProps: Array<keyof OnlyDefaultExportUnionProps>;
-} = props => <div />;
+} = (props) => <div />;
 
-OnlyDefaultExportUnion.handledProps = ['content'];
+OnlyDefaultExportUnion.handledProps = ["content"];
 
 export default OnlyDefaultExportUnion;

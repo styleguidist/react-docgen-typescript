@@ -1,11 +1,10 @@
-import * as React from 'react';
+import * as React from "react";
 
-export type StatelessProps<
-  T extends React.JSXElementConstructor<any>
-> = React.ComponentProps<T> & {
-  /** myProp description */
-  myProp: string;
-};
+export type StatelessProps<T extends React.JSXElementConstructor<any>> =
+  React.ComponentProps<T> & {
+    /** myProp description */
+    myProp: string;
+  };
 
 /** StatelessIntersectionGenericProps description */
 export const StatelessIntersectionGenericProps = <

@@ -1,12 +1,7 @@
-import { assert } from 'chai';
-import { isEqual } from 'lodash';
-import * as path from 'path';
-import {
-  ComponentDoc,
-  defaultParserOpts,
-  parse,
-  ParserOptions
-} from '../parser';
+import { assert } from "chai";
+import { isEqual } from "lodash";
+import * as path from "path";
+import { ComponentDoc, parse, ParserOptions } from "../parser";
 
 export interface ExpectedComponents {
   [key: string]: ExpectedComponent;
@@ -35,11 +30,11 @@ export interface ExpectedProp {
 export function fixturePath(componentName: string) {
   return path.join(
     __dirname,
-    '..',
-    '..',
-    'src',
-    '__tests__',
-    'data',
+    "..",
+    "..",
+    "src",
+    "__tests__",
+    "data",
     `${componentName}.tsx`
   ); // it's running in ./temp
 }
@@ -47,7 +42,7 @@ export function fixturePath(componentName: string) {
 export function check(
   componentName: string,
   expected: ExpectedComponents,
-  exactProperties: boolean = true,
+  exactProperties = true,
   description?: string | null,
   parserOpts?: ParserOptions
 ) {
@@ -58,7 +53,7 @@ export function check(
 export function checkComponent(
   actual: ComponentDoc[],
   expected: ExpectedComponents,
-  exactProperties: boolean = true,
+  exactProperties = true,
   description?: string | null
 ) {
   const expectedComponentNames = Object.getOwnPropertyNames(expected);
@@ -66,8 +61,8 @@ export function checkComponent(
     actual.length,
     expectedComponentNames.length,
     // tslint:disable-next-line:max-line-length
-    `The number of expected components is different - \r\n\expected: ${expectedComponentNames}, \r\n\actual: ${actual.map(
-      i => i.displayName
+    `The number of expected components is different - \r\nexpected: ${expectedComponentNames}, \r\nactual: ${actual.map(
+      (i) => i.displayName
     )}`
   );
 
@@ -75,7 +70,7 @@ export function checkComponent(
   for (const expectedComponentName of expectedComponentNames) {
     const expectedComponent = expected[expectedComponentName];
     const componentDocs = actual.filter(
-      i => i.displayName === expectedComponentName
+      (i) => i.displayName === expectedComponentName
     );
     if (componentDocs.length === 0) {
       errors.push(`Component is missing - ${expectedComponentName}`);
@@ -88,7 +83,7 @@ export function checkComponent(
 
     let expectedComponentDescription = `${compName} description`;
     if (description !== undefined) {
-      expectedComponentDescription = description || '';
+      expectedComponentDescription = description || "";
     }
 
     if (componentDoc.description !== expectedComponentDescription) {
@@ -202,5 +197,5 @@ export function checkComponent(
     console.log(JSON.stringify(actual, null, 4));
   }
 
-  assert(ok, errors.join('\r\n'));
+  assert(ok, errors.join("\r\n"));
 }

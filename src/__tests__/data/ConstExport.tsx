@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 /**
  * Row properties.
@@ -18,7 +18,7 @@ export const test = (one: number) => {
 };
 
 export const myObj = {
-  foo: 'bar'
+  foo: "bar",
 };
 
 /**

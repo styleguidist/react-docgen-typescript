@@ -1,1 +1,1 @@
-export { default as OnlyDefaultExportUnion } from './OnlyDefaultExportUnion';
+export { default as OnlyDefaultExportUnion } from "./OnlyDefaultExportUnion";

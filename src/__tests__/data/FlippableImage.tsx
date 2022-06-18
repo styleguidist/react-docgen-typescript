@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 /** Props comment */
 export type Props = React.HTMLAttributes<HTMLImageElement> & {
@@ -12,7 +12,7 @@ export type Props = React.HTMLAttributes<HTMLImageElement> & {
 export const FlippableImage = (props: Props) => {
   const { src, isFlippedX = false, isFlippedY = false, style, ...rest } = props;
 
-  let transform = '';
+  let transform = "";
   if (isFlippedX) {
     transform += ` scale(-1, 1)`;
   }
