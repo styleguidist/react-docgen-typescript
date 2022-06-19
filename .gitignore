@@ -47,5 +47,5 @@ jspm_packages
 .idea
 
 # App
-lib
+dist
 temp

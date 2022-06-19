@@ -4,26 +4,22 @@
   "description": "",
   "homepage": "https://github.com/styleguidist/react-docgen-typescript/",
   "bugs": "https://github.com/styleguidist/react-docgen-typescript/issues",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
     "lint": "eslint src",
-    "lint:fix": "npm run lint -- --fix",
+    "lint:fix": "pnpm run lint -- --fix",
     "prepublishOnly": "tsc -d",
-    "test": "vitest",
-    "tsc": "tsc",
-    "tsc:watch": "tsc -w"
+    "test": "vitest"
   },
   "license": "MIT",
   "peerDependencies": {
     "typescript": ">= 4.3.x"
   },
   "devDependencies": {
-    "@types/chai": "^4.1.0",
     "@types/lodash": "^4.14.137",
-    "@types/mocha": "^5.2.5",
-    "@types/node": "^15.6.1",
+    "@types/node": "^18.0.0",
     "@types/prop-types": "^15.5.4",
     "@types/react": "^16.9.34",
     "@types/source-map-support": "^0.4.1",
@@ -43,7 +39,7 @@
     "vitest": "^0.15.1"
   },
   "files": [
-    "lib",
+    "dist",
     "!**/__tests__/**"
   ],
   "repository": {

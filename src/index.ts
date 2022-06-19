@@ -1,4 +1,4 @@
-import {
+export {
   ComponentDoc,
   FileParser,
   getDefaultExportForFile,
@@ -12,18 +12,3 @@ import {
   withCustomConfig,
   withDefaultConfig,
 } from "./parser";
-
-export {
-  parse,
-  getDefaultExportForFile,
-  withCompilerOptions,
-  withDefaultConfig,
-  withCustomConfig,
-  ComponentDoc,
-  FileParser,
-  Parser,
-  ParserOptions,
-  Props,
-  PropItem,
-  PropItemType,
-};

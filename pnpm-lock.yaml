@@ -1,10 +1,8 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@types/chai': ^4.1.0
   '@types/lodash': ^4.14.137
-  '@types/mocha': ^5.2.5
-  '@types/node': ^15.6.1
+  '@types/node': ^18.0.0
   '@types/prop-types': ^15.5.4
   '@types/react': ^16.9.34
   '@types/source-map-support': ^0.4.1
@@ -24,10 +22,8 @@ specifiers:
   vitest: ^0.15.1
 
 devDependencies:
-  '@types/chai': 4.3.1
   '@types/lodash': 4.14.182
-  '@types/mocha': 5.2.7
-  '@types/node': 15.14.9
+  '@types/node': 18.0.0
   '@types/prop-types': 15.7.5
   '@types/react': 16.14.28
   '@types/source-map-support': 0.4.2
@@ -127,12 +123,8 @@ packages:
     resolution: {integrity: sha512-Klz949h02Gz2uZCMGwDUSDS1YBlTdDDgbWHi+81l29tQALUtvz4rAYi5uoVhE5Lagoq6DeqAUlbrHvW/mXDgdQ==}
     dev: true
 
-  /@types/mocha/5.2.7:
-    resolution: {integrity: sha512-NYrtPht0wGzhwe9+/idPaBB+TqkY9AhTvOLMkThm0IoEfLaiVQZwBwyJ5puCkO3AUCWrmcoePjp2mbFocKy4SQ==}
-    dev: true
-
-  /@types/node/15.14.9:
-    resolution: {integrity: sha512-qjd88DrCxupx/kJD5yQgZdcYKZKSIGBVDIBE1/LTGcNm3d2Np/jxojkdePDdfnBHJc5W7vSMpbJ1aB7p/Py69A==}
+  /@types/node/18.0.0:
+    resolution: {integrity: sha512-cHlGmko4gWLVI27cGJntjs/Sj8th9aYwplmZFwmmgYQQvL5NUsgVJG7OddLvNfLqYS31KFN0s3qlaD9qCaxACA==}
     dev: true
 
   /@types/prop-types/15.7.5:
@@ -154,7 +146,7 @@ packages:
   /@types/source-map-support/0.4.2:
     resolution: {integrity: sha512-GbGWx39O8NdUHSChdrU0XeigBAgu1Teg3llwE0slSVcH2qISaQT70ftAiH+h4HIt3VIObFU34PSpXIKJuXCybQ==}
     dependencies:
-      '@types/node': 15.14.9
+      '@types/node': 18.0.0
     dev: true
 
   /@typescript-eslint/eslint-plugin/5.28.0_py5roj3ykd3sga4gtxlmfvv4pa:
@@ -1605,7 +1597,7 @@ packages:
     dependencies:
       '@types/chai': 4.3.1
       '@types/chai-subset': 1.3.3
-      '@types/node': 15.14.9
+      '@types/node': 18.0.0
       '@vitest/ui': 0.15.1
       chai: 4.3.6
       debug: 4.3.4
