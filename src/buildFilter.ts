@@ -1,10 +1,10 @@
-import {
+import type {
   Component,
   ParserOptions,
   PropFilter,
   PropItem,
   StaticPropFilter,
-} from "./parser";
+} from "./parser/types";
 
 export function buildFilter(opts: ParserOptions): PropFilter {
   return (prop: PropItem, component: Component) => {

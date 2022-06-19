@@ -1,15 +1,11 @@
-import { assert, describe, expect, it } from "vitest";
 import * as fs from "fs";
 import * as path from "path";
 import * as ts from "typescript";
-import {
-  getDefaultExportForFile,
-  parse,
-  PropFilter,
-  withCustomConfig,
-  withDefaultConfig,
-} from "../parser";
-import { check, checkComponent, fixturePath } from "./testUtils";
+import { assert, describe, expect, it } from "vitest";
+import { check, checkComponent, fixturePath } from "../testUtils";
+import { parse, withCustomConfig, withDefaultConfig } from "../../parser";
+import { getDefaultExportForFile } from "../../parser/utilities";
+import type { PropFilter } from "../../parser/types";
 
 describe.concurrent("parser", () => {
   it("should parse simple react class component", () => {
@@ -73,7 +69,7 @@ describe.concurrent("parser", () => {
     });
   });
 
-  it("should parse mulitple files", () => {
+  it("should parse multiple files", () => {
     const result = parse([
       fixturePath("Column"),
       fixturePath("ColumnWithDefaultExportOnly"),
@@ -1432,7 +1428,7 @@ describe.concurrent("parser", () => {
       });
     });
 
-    describe("Returning not string default props ", () => {
+    describe("Returning not string default props", () => {
       it("returns not string defaultProps", () => {
         check(
           "StatelessWithDefaultPropsAsString",
@@ -1524,12 +1520,7 @@ describe.concurrent("parser", () => {
   describe("withCustomConfig", () => {
     it("should accept tsconfigs that typescript accepts", () => {
       assert.ok(
-        withCustomConfig(
-          // need to navigate to root because tests run on compiled tests
-          // and tsc does not include json files
-          path.join(__dirname, "../../src/__tests__/data/tsconfig.json"),
-          {}
-        )
+        withCustomConfig(path.join(__dirname, "../data/tsconfig.json"), {})
       );
     });
   });
@@ -1545,7 +1536,7 @@ describe.concurrent("parser", () => {
       };
       const parser = withCustomConfig(
         // tsconfig with strict: true
-        path.join(__dirname, "../../src/__tests__/data/tsconfig.json"),
+        path.join(__dirname, "../data/tsconfig.json"),
         options
       );
       it("removes undefined from enums", () => {
@@ -1616,15 +1607,9 @@ describe.concurrent("parser", () => {
   describe("parseWithProgramProvider", () => {
     it("should accept existing ts.Program instance", () => {
       let programProviderInvoked = false;
-
       // mimic a third party library providing a ts.Program instance.
       const programProvider = () => {
-        // need to navigate to root because tests run on compiled tests
-        // and tsc does not include json files
-        const tsconfigPath = path.join(
-          __dirname,
-          "../../src/__tests__/data/tsconfig.json"
-        );
+        const tsconfigPath = path.join(__dirname, "../data/tsconfig.json");
         const basePath = path.dirname(tsconfigPath);
 
         const { config, error } = ts.readConfigFile(tsconfigPath, (filename) =>
@@ -1689,8 +1674,7 @@ describe.concurrent("parser", () => {
   describe("methods", () => {
     it("should properly parse methods", () => {
       const [parsed] = parse(fixturePath("ColumnWithMethods"));
-      const methods = parsed.methods;
-      const myCoolMethod = methods[0];
+      const [myCoolMethod] = parsed.methods;
 
       assert.equal(myCoolMethod.description, "My super cool method");
       assert.equal(
@@ -1744,36 +1728,6 @@ describe.concurrent("parser", () => {
         Boolean(methods.find((method) => method.name === "myPrivateFunction")),
         false
       );
-    });
-  });
-
-  describe("getDefaultExportForFile", () => {
-    it("should filter out forbidden symbols", () => {
-      const result = getDefaultExportForFile({
-        fileName: "a-b",
-      } as ts.SourceFile);
-      assert.equal(result, "ab");
-    });
-
-    it("should remove leading non-letters", () => {
-      const result = getDefaultExportForFile({
-        fileName: "---123aba",
-      } as ts.SourceFile);
-      assert.equal(result, "aba");
-    });
-
-    it("should preserve numbers in the middle", () => {
-      const result = getDefaultExportForFile({
-        fileName: "1Body2Text3",
-      } as ts.SourceFile);
-      assert.equal(result, "Body2Text3");
-    });
-
-    it("should not return empty string", () => {
-      const result = getDefaultExportForFile({
-        fileName: "---123",
-      } as ts.SourceFile);
-      assert.equal(result.length > 0, true);
     });
   });
 

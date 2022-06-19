@@ -1,6 +1,6 @@
-import { expect, describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { buildFilter } from "../buildFilter";
-import { ParentType, ParserOptions, PropItem } from "../parser";
+import type { ParentType, ParserOptions, PropItem } from "../parser/types";
 
 function createProp(
   name: string,
@@ -138,7 +138,7 @@ describe("buildFilter", () => {
         "foobar description"
       );
       const opts: ParserOptions = {
-        propFilter: (prop, component) => prop.name.indexOf("foo") === -1,
+        propFilter: (prop) => prop.name.indexOf("foo") === -1,
       };
       const filterFn = buildFilter(opts);
       expect(
@@ -199,7 +199,7 @@ describe("buildFilter", () => {
         htmlAttributesInterface
       );
       const opts: ParserOptions = {
-        propFilter: (prop, component) => {
+        propFilter: (prop) => {
           if (prop.parent == null) {
             return true;
           }

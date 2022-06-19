@@ -1,14 +1,18 @@
 export {
-  ComponentDoc,
-  FileParser,
-  getDefaultExportForFile,
+  defaultOptions,
+  defaultParserOpts,
   parse,
   Parser,
-  ParserOptions,
-  PropItem,
-  PropItemType,
-  Props,
   withCompilerOptions,
   withCustomConfig,
   withDefaultConfig,
 } from "./parser";
+
+export type {
+  FileParser,
+  ParserOptions,
+  PropItem,
+  PropItemType,
+  Props,
+  ComponentDoc,
+} from "./parser/types";

@@ -1,112 +1,35 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as ts from "typescript";
-import { SymbolDisplayPart } from "typescript";
 
-import { buildFilter } from "./buildFilter";
-import { trimFileName } from "./trimFileName";
-
-type InterfaceOrTypeAliasDeclaration =
-  | ts.TypeAliasDeclaration
-  | ts.InterfaceDeclaration;
-export interface StringIndexedObject<T> {
-  [key: string]: T;
-}
-
-export interface ComponentDoc {
-  expression?: ts.Symbol;
-  displayName: string;
-  filePath: string;
-  description: string;
-  props: Props;
-  methods: Method[];
-  tags?: StringIndexedObject<string>;
-}
-
-export type Props = StringIndexedObject<PropItem>;
-
-export interface PropItem {
-  name: string;
-  required: boolean;
-  type: PropItemType;
-  description: string;
-  defaultValue: any;
-  parent?: ParentType;
-  declarations?: ParentType[];
-  tags?: StringIndexedObject<string>;
-}
-
-export interface Method {
-  name: string;
-  docblock: string;
-  modifiers: string[];
-  params: MethodParameter[];
-  returns?: {
-    description?: string | null;
-    type?: string;
-  } | null;
-  description: string;
-}
-
-export interface MethodParameter {
-  name: string;
-  description?: string | null;
-  type: MethodParameterType;
-}
-
-export interface MethodParameterType {
-  name: string;
-}
-
-export interface Component {
-  name: string;
-}
-
-export interface PropItemType {
-  name: string;
-  value?: any;
-  raw?: string;
-}
-
-export interface ParentType {
-  name: string;
-  fileName: string;
-}
-
-export type PropFilter = (props: PropItem, component: Component) => boolean;
-
-export type ComponentNameResolver = (
-  exp: ts.Symbol,
-  source: ts.SourceFile
-) => string | undefined | null | false;
-
-export interface ParserOptions {
-  propFilter?: StaticPropFilter | PropFilter;
-  componentNameResolver?: ComponentNameResolver;
-  shouldExtractLiteralValuesFromEnum?: boolean;
-  shouldRemoveUndefinedFromOptional?: boolean;
-  shouldExtractValuesFromUnion?: boolean;
-  skipChildrenPropWithoutDoc?: boolean;
-  savePropValueAsString?: boolean;
-  shouldIncludePropTagMap?: boolean;
-  shouldIncludeExpression?: boolean;
-  customComponentTypes?: string[];
-}
-
-export interface StaticPropFilter {
-  skipPropsWithName?: string[] | string;
-  skipPropsWithoutDoc?: boolean;
-}
+import { buildFilter } from "../buildFilter";
+import {
+  computeComponentName,
+  formatTag,
+  getDeclarations,
+  getParentType,
+  getPropertyName,
+  isOptional,
+  statementIsClassDeclaration,
+  statementIsStatelessWithDefaultProps,
+} from "./utilities";
+import type {
+  Component,
+  ComponentDoc,
+  ComponentNameResolver,
+  FileParser,
+  JSDoc,
+  Method,
+  MethodParameter,
+  ParserOptions,
+  PropFilter,
+  PropItemType,
+  Props,
+  StringIndexedObject,
+} from "./types";
+import { parseWithProgramProvider } from "./parseWithProgramProvider";
 
 export const defaultParserOpts: ParserOptions = {};
-
-export interface FileParser {
-  parse(filePathOrPaths: string | string[]): ComponentDoc[];
-  parseWithProgramProvider(
-    filePathOrPaths: string | string[],
-    programProvider?: () => ts.Program
-  ): ComponentDoc[];
-}
 
 export const defaultOptions: ts.CompilerOptions = {
   jsx: ts.JsxEmit.React,
@@ -148,7 +71,6 @@ export function withCustomConfig(
   );
 
   if (error !== undefined) {
-    // tslint:disable-next-line: max-line-length
     const errorText = `Cannot load custom tsconfig.json from provided path: ${tsconfigPath}, with error code: ${error.code}, message: ${error.messageText}`;
     throw new Error(errorText);
   }
@@ -162,10 +84,13 @@ export function withCustomConfig(
   );
 
   if (errors && errors.length) {
-    if (errors[0] instanceof Error) throw errors[0];
-    else if (errors[0].messageText)
+    if (errors[0] instanceof Error) {
+      throw errors[0];
+    } else if (errors[0].messageText) {
       throw new Error(`TS${errors[0].code}: ${errors[0].messageText}`);
-    else throw new Error(JSON.stringify(errors[0]));
+    } else {
+      throw new Error(JSON.stringify(errors[0]));
+    }
   }
 
   return withCompilerOptions(options, parserOpts);
@@ -195,16 +120,6 @@ export function withCompilerOptions(
       );
     },
   };
-}
-
-const isOptional = (prop: ts.Symbol) =>
-  // tslint:disable-next-line:no-bitwise
-  (prop.getFlags() & ts.SymbolFlags.Optional) !== 0;
-
-interface JSDoc {
-  description: string;
-  fullComment: string;
-  tags: StringIndexedObject<string>;
 }
 
 const defaultJSDoc: JSDoc = {
@@ -519,7 +434,7 @@ export class Parser {
     }
 
     const flags = ts.getCombinedModifierFlags(member.valueDeclaration);
-    const isStatic = (flags & ts.ModifierFlags.Static) !== 0; // tslint:disable-line no-bitwise
+    const isStatic = (flags & ts.ModifierFlags.Static) !== 0;
 
     if (isStatic) {
       modifiers.push("static");
@@ -570,7 +485,7 @@ export class Parser {
 
   public getReturnDescription(
     symbol: ts.Symbol
-  ): SymbolDisplayPart[] | undefined {
+  ): ts.SymbolDisplayPart[] | undefined {
     const tags = symbol.getJsDocTags();
     const returnTag = tags.find((tag) => tag.name === "returns");
     if (!returnTag || !Array.isArray(returnTag.text)) {
@@ -1117,348 +1032,4 @@ export class Parser {
       return acc;
     }, {} as StringIndexedObject<string | boolean | number | null>);
   }
-}
-
-function statementIsClassDeclaration(
-  statement: ts.Statement
-): statement is ts.ClassDeclaration {
-  return !!(statement as ts.ClassDeclaration).members;
-}
-
-function statementIsStatelessWithDefaultProps(
-  statement: ts.Statement
-): boolean {
-  const children = (statement as ts.ExpressionStatement).getChildren();
-  for (const child of children) {
-    const { left } = child as ts.BinaryExpression;
-    if (left) {
-      const { name } = left as ts.PropertyAccessExpression;
-      if (name && name.escapedText === "defaultProps") {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-function getPropertyName(
-  name: ts.PropertyName | ts.BindingPattern
-): string | null {
-  switch (name.kind) {
-    case ts.SyntaxKind.NumericLiteral:
-    case ts.SyntaxKind.StringLiteral:
-    case ts.SyntaxKind.Identifier:
-      return name.text;
-    case ts.SyntaxKind.ComputedPropertyName:
-      return name.getText();
-    default:
-      return null;
-  }
-}
-
-function formatTag(tag: ts.JSDocTagInfo) {
-  let result = "@" + tag.name;
-  if (tag.text) {
-    result += " " + ts.displayPartsToString(tag.text);
-  }
-  return result;
-}
-
-function getTextValueOfClassMember(
-  classDeclaration: ts.ClassDeclaration,
-  memberName: string
-): string {
-  const classDeclarationMembers = classDeclaration.members || [];
-  const [textValue] =
-    classDeclarationMembers &&
-    classDeclarationMembers
-      .filter((member) => ts.isPropertyDeclaration(member))
-      .filter((member) => {
-        const name = ts.getNameOfDeclaration(member) as ts.Identifier;
-        return name && name.text === memberName;
-      })
-      .map((member) => {
-        const property = member as ts.PropertyDeclaration;
-        return (
-          property.initializer && (property.initializer as ts.Identifier).text
-        );
-      });
-
-  return textValue || "";
-}
-
-function getTextValueOfFunctionProperty(
-  exp: ts.Symbol,
-  source: ts.SourceFile,
-  propertyName: string
-) {
-  const [textValue] = source.statements
-    .filter((statement) => ts.isExpressionStatement(statement))
-    .filter((statement) => {
-      const expr = (statement as ts.ExpressionStatement)
-        .expression as ts.BinaryExpression;
-      return (
-        expr.left &&
-        (expr.left as ts.PropertyAccessExpression).name &&
-        (expr.left as ts.PropertyAccessExpression).name.escapedText ===
-          propertyName
-      );
-    })
-    .filter((statement) => {
-      return ts.isStringLiteral(
-        (
-          (statement as ts.ExpressionStatement)
-            .expression as ts.BinaryExpression
-        ).right
-      );
-    })
-    .map((statement) => {
-      return (
-        (
-          (statement as ts.ExpressionStatement)
-            .expression as ts.BinaryExpression
-        ).right as ts.Identifier
-      ).text;
-    });
-
-  return textValue || "";
-}
-
-function computeComponentName(
-  exp: ts.Symbol,
-  source: ts.SourceFile,
-  customComponentTypes: ParserOptions["customComponentTypes"] = []
-) {
-  const exportName = exp.getName();
-
-  const statelessDisplayName = getTextValueOfFunctionProperty(
-    exp,
-    source,
-    "displayName"
-  );
-
-  const statefulDisplayName =
-    exp.valueDeclaration &&
-    ts.isClassDeclaration(exp.valueDeclaration) &&
-    getTextValueOfClassMember(exp.valueDeclaration, "displayName");
-
-  if (statelessDisplayName || statefulDisplayName) {
-    return statelessDisplayName || statefulDisplayName || "";
-  }
-
-  const defaultComponentTypes = [
-    "default",
-    "__function",
-    "Stateless",
-    "StyledComponentClass",
-    "StyledComponent",
-    "FunctionComponent",
-    "StatelessComponent",
-    "ForwardRefExoticComponent",
-    "MemoExoticComponent",
-  ];
-
-  const supportedComponentTypes = [
-    ...defaultComponentTypes,
-    ...customComponentTypes,
-  ];
-
-  if (supportedComponentTypes.indexOf(exportName) !== -1) {
-    return getDefaultExportForFile(source);
-  } else {
-    return exportName;
-  }
-}
-
-// Default export for a file: named after file
-export function getDefaultExportForFile(source: ts.SourceFile) {
-  const name = path.basename(source.fileName, path.extname(source.fileName));
-  const filename =
-    name === "index" ? path.basename(path.dirname(source.fileName)) : name;
-
-  // JS identifiers must starts with a letter, and contain letters and/or numbers
-  // So, you could not take filename as is
-  const identifier = filename
-    .replace(/^[^A-Z]*/gi, "")
-    .replace(/[^A-Z0-9]*/gi, "");
-
-  return identifier.length ? identifier : "DefaultName";
-}
-
-function isTypeLiteral(node: ts.Node): node is ts.TypeLiteralNode {
-  return node.kind === ts.SyntaxKind.TypeLiteral;
-}
-
-function getDeclarations(prop: ts.Symbol): ParentType[] | undefined {
-  const declarations = prop.getDeclarations();
-
-  if (declarations === undefined || declarations.length === 0) {
-    return undefined;
-  }
-
-  const parents: ParentType[] = [];
-
-  for (const declaration of declarations) {
-    const { parent } = declaration;
-
-    if (!isTypeLiteral(parent) && !isInterfaceOrTypeAliasDeclaration(parent)) {
-      continue;
-    }
-
-    const parentName =
-      "name" in parent
-        ? (parent as InterfaceOrTypeAliasDeclaration).name.text
-        : "TypeLiteral";
-
-    const { fileName } = (
-      parent as InterfaceOrTypeAliasDeclaration | ts.TypeLiteralNode
-    ).getSourceFile();
-
-    parents.push({
-      fileName: trimFileName(fileName),
-      name: parentName,
-    });
-  }
-
-  return parents;
-}
-
-function getParentType(prop: ts.Symbol): ParentType | undefined {
-  const declarations = prop.getDeclarations();
-
-  if (declarations == null || declarations.length === 0) {
-    return undefined;
-  }
-
-  // Props can be declared only in one place
-  const { parent } = declarations[0];
-
-  if (!isInterfaceOrTypeAliasDeclaration(parent)) {
-    return undefined;
-  }
-
-  const parentName = parent.name.text;
-  const { fileName } = parent.getSourceFile();
-
-  return {
-    fileName: trimFileName(fileName),
-    name: parentName,
-  };
-}
-
-function isInterfaceOrTypeAliasDeclaration(
-  node: ts.Node
-): node is ts.InterfaceDeclaration | ts.TypeAliasDeclaration {
-  return (
-    node.kind === ts.SyntaxKind.InterfaceDeclaration ||
-    node.kind === ts.SyntaxKind.TypeAliasDeclaration
-  );
-}
-
-function parseWithProgramProvider(
-  filePathOrPaths: string | string[],
-  compilerOptions: ts.CompilerOptions,
-  parserOpts: ParserOptions,
-  programProvider?: () => ts.Program
-): ComponentDoc[] {
-  const filePaths = Array.isArray(filePathOrPaths)
-    ? filePathOrPaths
-    : [filePathOrPaths];
-
-  const program = programProvider
-    ? programProvider()
-    : ts.createProgram(filePaths, compilerOptions);
-
-  const parser = new Parser(program, parserOpts);
-
-  const checker = program.getTypeChecker();
-
-  return filePaths
-    .map((filePath) => program.getSourceFile(filePath))
-    .filter(
-      (sourceFile): sourceFile is ts.SourceFile =>
-        typeof sourceFile !== "undefined"
-    )
-    .reduce<ComponentDoc[]>((docs, sourceFile) => {
-      const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
-
-      if (!moduleSymbol) {
-        return docs;
-      }
-
-      const components = checker.getExportsOfModule(moduleSymbol);
-      const componentDocs: ComponentDoc[] = [];
-
-      // First document all components
-      components.forEach((exp) => {
-        const doc = parser.getComponentInfo(
-          exp,
-          sourceFile,
-          parserOpts.componentNameResolver,
-          parserOpts.customComponentTypes
-        );
-
-        if (doc) {
-          componentDocs.push(doc);
-        }
-
-        if (!exp.exports) {
-          return;
-        }
-
-        // Then document any static sub-components
-        exp.exports.forEach((symbol) => {
-          if (symbol.flags & ts.SymbolFlags.Prototype) {
-            return;
-          }
-
-          if (symbol.flags & ts.SymbolFlags.Method) {
-            const signature = parser.getCallSignature(symbol);
-            const returnType = checker.typeToString(signature.getReturnType());
-
-            if (returnType !== "Element") {
-              return;
-            }
-          }
-
-          const doc = parser.getComponentInfo(
-            symbol,
-            sourceFile,
-            parserOpts.componentNameResolver,
-            parserOpts.customComponentTypes
-          );
-
-          if (doc) {
-            const prefix =
-              exp.escapedName === "default" ? "" : `${exp.escapedName}.`;
-
-            componentDocs.push({
-              ...doc,
-              displayName: `${prefix}${symbol.escapedName}`,
-            });
-          }
-        });
-      });
-
-      // Remove any duplicates (for HOC where the names are the same)
-      const componentDocsNoDuplicates = componentDocs.reduce(
-        (prevVal, comp) => {
-          const duplicate = prevVal.find((compDoc) => {
-            return compDoc!.displayName === comp!.displayName;
-          });
-          if (duplicate) return prevVal;
-          return [...prevVal, comp];
-        },
-        [] as ComponentDoc[]
-      );
-
-      const filteredComponentDocs = componentDocsNoDuplicates.filter(
-        (comp, index, comps) =>
-          comps
-            .slice(index + 1)
-            .every((innerComp) => innerComp!.displayName !== comp!.displayName)
-      );
-
-      return [...docs, ...filteredComponentDocs];
-    }, []);
 }
