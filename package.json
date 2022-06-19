@@ -10,8 +10,9 @@
   "scripts": {
     "lint": "eslint src",
     "lint:fix": "pnpm run lint -- --fix",
-    "prepublishOnly": "tsc -d",
-    "test": "vitest"
+    "prepare": "husky install",
+    "prepublishOnly": "pnpm run lint && pnpm test -- --run && tsc -d",
+    "test": "vitest --reporter dot"
   },
   "license": "MIT",
   "peerDependencies": {
