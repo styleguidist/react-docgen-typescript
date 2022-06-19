@@ -1,4 +1,4 @@
-import { assert } from "chai";
+import { assert, describe, it } from "vitest";
 import * as fs from "fs";
 import * as path from "path";
 import * as ts from "typescript";
@@ -1107,30 +1107,31 @@ describe("parser", () => {
         });
       });
 
-      it("should collect all `onClick prop` parent declarations", (done) => {
-        withDefaultConfig({
-          propFilter: (prop) => {
-            if (prop.name === "onClick") {
-              assert.deepEqual(prop.declarations, [
-                {
-                  fileName:
-                    "react-docgen-typescript/node_modules/.pnpm/@types+react@16.14.28/node_modules/@types/react/index.d.ts",
-                  name: "DOMAttributes",
-                },
-                {
-                  fileName:
-                    "react-docgen-typescript/src/__tests__/data/ButtonWithOnClickComponent.tsx",
-                  name: "TypeLiteral",
-                },
-              ]);
+      it("should collect all `onClick prop` parent declarations", () =>
+        new Promise<void>((done) => {
+          withDefaultConfig({
+            propFilter: (prop) => {
+              if (prop.name === "onClick") {
+                assert.deepEqual(prop.declarations, [
+                  {
+                    fileName:
+                      "react-docgen-typescript/node_modules/.pnpm/@types+react@16.14.28/node_modules/@types/react/index.d.ts",
+                    name: "DOMAttributes",
+                  },
+                  {
+                    fileName:
+                      "react-docgen-typescript/src/__tests__/data/ButtonWithOnClickComponent.tsx",
+                    name: "TypeLiteral",
+                  },
+                ]);
 
-              done();
-            }
+                done();
+              }
 
-            return true;
-          },
-        }).parse(fixturePath("ButtonWithOnClickComponent"));
-      });
+              return true;
+            },
+          }).parse(fixturePath("ButtonWithOnClickComponent"));
+        }));
 
       it("should allow filtering by parent declarations", () => {
         const propFilter: PropFilter = (prop) => {

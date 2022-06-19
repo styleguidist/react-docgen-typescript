@@ -1,4 +1,4 @@
-import { assert } from "chai";
+import { assert } from "vitest";
 import { isEqual } from "lodash";
 import * as path from "path";
 import { ComponentDoc, parse, ParserOptions } from "../parser";

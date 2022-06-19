@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { expect, describe, it } from "vitest";
 import { buildFilter } from "../buildFilter";
 import { ParentType, ParserOptions, PropItem } from "../parser";
 
@@ -32,7 +32,7 @@ describe("buildFilter", () => {
         [prop1, prop2, children].filter((prop) =>
           filterFn(prop, { name: prop.name })
         )
-      ).to.eql([prop1, prop2]);
+      ).toEqual([prop1, prop2]);
     });
     it('should not skip "children" property if description is set', () => {
       const prop1 = createProp("prop1", false, undefined, "prop1 description");
@@ -49,7 +49,7 @@ describe("buildFilter", () => {
         [prop1, prop2, children].filter((prop) =>
           filterFn(prop, { name: prop.name })
         )
-      ).to.eql([prop1, prop2, children]);
+      ).toEqual([prop1, prop2, children]);
     });
   });
 
@@ -74,7 +74,7 @@ describe("buildFilter", () => {
         const filterFn = buildFilter(opts);
         expect(
           [prop1, prop2].filter((prop) => filterFn(prop, { name: prop.name }))
-        ).to.eql([prop2]);
+        ).toEqual([prop2]);
       });
       it("should skip multiple props by name", () => {
         const prop1 = createProp(
@@ -103,7 +103,7 @@ describe("buildFilter", () => {
           [prop1, prop2, prop3].filter((prop) =>
             filterFn(prop, { name: prop.name })
           )
-        ).to.eql([prop2]);
+        ).toEqual([prop2]);
       });
     });
 
@@ -122,7 +122,7 @@ describe("buildFilter", () => {
         const filterFn = buildFilter(opts);
         expect(
           [prop1, prop2].filter((prop) => filterFn(prop, { name: prop.name }))
-        ).to.eql([prop1]);
+        ).toEqual([prop1]);
       });
     });
   });
@@ -145,7 +145,7 @@ describe("buildFilter", () => {
         [prop1, prop2, prop3].filter((prop) =>
           filterFn(prop, { name: prop.name })
         )
-      ).to.eql([prop2]);
+      ).toEqual([prop2]);
     });
 
     it("should get be possible to filter by component name", () => {
@@ -165,7 +165,7 @@ describe("buildFilter", () => {
         [prop1, prop2, prop3].filter((prop) =>
           filterFn(prop, { name: prop.name.toUpperCase() })
         )
-      ).to.eql([prop1]);
+      ).toEqual([prop1]);
     });
 
     it("should be possible to filter by interface in which prop was declared.", () => {
@@ -216,7 +216,7 @@ describe("buildFilter", () => {
         [prop1, prop2, prop3].filter((prop) =>
           filterFn(prop, { name: "SomeComponent" })
         )
-      ).to.eql([prop1]);
+      ).toEqual([prop1]);
     });
   });
 });
