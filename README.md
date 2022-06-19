@@ -55,7 +55,7 @@ const tsConfigParser = docgen.withCustomConfig("./tsconfig.json", {
 
 Include following line in your `styleguide.config.js`:
 
-```javascript
+```ts
 module.exports = {
   propsParser: require("react-docgen-typescript").withDefaultConfig([
     parserOptions,
@@ -65,7 +65,7 @@ module.exports = {
 
 or if you want to use custom tsconfig file
 
-```javascript
+```ts
 module.exports = {
   propsParser: require("react-docgen-typescript").withCustomConfig(
     "./tsconfig.json",
@@ -110,9 +110,11 @@ type PropFilter = (prop: PropItem, component: Component) => boolean;
 const options = {
   propFilter: (prop: PropItem, component: Component) => {
     if (prop.declarations !== undefined && prop.declarations.length > 0) {
-      const hasPropAdditionalDescription = prop.declarations.find((declaration) => {
-        return !declaration.fileName.includes("node_modules");
-      });
+      const hasPropAdditionalDescription = prop.declarations.find(
+        (declaration) => {
+          return !declaration.fileName.includes("node_modules");
+        }
+      );
 
       return Boolean(hasPropAdditionalDescription);
     }
@@ -153,7 +155,7 @@ If set to true, types that are optional will not display " | undefined" in the t
 If set to true, defaultValue to props will be string.
 Example:
 
-```javascript
+```ts
 Component.defaultProps = {
   counter: 123,
   disabled: false,
@@ -162,7 +164,7 @@ Component.defaultProps = {
 
 Will return:
 
-```javascript
+```ts
   counter: {
       defaultValue: '123',
       required: true,
@@ -192,7 +194,7 @@ In the example folder you can see React Styleguidist integration.
 
 The component [`Column.tsx`](./examples/react-styleguidist-example/components/Column.tsx)
 
-```javascript
+```ts
 import * as React from "react";
 import { Component } from "react";
 
@@ -228,7 +230,7 @@ Will generate the following stylesheet:
 
 The functional component [`Grid.tsx`](./examples/react-styleguidist-example/components/Grid.tsx)
 
-```javascript
+```ts
 import * as React from "react";
 
 /**
@@ -264,15 +266,14 @@ Will generate the following stylesheet:
 
 ## Contributions
 
-The typescript is pretty complex and there are many different ways how
-to define components and their props so it's realy hard to support all
-these use cases. That means only one thing, contributions are highly
-welcome. Just keep in mind that each PR should also include tests for
-the part it's fixing.
+There are many different ways to define components and their props so it's really hard to support all use cases.
+That means only one thing: contributions are highly welcome & encouraged.
+Just keep in mind that each PR should also include tests for the part it's fixing.
 
-Thanks to all contributors without their help there wouldn't be a single
-bug fixed or feature implemented. Check the [**contributors**](https://github.com/styleguidist/react-docgen-typescript/graphs/contributors) tab to find out
-more. All those people supported this project. **THANK YOU!**
+Thanks to all contributors, without their help there wouldn't be a single bug fixed or feature implemented.
+Check the [**contributors**](https://github.com/styleguidist/react-docgen-typescript/graphs/contributors) tab to find out more.
+All those people supported this project.
+**THANK YOU!**
 
 ## Thanks to others
 
