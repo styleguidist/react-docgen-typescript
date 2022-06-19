@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
+import type { ParentType } from "../parser/utilities/getParentType";
+import type { PropItem } from "../parser/types";
+import type { ParserOptions } from "../parser";
 import { buildFilter } from "../buildFilter";
-import type { ParentType, ParserOptions, PropItem } from "../parser/types";
 
 function createProp(
   name: string,

@@ -5,6 +5,8 @@ import * as ts from "typescript";
 import { buildFilter } from "../buildFilter";
 import {
   computeComponentName,
+  defaultCompilerOptions,
+  defaultJSDoc,
   formatTag,
   getDeclarations,
   getParentType,
@@ -13,6 +15,7 @@ import {
   statementIsClassDeclaration,
   statementIsStatelessWithDefaultProps,
 } from "./utilities";
+import { parseWithProgramProvider } from "./parseWithProgramProvider";
 import type {
   Component,
   ComponentDoc,
@@ -21,41 +24,40 @@ import type {
   JSDoc,
   Method,
   MethodParameter,
-  ParserOptions,
   PropFilter,
   PropItemType,
   Props,
+  StaticPropFilter,
   StringIndexedObject,
 } from "./types";
-import { parseWithProgramProvider } from "./parseWithProgramProvider";
 
-export const defaultParserOpts: ParserOptions = {};
+export interface ParserOptions {
+  propFilter?: StaticPropFilter | PropFilter;
+  componentNameResolver?: ComponentNameResolver;
+  shouldExtractLiteralValuesFromEnum?: boolean;
+  shouldRemoveUndefinedFromOptional?: boolean;
+  shouldExtractValuesFromUnion?: boolean;
+  skipChildrenPropWithoutDoc?: boolean;
+  savePropValueAsString?: boolean;
+  shouldIncludePropTagMap?: boolean;
+  shouldIncludeExpression?: boolean;
+  customComponentTypes?: string[];
+}
 
-export const defaultOptions: ts.CompilerOptions = {
-  jsx: ts.JsxEmit.React,
-  module: ts.ModuleKind.CommonJS,
-  target: ts.ScriptTarget.Latest,
-};
-
-/**
- * Parses a file with default TS options
- * @param filePathOrPaths component file that should be parsed
- * @param parserOpts options used to parse the files
- */
 export function parse(
   filePathOrPaths: string | string[],
-  parserOpts: ParserOptions = defaultParserOpts
+  parserOpts: ParserOptions = {}
 ) {
-  return withCompilerOptions(defaultOptions, parserOpts).parse(filePathOrPaths);
+  return withCompilerOptions(defaultCompilerOptions, parserOpts).parse(
+    filePathOrPaths
+  );
 }
 
 /**
  * Constructs a parser for a default configuration.
  */
-export function withDefaultConfig(
-  parserOpts: ParserOptions = defaultParserOpts
-): FileParser {
-  return withCompilerOptions(defaultOptions, parserOpts);
+export function withDefaultConfig(parserOpts: ParserOptions = {}): FileParser {
+  return withCompilerOptions(defaultCompilerOptions, parserOpts);
 }
 
 /**
@@ -101,7 +103,7 @@ export function withCustomConfig(
  */
 export function withCompilerOptions(
   compilerOptions: ts.CompilerOptions,
-  parserOpts: ParserOptions = defaultParserOpts
+  parserOpts: ParserOptions = {}
 ): FileParser {
   return {
     parse(filePathOrPaths: string | string[]): ComponentDoc[] {
@@ -121,12 +123,6 @@ export function withCompilerOptions(
     },
   };
 }
-
-const defaultJSDoc: JSDoc = {
-  description: "",
-  fullComment: "",
-  tags: {},
-};
 
 export class Parser {
   private readonly checker: ts.TypeChecker;

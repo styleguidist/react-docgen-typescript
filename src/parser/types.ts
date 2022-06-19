@@ -2,8 +2,6 @@ import * as ts from "typescript";
 
 import type { ParentType } from "./utilities/getParentType";
 
-export type { ParentType };
-
 export interface StringIndexedObject<T> {
   [key: string]: T;
 }
@@ -68,19 +66,6 @@ export type ComponentNameResolver = (
   exp: ts.Symbol,
   source: ts.SourceFile
 ) => string | undefined | null | false;
-
-export interface ParserOptions {
-  propFilter?: StaticPropFilter | PropFilter;
-  componentNameResolver?: ComponentNameResolver;
-  shouldExtractLiteralValuesFromEnum?: boolean;
-  shouldRemoveUndefinedFromOptional?: boolean;
-  shouldExtractValuesFromUnion?: boolean;
-  skipChildrenPropWithoutDoc?: boolean;
-  savePropValueAsString?: boolean;
-  shouldIncludePropTagMap?: boolean;
-  shouldIncludeExpression?: boolean;
-  customComponentTypes?: string[];
-}
 
 export interface StaticPropFilter {
   skipPropsWithName?: string[] | string;

@@ -1,5 +1,5 @@
 import * as ts from "typescript";
-import type { ParserOptions } from "../types";
+import type { ParserOptions } from "../";
 import { getDefaultExportForFile } from "./getDefaultExportForFile";
 
 export function computeComponentName(

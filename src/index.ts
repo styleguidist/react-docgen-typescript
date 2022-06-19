@@ -1,16 +1,16 @@
 export {
-  defaultOptions,
-  defaultParserOpts,
   parse,
   Parser,
   withCompilerOptions,
   withCustomConfig,
   withDefaultConfig,
 } from "./parser";
+export { defaultCompilerOptions } from "./parser/utilities";
+
+export type { ParserOptions } from "./parser";
 
 export type {
   FileParser,
-  ParserOptions,
   PropItem,
   PropItemType,
   Props,
