@@ -1,4 +1,4 @@
-import { assert, describe, it } from "vitest";
+import { assert, describe, expect, it } from "vitest";
 import * as fs from "fs";
 import * as path from "path";
 import * as ts from "typescript";
@@ -11,7 +11,7 @@ import {
 } from "../parser";
 import { check, checkComponent, fixturePath } from "./testUtils";
 
-describe("parser", () => {
+describe.concurrent("parser", () => {
   it("should parse simple react class component", () => {
     check("Column", {
       Column: {
@@ -1030,8 +1030,7 @@ describe("parser", () => {
 
       describe("propsFilter method", () => {
         it("should apply filter function and filter components accordingly", () => {
-          const propFilter: PropFilter = (prop, component) =>
-            prop.name !== "prop1";
+          const propFilter: PropFilter = (prop) => prop.name !== "prop1";
           check(
             "Column",
             {
@@ -1081,7 +1080,7 @@ describe("parser", () => {
         });
 
         it("should allow filtering by parent interface", () => {
-          const propFilter: PropFilter = (prop, component) => {
+          const propFilter: PropFilter = (prop) => {
             if (prop.parent == null) {
               return true;
             }
@@ -1112,12 +1111,13 @@ describe("parser", () => {
           withDefaultConfig({
             propFilter: (prop) => {
               if (prop.name === "onClick") {
-                assert.deepEqual(prop.declarations, [
-                  {
-                    fileName:
-                      "react-docgen-typescript/node_modules/.pnpm/@types+react@16.14.28/node_modules/@types/react/index.d.ts",
+                expect(prop.declarations).toEqual([
+                  expect.objectContaining({
+                    fileName: expect.stringContaining(
+                      "node_modules/@types/react/index.d.ts"
+                    ),
                     name: "DOMAttributes",
-                  },
+                  }),
                   {
                     fileName:
                       "react-docgen-typescript/src/__tests__/data/ButtonWithOnClickComponent.tsx",
@@ -1581,9 +1581,6 @@ describe("parser", () => {
         checkComponent(result, expected, false);
       });
       it("removes undefined from unions", () => {
-        const result = parser.parse(
-          fixturePath("RemoveOptionalValuesFromUnion")
-        );
         const expected = {
           RemoveOptionalValuesFromUnion: {
             sampleStringUnion: {
