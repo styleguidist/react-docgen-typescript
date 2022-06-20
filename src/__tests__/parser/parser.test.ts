@@ -68,6 +68,35 @@ describe.concurrent("parser", () => {
     ]);
   });
 
+  it("parses plain function with rest parameter", () => {
+    const filePath = fixturePath("plain/functionWithRestParam");
+
+    const result = parse(filePath);
+
+    expect(result).toEqual([
+      {
+        displayName: "sum",
+        params: [{ name: "numbers", type: "number[]", description: "" }],
+        filePath,
+        methods: [],
+        tags: {
+          param: "numbers",
+        },
+        props: {},
+        returns: "number",
+        description: "Gets the sum of all numbers passed in",
+      },
+    ]);
+  });
+
+  it("should parse functional component with spread props", () => {
+    check("FunctionalComponentWithSpreadProps", {
+      Jumbotron: {
+        prop1: { type: "string", required: true },
+      },
+    });
+  });
+
   it("should parse simple react class component", () => {
     check("Column", {
       Column: {

@@ -301,6 +301,8 @@ export class Parser {
           returns: declaration.type?.getText(),
           params: declaration.parameters.map(
             (sym: ts.ParameterDeclaration) => ({
+              // eslint-disable-next-line
+              // @ts-ignore
               name: sym.name?.escapedText,
               description: ts
                 .getJSDocTags(sym)
@@ -346,8 +348,15 @@ export class Parser {
         }
         // Maybe we could check return type instead,
         // but not sure if Element, ReactElement<T> are all possible values
-        const propsParam = params[0];
+        const propsParam: ts.Symbol = params[0];
+
         if (propsParam.name === "props" || params.length === 1) {
+          // eslint-disable-next-line
+          // @ts-ignore
+          if (propsParam.valueDeclaration?.dotDotDotToken) {
+            continue;
+          }
+
           return propsParam;
         }
       }
