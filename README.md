@@ -1,6 +1,6 @@
 # react-docgen-typescript
 
-[![Build Status](https://github.com/jakxz/react-docgen-typescript/actions/workflows/nodejs.yml/badge.svg)](https://github.com/styleguidist/react-docgen-typescript/actions/workflows/nodejs.yml)
+[![Build Status](https://github.com/jakxz/react-docgen-typescript/actions/workflows/nodejs.yml/badge.svg)](https://github.com/jakxz/react-docgen-typescript/actions/workflows/nodejs.yml)
 
 A simple parser for React properties defined in TypeScript instead of propTypes.
 
