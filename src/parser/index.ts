@@ -157,7 +157,7 @@ export class Parser {
     this.shouldIncludeExpression = Boolean(shouldIncludeExpression);
   }
 
-  private getComponentFromExpression(exp: ts.Symbol) {
+  private getComponentFromExpression(exp: ts.Symbol): ts.Symbol {
     const declaration = exp.valueDeclaration || exp.declarations![0];
     const type = this.checker.getTypeOfSymbolAtLocation(exp, declaration);
     const typeSymbol = type.symbol || type.aliasSymbol;
@@ -180,7 +180,7 @@ export class Parser {
       );
 
       if (component) {
-        exp = component;
+        return component;
       }
     }
 
@@ -294,6 +294,21 @@ export class Parser {
         props,
       };
     } else if (description && displayName) {
+      let funInfo = {};
+      if (ts.isFunctionDeclaration(declaration)) {
+        funInfo = {
+          returns: declaration.type?.getText(),
+          params: declaration.parameters.map((sym) => ({
+            name: sym.name?.escapedText,
+            description: ts
+              .getJSDocTags(sym)
+              .map((tag) => tag.comment)
+              .join(""),
+            type: sym?.type?.getText(),
+          })),
+        };
+      }
+
       result = {
         tags,
         filePath,
@@ -301,6 +316,7 @@ export class Parser {
         displayName,
         methods,
         props: {},
+        ...funInfo,
       };
     }
 

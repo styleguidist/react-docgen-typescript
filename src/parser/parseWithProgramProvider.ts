@@ -30,7 +30,6 @@ export function parseWithProgramProvider(
     )
     .reduce<ComponentDoc[]>((acc, sourceFile) => {
       const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
-
       if (!moduleSymbol) {
         return acc;
       }

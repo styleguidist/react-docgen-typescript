@@ -8,6 +8,36 @@ import { getDefaultExportForFile } from "../../parser/utilities";
 import type { PropFilter } from "../../parser/types";
 
 describe.concurrent("parser", () => {
+  it("parses plain function", () => {
+    const result = parse(fixturePath("plain/function"));
+
+    expect(result).toEqual([
+      {
+        displayName: "add",
+        params: [
+          {
+            description: "the magical first number",
+            name: "a",
+            type: "number",
+          },
+          {
+            description: "boring second number",
+            name: "b",
+            type: "number",
+          },
+        ],
+        description: "get the sum of 2 numbers",
+        returns: "string",
+        tags: {
+          param: "a the magical first number\nb boring second number",
+        },
+        methods: [],
+        props: {},
+        filePath: fixturePath("plain/function"),
+      },
+    ]);
+  });
+
   it("should parse simple react class component", () => {
     check("Column", {
       Column: {
