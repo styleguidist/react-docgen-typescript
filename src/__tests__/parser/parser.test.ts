@@ -68,6 +68,12 @@ describe.concurrent("parser", () => {
     ]);
   });
 
+  it("parses mixed React and non-React functions", () => {
+    const result = parse(fixturePath("mixed/UtilityFunctionAndReactComponent"));
+
+    expect(result).toMatchSnapshot();
+  });
+
   it("should parse simple react class component", () => {
     check("Column", {
       Column: {
