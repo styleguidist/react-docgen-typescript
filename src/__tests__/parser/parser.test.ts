@@ -7,12 +7,6 @@ import { parse, withCustomConfig, withDefaultConfig } from "../../parser";
 import { getDefaultExportForFile } from "../../parser/utilities";
 import type { PropFilter } from "../../parser/types";
 
-it("parses mixed React and non-React functions", () => {
-  const result = parse(fixturePath("mixed/UtilityFunctionAndReactComponent"));
-
-  expect(result).toMatchSnapshot();
-});
-
 describe.concurrent("parser", () => {
   it("parses plain function", () => {
     const result = parse(fixturePath("plain/function"));
