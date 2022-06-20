@@ -1,7 +1,8 @@
 import * as ts from "typescript";
-import { Parser } from "./";
 import type { ParserOptions } from "./";
+import { Parser } from "./";
 import type { ComponentDoc } from "./types";
+import { iterateSymbolTable } from "./utilities";
 
 export function parseWithProgramProvider(
   filePathOrPaths: string | string[],
@@ -27,11 +28,11 @@ export function parseWithProgramProvider(
       (sourceFile): sourceFile is ts.SourceFile =>
         typeof sourceFile !== "undefined"
     )
-    .reduce<ComponentDoc[]>((docs, sourceFile) => {
+    .reduce<ComponentDoc[]>((acc, sourceFile) => {
       const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
 
       if (!moduleSymbol) {
-        return docs;
+        return acc;
       }
 
       const components = checker.getExportsOfModule(moduleSymbol);
@@ -50,14 +51,10 @@ export function parseWithProgramProvider(
           componentDocs.push(doc);
         }
 
-        if (!exp.exports) {
-          return;
-        }
-
         // Then document any static sub-components
-        exp.exports.forEach((symbol) => {
+        iterateSymbolTable<ComponentDoc>(exp.exports, (symbol) => {
           if (symbol.flags & ts.SymbolFlags.Prototype) {
-            return;
+            return null;
           }
 
           if (symbol.flags & ts.SymbolFlags.Method) {
@@ -65,7 +62,7 @@ export function parseWithProgramProvider(
             const returnType = checker.typeToString(signature.getReturnType());
 
             if (returnType !== "Element") {
-              return;
+              return null;
             }
           }
 
@@ -85,10 +82,12 @@ export function parseWithProgramProvider(
               displayName: `${prefix}${symbol.escapedName}`,
             });
           }
+
+          return null;
         });
       });
 
-      return [...docs, ...componentDocs];
+      return [...acc, ...componentDocs];
     }, [])
     .filter((comp, index, comps) =>
       comps

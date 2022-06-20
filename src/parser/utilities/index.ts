@@ -18,9 +18,12 @@ export function isOptional(prop: ts.Symbol) {
 }
 
 export function iterateSymbolTable<T>(
-  symTable: ts.SymbolTable,
+  symTable: ts.SymbolTable | undefined,
   iterator: (sym: ts.Symbol) => T | null
 ): T[] {
+  if (!symTable) {
+    return [];
+  }
   const result: (T | null)[] = [];
   symTable.forEach((sym) => result.push(iterator(sym)));
   return result.filter(nonNull);
