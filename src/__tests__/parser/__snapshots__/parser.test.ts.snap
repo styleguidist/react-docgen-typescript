@@ -1,6 +1,6 @@
 // Vitest Snapshot v1
 
-exports[`parser > parses mixed React and non-React functions 1`] = `
+exports[`parses mixed React and non-React functions 1`] = `
 [
   {
     "description": "Print text in a div",

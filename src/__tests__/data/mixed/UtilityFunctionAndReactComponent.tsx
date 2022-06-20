@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 
 interface Props {
   /* the main text */
@@ -8,7 +8,7 @@ interface Props {
 /**
  * Print text in a div
  */
-export function MyComponent({ text }: Props) {
+export function MyComponent({ text }: Props): React.ReactNode {
   return <div>{text}</div>;
 }
 
