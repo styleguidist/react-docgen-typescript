@@ -294,18 +294,21 @@ export class Parser {
         props,
       };
     } else if (description && displayName) {
+      // there aren't props, but, we can get plain function information
       let funInfo = {};
       if (ts.isFunctionDeclaration(declaration)) {
         funInfo = {
           returns: declaration.type?.getText(),
-          params: declaration.parameters.map((sym) => ({
-            name: sym.name?.escapedText,
-            description: ts
-              .getJSDocTags(sym)
-              .map((tag) => tag.comment)
-              .join(""),
-            type: sym?.type?.getText(),
-          })),
+          params: declaration.parameters.map(
+            (sym: ts.ParameterDeclaration) => ({
+              name: sym.name?.escapedText,
+              description: ts
+                .getJSDocTags(sym)
+                .map((tag) => tag.comment)
+                .join(""),
+              type: sym?.type?.getText(),
+            })
+          ),
         };
       }
 

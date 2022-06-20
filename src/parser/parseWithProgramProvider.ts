@@ -2,7 +2,7 @@ import * as ts from "typescript";
 import type { ParserOptions } from "./";
 import { Parser } from "./";
 import type { ComponentDoc } from "./types";
-import { iterateSymbolTable } from "./utilities";
+import { iterateSymbolTable, nonNull } from "./utilities";
 
 export function parseWithProgramProvider(
   filePathOrPaths: string | string[],
@@ -24,10 +24,7 @@ export function parseWithProgramProvider(
 
   return filePaths
     .map((filePath) => program.getSourceFile(filePath))
-    .filter(
-      (sourceFile): sourceFile is ts.SourceFile =>
-        typeof sourceFile !== "undefined"
-    )
+    .filter(nonNull)
     .reduce<ComponentDoc[]>((acc, sourceFile) => {
       const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
       if (!moduleSymbol) {
