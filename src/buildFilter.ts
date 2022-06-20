@@ -1,6 +1,6 @@
+import type { ParserOptions } from "./parser";
 import type {
   Component,
-  ParserOptions,
   PropFilter,
   PropItem,
   StaticPropFilter,

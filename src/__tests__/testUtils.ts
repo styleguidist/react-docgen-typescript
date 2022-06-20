@@ -2,7 +2,8 @@ import * as path from "path";
 import { assert } from "vitest";
 import { isEqual } from "lodash";
 import { parse } from "../parser";
-import type { ComponentDoc, ParserOptions } from "../parser/types";
+import type { ParserOptions } from "../parser";
+import type { ComponentDoc } from "../parser/types";
 
 export interface ExpectedComponents {
   [key: string]: ExpectedComponent;
