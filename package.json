@@ -1,6 +1,6 @@
 {
   "name": "@jakxz/docgen-typescript",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "publishConfig": {
     "access": "public"
   },
@@ -14,7 +14,7 @@
     "lint": "eslint src",
     "lint:fix": "pnpm run lint -- --fix",
     "prepare": "husky install",
-    "prepublishOnly": "pnpm run lint && pnpm test -- --run && tsc -d",
+    "prepublishOnly": "pnpm run lint && pnpm test -- --run && rimraf dist && tsc -d",
     "test": "vitest --reporter dot"
   },
   "license": "MIT",
@@ -37,6 +37,7 @@
     "pretty-quick": "^3.1.3",
     "prop-types": "^15.6.2",
     "react": "^16.4.2",
+    "rimraf": "^3.0.2",
     "typescript": "^4.7.4",
     "vitest": "^0.15.2"
   },
