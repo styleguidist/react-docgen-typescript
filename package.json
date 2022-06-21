@@ -1,9 +1,12 @@
 {
-  "name": "react-docgen-typescript",
-  "version": "2.2.3",
+  "name": "@jakxz/docgen-typescript",
+  "version": "3.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "",
-  "homepage": "https://github.com/styleguidist/react-docgen-typescript/",
-  "bugs": "https://github.com/styleguidist/react-docgen-typescript/issues",
+  "homepage": "https://github.com/jakxz/react-docgen-typescript/",
+  "bugs": "https://github.com/jakxz/react-docgen-typescript/issues",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -35,7 +38,7 @@
     "prop-types": "^15.6.2",
     "react": "^16.4.2",
     "typescript": "^4.7.4",
-    "vitest": "^0.15.1"
+    "vitest": "^0.15.2"
   },
   "files": [
     "dist",
@@ -43,6 +46,6 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/styleguidist/react-docgen-typescript.git"
+    "url": "https://github.com/jakxz/react-docgen-typescript.git"
   }
 }
