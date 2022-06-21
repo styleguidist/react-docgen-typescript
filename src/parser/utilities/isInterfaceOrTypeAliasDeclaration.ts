@@ -6,7 +6,7 @@ export type InterfaceOrTypeAliasDeclaration =
 
 export function isInterfaceOrTypeAliasDeclaration(
   node: ts.Node
-): node is ts.InterfaceDeclaration | ts.TypeAliasDeclaration {
+): node is InterfaceOrTypeAliasDeclaration {
   return (
     node.kind === ts.SyntaxKind.InterfaceDeclaration ||
     node.kind === ts.SyntaxKind.TypeAliasDeclaration

@@ -1,9 +1,6 @@
 import * as ts from "typescript";
 import { trimFileName } from "../../trimFileName";
-import {
-  InterfaceOrTypeAliasDeclaration,
-  isInterfaceOrTypeAliasDeclaration,
-} from "./isInterfaceOrTypeAliasDeclaration";
+import { isInterfaceOrTypeAliasDeclaration } from "./isInterfaceOrTypeAliasDeclaration";
 import type { ParentType } from "./getParentType";
 
 export function getDeclarations(prop: ts.Symbol): ParentType[] | undefined {
@@ -20,18 +17,11 @@ export function getDeclarations(prop: ts.Symbol): ParentType[] | undefined {
       continue;
     }
 
-    const parentName =
-      "name" in parent
-        ? (parent as InterfaceOrTypeAliasDeclaration).name.text
-        : "TypeLiteral";
-
-    const { fileName } = (
-      parent as InterfaceOrTypeAliasDeclaration | ts.TypeLiteralNode
-    ).getSourceFile();
+    const { fileName } = parent.getSourceFile();
 
     parents.push({
       fileName: trimFileName(fileName),
-      name: parentName,
+      name: "name" in parent ? parent.name.text : "TypeLiteral",
     });
   }
 

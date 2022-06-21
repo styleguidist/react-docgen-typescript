@@ -41,11 +41,9 @@ export function computeComponentName(
     ...customComponentTypes,
   ];
 
-  if (supportedComponentTypes.indexOf(exportName) !== -1) {
-    return getDefaultExportForFile(source);
-  } else {
-    return exportName;
-  }
+  return supportedComponentTypes.includes(exportName)
+    ? getDefaultExportForFile(source)
+    : exportName;
 }
 
 function getTextValueOfClassMember(
