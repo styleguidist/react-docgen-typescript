@@ -1513,7 +1513,7 @@ describe('parser', () => {
       it('should be disabled by default', () => {
         const [parsed] = parse(fixturePath('StatelessDisplayName'));
         assert.equal(parsed.expression, undefined);
-        assert.equal(parsed.expression, parsed.rawExpression);
+        assert.equal(parsed.expression, parsed.rootExpression);
       });
 
       it('should cause the parser to return the component expression when set to true', () => {
@@ -1521,10 +1521,10 @@ describe('parser', () => {
           shouldIncludeExpression: true
         });
         assert.equal(parsed.expression!.name, 'Stateless');
-        assert.equal(parsed.expression, parsed.rawExpression);
+        assert.equal(parsed.expression, parsed.rootExpression);
       });
 
-      it('should cause the parser to return the raw expression when set to true', () => {
+      it('should cause the parser to return the root expression when set to true', () => {
         const [parsed] = parse(
           fixturePath('FunctionDeclarationAsDefaultExportWithMemo'),
           {
@@ -1532,7 +1532,7 @@ describe('parser', () => {
           }
         );
         assert.equal(parsed.expression!.name, 'Jumbotron');
-        assert.equal(parsed.rawExpression!.name, 'default');
+        assert.equal(parsed.rootExpression!.name, 'default');
       });
     });
   });
