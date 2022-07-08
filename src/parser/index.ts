@@ -504,7 +504,13 @@ export class Parser {
 
   public isTaggedPublic(symbol: ts.Symbol) {
     const jsDocTags = symbol.getJsDocTags();
-    return Boolean(jsDocTags.find((tag) => tag.name === "public"));
+    const hasPublicKeyword = symbol.valueDeclaration?.modifiers?.some(
+      (val) => val.kind === ts.SyntaxKind.PublicKeyword
+    );
+    return (
+      hasPublicKeyword ||
+      Boolean(jsDocTags.find((tag) => tag.name === "public"))
+    );
   }
 
   public getReturnDescription(
