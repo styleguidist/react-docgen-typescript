@@ -1198,11 +1198,26 @@ function getTextValueOfFunctionProperty(
     .filter(statement => {
       const expr = (statement as ts.ExpressionStatement)
         .expression as ts.BinaryExpression;
+
+      /**
+       * Ensure the .displayName is for the currently processing function.
+       *
+       * This avoids the following situations:
+       *
+       *  - A file has multiple functions, one has `.displayName`, and all
+       *    functions ends up with that same `.displayName` value.
+       *
+       *  - A file has multiple functions, each with a different
+       *    `.displayName`, but the first is applied to all of them.
+       */
+      const flowNodeNameEscapedText = (statement as any)?.flowNode?.node?.name
+        ?.escapedText as false | ts.__String | undefined;
+
       return (
         expr.left &&
         (expr.left as ts.PropertyAccessExpression).name &&
         (expr.left as ts.PropertyAccessExpression).name.escapedText ===
-          propertyName
+          (propertyName && flowNodeNameEscapedText === exp.escapedName)
       );
     })
     .filter(statement => {
