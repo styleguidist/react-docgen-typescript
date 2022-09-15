@@ -989,32 +989,6 @@ describe('parser', () => {
       const [parsed] = parse(fixturePath('StatefulDisplayNameFolder/index'));
       assert.equal(parsed.displayName, 'StatefulDisplayNameFolder');
     });
-
-    it('should get all displayNames from single file when multiple functions have the property defined', () => {
-      const [parsed1, parsed2, parsed3] = parse(
-        fixturePath('StatelessDisplayNameMultipleDisplayNames')
-      );
-
-      // parsed1.displayName === 'Button'?
-      // parsed1.displayName === 'SubmitButton'?
-      // parsed1.displayName === 'ResetButton'?
-
-      assert.equal(parsed1.displayName, 'First');
-      assert.equal(parsed2.displayName, 'Second');
-      assert.equal(parsed3.displayName, 'Third');
-    });
-
-    it('should get all displayNames from single file when multiple functions have the property defined', () => {
-      const [parsed1, parsed2] = parse(
-        fixturePath('StatelessDisplayNameMultipleFnsOneDisplayName')
-      );
-
-      // parsed1.displayName === 'Button'?
-      // parsed2 is `undefined`?
-
-      assert.equal(parsed1.displayName, 'First');
-      assert.equal(parsed2.displayName, 'someSeparateFunction');
-    });
   });
 
   describe('Parser options', () => {
