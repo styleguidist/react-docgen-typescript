@@ -27,10 +27,10 @@
     "lint-staged": "^7.2.2",
     "prettier": "^1.14.2",
     "react-docgen-typescript": "^1.9.0",
-    "react-styleguidist": "^7.3.7",
-    "ts-loader": "^5.1.0",
+    "react-styleguidist": "^13.0.0",
+    "ts-loader": "^9.4.2",
     "tslint": "^5.11.0",
     "typescript": "^3.0.3",
-    "webpack": "^4.18.0"
+    "webpack": "^5.75.0"
   }
 }
