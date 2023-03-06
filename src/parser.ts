@@ -704,6 +704,8 @@ export class Parser {
 
       if (hasCodeBasedDefault) {
         defaultValue = { value: defaultProps[propName] };
+      } else if (jsDocComment.tags.defaultValue) {
+        defaultValue = { value: jsDocComment.tags.defaultValue };
       } else if (jsDocComment.tags.default) {
         defaultValue = { value: jsDocComment.tags.default };
       }
@@ -751,7 +753,11 @@ export class Parser {
 
   public findDocComment(symbol: ts.Symbol): JSDoc {
     const comment = this.getFullJsDocComment(symbol);
-    if (comment.fullComment || comment.tags.default) {
+    if (
+      comment.fullComment ||
+      comment.tags.default ||
+      comment.tags.defaultValue
+    ) {
       return comment;
     }
 
@@ -799,7 +805,7 @@ export class Parser {
         ? currentValue + '\n' + trimmedText
         : trimmedText;
 
-      if (['default', 'type'].indexOf(tag.name) < 0) {
+      if (['default', 'type', 'defaultValue'].indexOf(tag.name) < 0) {
         tagComments.push(formatTag(tag));
       }
     });
