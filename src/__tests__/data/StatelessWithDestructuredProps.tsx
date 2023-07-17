@@ -28,6 +28,8 @@ export interface StatelessWithDefaultPropsProps {
   sampleUndefined?: any;
   /** sampleNumber description */
   sampleNumber?: number;
+  /** sampleRenamed description */
+  sampleRenamed?: string;
 }
 
 /** StatelessWithDefaultProps description */
@@ -40,7 +42,8 @@ export function StatelessWithDefaultProps({
   sampleObject = { a: '1', b: 2, c: true, d: false, e: undefined, f: null, g: { a: '1' } },
   sampleString = 'hello',
   sampleTrue = true,
-  sampleUndefined
+  sampleUndefined,
+  sampleRenamed: renamedSample = 'world'
 }: StatelessWithDefaultPropsProps) {
   return <div>test</div>;
 }
