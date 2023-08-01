@@ -121,7 +121,7 @@ describe('parser', () => {
 
   it('should parse typescript definition files', () => {
     check(
-      'DefinitionFile',
+      'DefinitionFile.d.ts',
       {
         Baz: {
           baz: { description: '', type: 'string', required: true }
@@ -137,9 +137,7 @@ describe('parser', () => {
         }
       },
       false,
-      '',
-      undefined,
-      '.d.ts'
+      ''
     );
   });
 
