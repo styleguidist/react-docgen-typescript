@@ -307,6 +307,7 @@ export class Parser {
 
         const defaultComponentTypes = [
           '__function',
+          '__type',
           'StatelessComponent',
           'Stateless',
           'StyledComponentClass',

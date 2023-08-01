@@ -32,7 +32,7 @@ export interface ExpectedProp {
   };
 }
 
-export function fixturePath(componentName: string) {
+export function fixturePath(componentName: string, ext?: string) {
   return path.join(
     __dirname,
     '..',
@@ -40,7 +40,7 @@ export function fixturePath(componentName: string) {
     'src',
     '__tests__',
     'data',
-    `${componentName}.tsx`
+    `${componentName}${ext ?? '.tsx'}`
   ); // it's running in ./temp
 }
 
@@ -49,9 +49,10 @@ export function check(
   expected: ExpectedComponents,
   exactProperties: boolean = true,
   description?: string | null,
-  parserOpts?: ParserOptions
+  parserOpts?: ParserOptions,
+  extension?: string
 ) {
-  const result = parse(fixturePath(componentName), parserOpts);
+  const result = parse(fixturePath(componentName, extension), parserOpts);
   checkComponent(result, expected, exactProperties, description);
 }
 

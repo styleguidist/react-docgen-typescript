@@ -119,6 +119,30 @@ describe('parser', () => {
     });
   });
 
+  it('should parse typescript definition files', () => {
+    check(
+      'DefinitionFile',
+      {
+        Baz: {
+          baz: { description: '', type: 'string', required: true }
+        },
+        Bar: {
+          bar: { description: '', type: 'string', required: true }
+        },
+        FooBar: {
+          foobar: { description: '', type: 'string' }
+        },
+        Buzz: {
+          buzz: { description: '', type: 'string', required: true }
+        }
+      },
+      false,
+      '',
+      undefined,
+      '.d.ts'
+    );
+  });
+
   it('should parse simple react class component with picked properties', () => {
     check('ColumnWithPick', {
       Column: {
