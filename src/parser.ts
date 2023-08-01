@@ -359,12 +359,11 @@ export class Parser {
 
     let result: ComponentDoc | null = null;
     if (propsType) {
-      if (!commentSource.valueDeclaration) {
-        return null;
-      }
+      let commentDeclaration =
+        commentSource.valueDeclaration ?? commentSource.declarations?.[0];
       const defaultProps = this.extractDefaultPropsFromComponent(
         commentSource,
-        commentSource.valueDeclaration.getSourceFile()
+        commentDeclaration?.getSourceFile()
       );
       const props = this.getPropsInfo(propsType, defaultProps);
 
@@ -840,8 +839,9 @@ export class Parser {
 
   public extractDefaultPropsFromComponent(
     symbol: ts.Symbol,
-    source: ts.SourceFile
+    source?: ts.SourceFile
   ) {
+    if (source == null) return {};
     let possibleStatements = [
       ...source.statements
         // ensure that name property is available
