@@ -1271,7 +1271,7 @@ function computeComponentName(
 
 // Default export for a file: named after file
 export function getDefaultExportForFile(source: ts.SourceFile) {
-  const name = path.basename(source.fileName, path.extname(source.fileName));
+  const name = path.basename(source.fileName).split('.')[0];
   const filename =
     name === 'index' ? path.basename(path.dirname(source.fileName)) : name;
 

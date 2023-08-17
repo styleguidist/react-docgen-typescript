@@ -40,7 +40,7 @@ export function fixturePath(componentName: string) {
     'src',
     '__tests__',
     'data',
-    `${componentName}.tsx`
+    `${componentName}${componentName.includes('.ts') ? '' : '.tsx'}`
   ); // it's running in ./temp
 }
 

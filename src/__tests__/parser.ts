@@ -45,6 +45,19 @@ describe('parser', () => {
     });
   });
 
+  it('should parse simple typescript definition file with default export', () => {
+    check(
+      'StatelessDisplayNameFolder/Stateless.d.ts',
+      {
+        Stateless: {
+          foo: { description: '', type: 'string', required: false }
+        }
+      },
+      true,
+      ''
+    );
+  });
+
   describe('file path', () => {
     it('should return the correct filepath for a parsed component', () => {
       const results = parse([fixturePath('FilePathCheck')]);
