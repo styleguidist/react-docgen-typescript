@@ -311,6 +311,7 @@ export class Parser {
           'Stateless',
           'StyledComponentClass',
           'StyledComponent',
+          'IStyledComponent',
           'FunctionComponent',
           'ForwardRefExoticComponent',
           'MemoExoticComponent'
@@ -1249,6 +1250,7 @@ function computeComponentName(
     'Stateless',
     'StyledComponentClass',
     'StyledComponent',
+    'IStyledComponent',
     'FunctionComponent',
     'StatelessComponent',
     'ForwardRefExoticComponent',
