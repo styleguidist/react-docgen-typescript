@@ -685,6 +685,11 @@ describe('parser', () => {
           defaultValue: undefined,
           required: false,
           type: 'any'
+        },
+        sampleRenamed: {
+          defaultValue: 'world',
+          required: false,
+          type: 'string'
         }
       }
     };
