@@ -87,6 +87,7 @@ export interface ParserOptions {
   shouldExtractLiteralValuesFromEnum?: boolean;
   shouldRemoveUndefinedFromOptional?: boolean;
   shouldExtractValuesFromUnion?: boolean;
+  shouldSortEnums?: boolean;
   skipChildrenPropWithoutDoc?: boolean;
   savePropValueAsString?: boolean;
   shouldIncludePropTagMap?: boolean;
@@ -220,6 +221,7 @@ export class Parser {
   private readonly shouldRemoveUndefinedFromOptional: boolean;
   private readonly shouldExtractLiteralValuesFromEnum: boolean;
   private readonly shouldExtractValuesFromUnion: boolean;
+  private readonly shouldSortEnums: boolean;
   private readonly savePropValueAsString: boolean;
   private readonly shouldIncludePropTagMap: boolean;
   private readonly shouldIncludeExpression: boolean;
@@ -230,6 +232,7 @@ export class Parser {
       shouldExtractLiteralValuesFromEnum,
       shouldRemoveUndefinedFromOptional,
       shouldExtractValuesFromUnion,
+      shouldSortEnums,
       shouldIncludePropTagMap,
       shouldIncludeExpression
     } = opts;
@@ -242,6 +245,7 @@ export class Parser {
       shouldRemoveUndefinedFromOptional
     );
     this.shouldExtractValuesFromUnion = Boolean(shouldExtractValuesFromUnion);
+    this.shouldSortEnums = Boolean(shouldSortEnums);
     this.savePropValueAsString = Boolean(savePropValueAsString);
     this.shouldIncludePropTagMap = Boolean(shouldIncludePropTagMap);
     this.shouldIncludeExpression = Boolean(shouldIncludeExpression);
@@ -598,6 +602,7 @@ export class Parser {
     if (type.getSymbol()) {
       commentInfo = { ...this.getFullJsDocComment(type.getSymbol()!) };
     }
+    // console.log(this.getValuesFromUnionType(type))
     return {
       value: this.getValuesFromUnionType(type),
       ...commentInfo
@@ -633,6 +638,12 @@ export class Parser {
 
         if (this.shouldRemoveUndefinedFromOptional && !isRequired) {
           value = value.filter(option => option.value != 'undefined');
+        }
+
+        if (this.shouldSortEnums) {
+          value.sort((a, b) =>
+            a.value.toString().localeCompare(b.value.toString())
+          );
         }
 
         return {

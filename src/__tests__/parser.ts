@@ -1448,6 +1448,63 @@ describe('parser', () => {
       });
     });
 
+    describe('Sorting enums', () => {
+      it('does not sort enums by default', () => {
+        check(
+          'SimpleEnumsAndUnions',
+          {
+            SimpleEnumsAndUnions: {
+              sampleUnionProp: {
+                raw: 'SampleUnion',
+                type: 'enum',
+                value: [
+                  { value: '"h1"' },
+                  { value: '"h6"' },
+                  { value: '"h2"' },
+                  { value: '"h4"' },
+                  { value: '"h5"' },
+                  { value: '"h3"' }
+                ]
+              }
+            }
+          },
+          false,
+          null,
+          {
+            shouldExtractLiteralValuesFromEnum: true
+          }
+        );
+      });
+
+      it('sorts enums when shouldSortEnums is true', () => {
+        check(
+          'SimpleEnumsAndUnions',
+          {
+            SimpleEnumsAndUnions: {
+              sampleUnionProp: {
+                raw: 'SampleUnion',
+                type: 'enum',
+                value: [
+                  { value: '"h1"' },
+                  { value: '"h2"' },
+                  { value: '"h3"' },
+                  { value: '"h4"' },
+                  { value: '"h5"' },
+                  { value: '"h6"' }
+                ]
+              }
+            }
+          },
+          false,
+          null,
+          {
+            shouldExtractLiteralValuesFromEnum: true,
+            shouldSortEnums: true
+          }
+        );
+      });
+    });
+
     describe('Returning not string default props ', () => {
       it('returns not string defaultProps', () => {
         check(
