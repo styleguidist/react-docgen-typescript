@@ -602,7 +602,6 @@ export class Parser {
     if (type.getSymbol()) {
       commentInfo = { ...this.getFullJsDocComment(type.getSymbol()!) };
     }
-    // console.log(this.getValuesFromUnionType(type))
     return {
       value: this.getValuesFromUnionType(type),
       ...commentInfo
