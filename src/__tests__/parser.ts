@@ -1448,12 +1448,12 @@ describe('parser', () => {
       });
     });
 
-    describe('Sorting enums', () => {
-      it('does not sort enums by default', () => {
+    describe('Sorting unions', () => {
+      it('does not sort union members by default', () => {
         check(
-          'SimpleEnumsAndUnions',
+          'SimpleUnions',
           {
-            SimpleEnumsAndUnions: {
+            SimpleUnions: {
               sampleUnionProp: {
                 raw: 'SampleUnion',
                 type: 'enum',
@@ -1476,11 +1476,11 @@ describe('parser', () => {
         );
       });
 
-      it('sorts enums when shouldSortEnums is true', () => {
+      it('sorts union members when shouldSortUnions is true', () => {
         check(
-          'SimpleEnumsAndUnions',
+          'SimpleUnions',
           {
-            SimpleEnumsAndUnions: {
+            SimpleUnions: {
               sampleUnionProp: {
                 raw: 'SampleUnion',
                 type: 'enum',
@@ -1499,7 +1499,7 @@ describe('parser', () => {
           null,
           {
             shouldExtractLiteralValuesFromEnum: true,
-            shouldSortEnums: true
+            shouldSortUnions: true
           }
         );
       });

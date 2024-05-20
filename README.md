@@ -140,6 +140,10 @@ If set to true, string enums and unions will be converted to docgen enum format.
 
 If set to true, every unions will be converted to docgen enum format.
 
+### `shouldSortUnions`: boolean
+
+When used in combination with `shouldExtractValuesFromUnion`, sorts union members in string-sort order when set to true. This is useful for ensuring the same order of members every time.
+
 ### `skipChildrenPropWithoutDoc`: boolean (default: `true`)
 
 If set to false the docs for the `children` prop will be generated even without an explicit description.
