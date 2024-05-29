@@ -1002,6 +1002,48 @@ describe('parser', () => {
       const [parsed] = parse(fixturePath('StatefulDisplayNameFolder/index'));
       assert.equal(parsed.displayName, 'StatefulDisplayNameFolder');
     });
+
+    describe('multiple components in one', () => {
+      it('should parse all `displayName` properties correctly when all are explicitly defined.', () => {
+        const result = parse(fixturePath('MultipleAllWithDisplayName'));
+
+        // Ensure we're not missing any exports.
+        assert.equal(result.length, 3);
+
+        const [parsed1, parsed2, parsed3] = result;
+
+        assert.equal(parsed1.displayName, 'First');
+        assert.equal(parsed2.displayName, 'Second');
+        assert.equal(parsed3.displayName, 'Third');
+      });
+
+      it('should parse all `displayName` properties correctly when some are explicitly defined.', () => {
+        const result = parse(fixturePath('MultipleSomeWithDisplayName'));
+
+        // Ensure we're not missing any exports.
+        assert.equal(result.length, 4);
+
+        const [parsed1, parsed2, parsed3, parsed4] = result;
+
+        assert.equal(parsed1.displayName, 'First');
+        assert.equal(parsed2.displayName, 'NoExplicitDisplayName1');
+        assert.equal(parsed3.displayName, 'Second');
+        assert.equal(parsed4.displayName, 'NoExplicitDisplayName2');
+      });
+
+      it('should parse all `displayName` properties correctly when none are explicitly defined.', () => {
+        const result = parse(fixturePath('MultipleWithNoExplicitDisplayName'));
+
+        // Ensure we're not missing any exports.
+        assert.equal(result.length, 3);
+
+        const [parsed1, parsed2, parsed3] = result;
+
+        assert.equal(parsed1.displayName, 'Button');
+        assert.equal(parsed2.displayName, 'SubmitButton');
+        assert.equal(parsed3.displayName, 'ResetButton');
+      });
+    });
   });
 
   describe('Parser options', () => {
