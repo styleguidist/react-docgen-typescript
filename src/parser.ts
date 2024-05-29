@@ -87,6 +87,7 @@ export interface ParserOptions {
   shouldExtractLiteralValuesFromEnum?: boolean;
   shouldRemoveUndefinedFromOptional?: boolean;
   shouldExtractValuesFromUnion?: boolean;
+  shouldSortUnions?: boolean;
   skipChildrenPropWithoutDoc?: boolean;
   savePropValueAsString?: boolean;
   shouldIncludePropTagMap?: boolean;
@@ -220,6 +221,7 @@ export class Parser {
   private readonly shouldRemoveUndefinedFromOptional: boolean;
   private readonly shouldExtractLiteralValuesFromEnum: boolean;
   private readonly shouldExtractValuesFromUnion: boolean;
+  private readonly shouldSortUnions: boolean;
   private readonly savePropValueAsString: boolean;
   private readonly shouldIncludePropTagMap: boolean;
   private readonly shouldIncludeExpression: boolean;
@@ -230,6 +232,7 @@ export class Parser {
       shouldExtractLiteralValuesFromEnum,
       shouldRemoveUndefinedFromOptional,
       shouldExtractValuesFromUnion,
+      shouldSortUnions,
       shouldIncludePropTagMap,
       shouldIncludeExpression
     } = opts;
@@ -242,6 +245,7 @@ export class Parser {
       shouldRemoveUndefinedFromOptional
     );
     this.shouldExtractValuesFromUnion = Boolean(shouldExtractValuesFromUnion);
+    this.shouldSortUnions = Boolean(shouldSortUnions);
     this.savePropValueAsString = Boolean(savePropValueAsString);
     this.shouldIncludePropTagMap = Boolean(shouldIncludePropTagMap);
     this.shouldIncludeExpression = Boolean(shouldIncludeExpression);
@@ -633,6 +637,12 @@ export class Parser {
 
         if (this.shouldRemoveUndefinedFromOptional && !isRequired) {
           value = value.filter(option => option.value != 'undefined');
+        }
+
+        if (this.shouldSortUnions) {
+          value.sort((a, b) =>
+            a.value.toString().localeCompare(b.value.toString())
+          );
         }
 
         return {
