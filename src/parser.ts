@@ -226,6 +226,7 @@ export class Parser {
   private readonly shouldIncludePropTagMap: boolean;
   private readonly shouldIncludeExpression: boolean;
   private propertiesOfPropsCache: Map<string, PropItem> = new Map();
+  private componentsInfoCache: Map<string, ComponentDoc | null> = new Map();
 
   constructor(program: ts.Program, opts: ParserOptions) {
     const {
@@ -300,11 +301,17 @@ export class Parser {
     const typeSymbol = type.symbol || type.aliasSymbol;
     const originalName = rootExp.getName();
     const filePath = source.fileName;
+    const cacheKey = `${filePath}_${originalName}`;
+
+    if (this.componentsInfoCache.has(cacheKey)) {
+      return this.componentsInfoCache.get(cacheKey) as ComponentDoc | null;
+    }
 
     if (!rootExp.valueDeclaration) {
       if (!typeSymbol && (rootExp.flags & ts.SymbolFlags.Alias) !== 0) {
         commentSource = this.checker.getAliasedSymbol(commentSource);
       } else if (!typeSymbol) {
+        this.componentsInfoCache.set(cacheKey, null);
         return null;
       } else {
         rootExp = typeSymbol;
@@ -347,6 +354,7 @@ export class Parser {
       (typeSymbol.getEscapedName() === 'Requireable' ||
         typeSymbol.getEscapedName() === 'Validator')
     ) {
+      this.componentsInfoCache.set(cacheKey, null);
       return null;
     }
 
@@ -366,6 +374,7 @@ export class Parser {
     let result: ComponentDoc | null = null;
     if (propsType) {
       if (!commentSource.valueDeclaration) {
+        this.componentsInfoCache.set(cacheKey, null);
         return null;
       }
       const defaultProps = this.extractDefaultPropsFromComponent(
@@ -405,6 +414,7 @@ export class Parser {
       result.rootExpression = exp;
     }
 
+    this.componentsInfoCache.set(cacheKey, result);
     return result;
   }
 
