@@ -225,6 +225,8 @@ export class Parser {
   private readonly savePropValueAsString: boolean;
   private readonly shouldIncludePropTagMap: boolean;
   private readonly shouldIncludeExpression: boolean;
+  private propertiesOfPropsCache: Map<string, PropItem> = new Map();
+  private componentsInfoCache: Map<string, ComponentDoc | null> = new Map();
 
   constructor(program: ts.Program, opts: ParserOptions) {
     const {
@@ -299,11 +301,17 @@ export class Parser {
     const typeSymbol = type.symbol || type.aliasSymbol;
     const originalName = rootExp.getName();
     const filePath = source.fileName;
+    const cacheKey = `${filePath}_${originalName}`;
+
+    if (this.componentsInfoCache.has(cacheKey)) {
+      return this.componentsInfoCache.get(cacheKey) as ComponentDoc | null;
+    }
 
     if (!rootExp.valueDeclaration) {
       if (!typeSymbol && (rootExp.flags & ts.SymbolFlags.Alias) !== 0) {
         commentSource = this.checker.getAliasedSymbol(commentSource);
       } else if (!typeSymbol) {
+        this.componentsInfoCache.set(cacheKey, null);
         return null;
       } else {
         rootExp = typeSymbol;
@@ -346,6 +354,7 @@ export class Parser {
       (typeSymbol.getEscapedName() === 'Requireable' ||
         typeSymbol.getEscapedName() === 'Validator')
     ) {
+      this.componentsInfoCache.set(cacheKey, null);
       return null;
     }
 
@@ -365,6 +374,7 @@ export class Parser {
     let result: ComponentDoc | null = null;
     if (propsType) {
       if (!commentSource.valueDeclaration) {
+        this.componentsInfoCache.set(cacheKey, null);
         return null;
       }
       const defaultProps = this.extractDefaultPropsFromComponent(
@@ -404,6 +414,7 @@ export class Parser {
       result.rootExpression = exp;
     }
 
+    this.componentsInfoCache.set(cacheKey, result);
     return result;
   }
 
@@ -701,60 +712,73 @@ export class Parser {
 
     propertiesOfProps.forEach(prop => {
       const propName = prop.getName();
-
-      // Find type of prop by looking in context of the props object itself.
-      const propType = this.checker.getTypeOfSymbolAtLocation(
-        prop,
-        propsObj.valueDeclaration!
-      );
-
-      const jsDocComment = this.findDocComment(prop);
-      const hasCodeBasedDefault = defaultProps[propName] !== undefined;
-
-      let defaultValue: { value: any } | null = null;
-
-      if (hasCodeBasedDefault) {
-        defaultValue = { value: defaultProps[propName] };
-      } else if (jsDocComment.tags.default) {
-        defaultValue = { value: jsDocComment.tags.default };
-      }
-
       const parent = getParentType(prop);
-      const parents = getDeclarations(prop);
-      const declarations = prop.declarations || [];
-      const baseProp = baseProps.find(p => p.getName() === propName);
+      const cacheKey = `${parent?.fileName}_${propName}`;
+      if (this.propertiesOfPropsCache.has(cacheKey)) {
+        result[propName] = this.propertiesOfPropsCache.get(
+          cacheKey
+        ) as PropItem;
+      } else {
+        // Find type of prop by looking in context of the props object itself.
+        const propType = this.checker.getTypeOfSymbolAtLocation(
+          prop,
+          propsObj.valueDeclaration!
+        );
 
-      const required =
-        !isOptional(prop) &&
-        !hasCodeBasedDefault &&
-        // If in a intersection or union check original declaration for "?"
-        // @ts-ignore
-        declarations.every(d => !d.questionToken) &&
-        (!baseProp || !isOptional(baseProp));
+        const jsDocComment = this.findDocComment(prop);
+        const hasCodeBasedDefault = defaultProps[propName] !== undefined;
 
-      const type = jsDocComment.tags.type
-        ? {
-            name: jsDocComment.tags.type
-          }
-        : this.getDocgenType(propType, required);
+        let defaultValue: { value: any } | null = null;
 
-      const propTags = this.shouldIncludePropTagMap
-        ? { tags: jsDocComment.tags }
-        : {};
-      const description = this.shouldIncludePropTagMap
-        ? jsDocComment.description.replace(/\r\n/g, '\n')
-        : jsDocComment.fullComment.replace(/\r\n/g, '\n');
+        if (hasCodeBasedDefault) {
+          defaultValue = { value: defaultProps[propName] };
+        } else if (jsDocComment.tags.default) {
+          defaultValue = { value: jsDocComment.tags.default };
+        }
 
-      result[propName] = {
-        defaultValue,
-        description: description,
-        name: propName,
-        parent,
-        declarations: parents,
-        required,
-        type,
-        ...propTags
-      };
+        const parents = getDeclarations(prop);
+        const declarations = prop.declarations || [];
+        const baseProp = baseProps.find(p => p.getName() === propName);
+
+        const required =
+          !isOptional(prop) &&
+          !hasCodeBasedDefault &&
+          // If in a intersection or union check original declaration for "?"
+          // @ts-ignore
+          declarations.every(d => !d.questionToken) &&
+          (!baseProp || !isOptional(baseProp));
+
+        const type = jsDocComment.tags.type
+          ? {
+              name: jsDocComment.tags.type
+            }
+          : this.getDocgenType(propType, required);
+
+        const propTags = this.shouldIncludePropTagMap
+          ? { tags: jsDocComment.tags }
+          : {};
+        const description = this.shouldIncludePropTagMap
+          ? jsDocComment.description.replace(/\r\n/g, '\n')
+          : jsDocComment.fullComment.replace(/\r\n/g, '\n');
+
+        const propItem: PropItem = {
+          defaultValue,
+          description: description,
+          name: propName,
+          parent,
+          declarations: parents,
+          required,
+          type,
+          ...propTags
+        };
+        if (parent?.fileName.includes('node_modules')) {
+          this.propertiesOfPropsCache.set(
+            `${parent.fileName}_${propName}`,
+            propItem
+          );
+        }
+        result[propName] = propItem;
+      }
     });
 
     return result;
