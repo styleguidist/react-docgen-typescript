@@ -1,12 +1,13 @@
 import * as path from 'path';
 
 const slashRegex = /[\\/]/g;
-
+const fileNameCache = new Map<string, string>();
 export function trimFileName(
   fileName: string,
   cwd: string = process.cwd(),
   platform?: 'posix' | 'win32'
-) {
+): string {
+  if (fileNameCache.has(fileName)) return fileNameCache.get(fileName) as string;
   // This allows tests to run regardless of current platform
   const pathLib = platform ? path[platform] : path;
 
@@ -24,17 +25,18 @@ export function trimFileName(
   let parent = cwd;
   do {
     if (normalizedFileName.startsWith(parent)) {
-      return (
-        pathLib
-          // Preserve the parent directory name to match existing behavior
-          .relative(pathLib.dirname(parent), normalizedFileName)
-          // Restore original type of slashes
-          .replace(slashRegex, originalSep)
-      );
+      const finalPathName = pathLib
+        // Preserve the parent directory name to match existing behavior
+        .relative(pathLib.dirname(parent), normalizedFileName)
+        // Restore original type of slashes
+        .replace(slashRegex, originalSep);
+      fileNameCache.set(fileName, finalPathName);
+      return finalPathName;
     }
     parent = pathLib.dirname(parent);
   } while (parent !== root);
 
+  fileNameCache.set(fileName, fileName);
   // No common ancestor, so return the path as-is
   return fileName;
 }
