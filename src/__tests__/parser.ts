@@ -45,6 +45,19 @@ describe('parser', () => {
     });
   });
 
+  it('should parse simple typescript definition file with default export', () => {
+    check(
+      'StatelessDisplayNameFolder/Stateless.d.ts',
+      {
+        Stateless: {
+          foo: { description: '', type: 'string', required: false }
+        }
+      },
+      true,
+      ''
+    );
+  });
+
   describe('file path', () => {
     it('should return the correct filepath for a parsed component', () => {
       const results = parse([fixturePath('FilePathCheck')]);
@@ -1472,6 +1485,63 @@ describe('parser', () => {
           null,
           {
             shouldExtractValuesFromUnion: true
+          }
+        );
+      });
+    });
+
+    describe('Sorting unions', () => {
+      it('does not sort union members by default', () => {
+        check(
+          'SimpleUnions',
+          {
+            SimpleUnions: {
+              sampleUnionProp: {
+                raw: 'SampleUnion',
+                type: 'enum',
+                value: [
+                  { value: '"h1"' },
+                  { value: '"h6"' },
+                  { value: '"h2"' },
+                  { value: '"h4"' },
+                  { value: '"h5"' },
+                  { value: '"h3"' }
+                ]
+              }
+            }
+          },
+          false,
+          null,
+          {
+            shouldExtractLiteralValuesFromEnum: true
+          }
+        );
+      });
+
+      it('sorts union members when shouldSortUnions is true', () => {
+        check(
+          'SimpleUnions',
+          {
+            SimpleUnions: {
+              sampleUnionProp: {
+                raw: 'SampleUnion',
+                type: 'enum',
+                value: [
+                  { value: '"h1"' },
+                  { value: '"h2"' },
+                  { value: '"h3"' },
+                  { value: '"h4"' },
+                  { value: '"h5"' },
+                  { value: '"h6"' }
+                ]
+              }
+            }
+          },
+          false,
+          null,
+          {
+            shouldExtractLiteralValuesFromEnum: true,
+            shouldSortUnions: true
           }
         );
       });
