@@ -254,8 +254,76 @@ export class Parser {
     this.shouldIncludeExpression = Boolean(shouldIncludeExpression);
   }
 
-  private getComponentFromExpression(exp: ts.Symbol) {
+  public getTypeSymbol(exp: ts.Symbol) {
     const declaration = exp.valueDeclaration || exp.declarations![0];
+    const type = this.checker.getTypeOfSymbolAtLocation(exp, declaration);
+    const typeSymbol = type.symbol || type.aliasSymbol;
+    return typeSymbol;
+  }
+
+  public isPlainObjectType(exp: ts.Symbol) {
+    let targetSymbol = exp;
+    if (exp.flags & ts.SymbolFlags.Alias) {
+      targetSymbol = this.checker.getAliasedSymbol(exp);
+    }
+    const declaration =
+      targetSymbol.valueDeclaration || targetSymbol.declarations![0];
+
+    if (ts.isClassDeclaration(declaration)) {
+      return false;
+    }
+
+    const type = this.checker.getTypeOfSymbolAtLocation(
+      targetSymbol,
+      declaration
+    );
+    // Confirm it's an object type
+    if (!(type.flags & ts.TypeFlags.Object)) {
+      return false;
+    }
+    const objectType = type as ts.ObjectType;
+    const isPlain = !!(
+      objectType.objectFlags &
+      (ts.ObjectFlags.Anonymous | ts.ObjectFlags.ObjectLiteral)
+    );
+    return isPlain;
+  }
+
+  /**
+   * Attempts to gather a symbol's exports.
+   * Some symbol's like `default` exports are aliased, so we need to get the real symbol.
+   * @param exp symbol
+   */
+  public getComponentExports(exp: ts.Symbol) {
+    let targetSymbol = exp;
+
+    if (targetSymbol.exports) {
+      return { symbol: targetSymbol, exports: targetSymbol.exports! };
+    }
+
+    if (exp.flags & ts.SymbolFlags.Alias) {
+      targetSymbol = this.checker.getAliasedSymbol(exp);
+    }
+    if (targetSymbol.exports) {
+      return { symbol: targetSymbol, exports: targetSymbol.exports };
+    }
+  }
+
+  private getComponentFromExpression(exp: ts.Symbol) {
+    let declaration = exp.valueDeclaration || exp.declarations![0];
+    // Lookup component if it's a property assignment
+    if (declaration && ts.isPropertyAssignment(declaration)) {
+      if (ts.isIdentifier(declaration.initializer)) {
+        const newSymbol = this.checker.getSymbolAtLocation(
+          declaration.initializer
+        );
+        if (newSymbol) {
+          exp = newSymbol;
+          declaration = exp.valueDeclaration || exp.declarations![0];
+        }
+      }
+    }
+
     const type = this.checker.getTypeOfSymbolAtLocation(exp, declaration);
     const typeSymbol = type.symbol || type.aliasSymbol;
 
@@ -264,7 +332,6 @@ export class Parser {
     }
 
     const symbolName = typeSymbol.getName();
-
     if (
       (symbolName === 'MemoExoticComponent' ||
         symbolName === 'ForwardRefExoticComponent') &&
@@ -1230,7 +1297,7 @@ function getTextValueOfFunctionProperty(
   source: ts.SourceFile,
   propertyName: string
 ) {
-  const [textValue] = source.statements
+  const identifierStatements: [ts.__String, string][] = source.statements
     .filter(statement => ts.isExpressionStatement(statement))
     .filter(statement => {
       const expr = (statement as ts.ExpressionStatement)
@@ -1280,11 +1347,25 @@ function getTextValueOfFunctionProperty(
       );
     })
     .map(statement => {
-      return (((statement as ts.ExpressionStatement)
-        .expression as ts.BinaryExpression).right as ts.Identifier).text;
+      const expressionStatement = (statement as ts.ExpressionStatement)
+        .expression as ts.BinaryExpression;
+      const name = ((expressionStatement.left as ts.PropertyAccessExpression)
+        .expression as ts.Identifier).escapedText;
+      const value = (expressionStatement.right as ts.Identifier).text;
+      return [name, value];
     });
 
-  return textValue || '';
+  if (identifierStatements.length > 0) {
+    const locatedStatement = identifierStatements.find(
+      statement => statement[0] === exp.escapedName
+    );
+    if (locatedStatement) {
+      return locatedStatement[1];
+    }
+    return identifierStatements[0][1] || '';
+  }
+
+  return '';
 }
 
 function computeComponentName(
@@ -1450,11 +1531,28 @@ function parseWithProgramProvider(
         return docs;
       }
 
-      const components = checker.getExportsOfModule(moduleSymbol);
+      const exports = checker.getExportsOfModule(moduleSymbol);
       const componentDocs: ComponentDoc[] = [];
+      const exportsAndMembers: ts.Symbol[] = [];
+
+      // Examine each export to determine if it's on object which may contain components
+      exports.forEach(exp => {
+        // Push symbol for extraction to maintain existing behavior
+        exportsAndMembers.push(exp);
+        // Determine if the export symbol is an object
+        if (!parser.isPlainObjectType(exp)) {
+          return;
+        }
+        const typeSymbol = parser.getTypeSymbol(exp);
+        if (typeSymbol?.members) {
+          typeSymbol.members.forEach(member => {
+            exportsAndMembers.push(member);
+          });
+        }
+      });
 
       // First document all components
-      components.forEach(exp => {
+      exportsAndMembers.forEach(exp => {
         const doc = parser.getComponentInfo(
           exp,
           sourceFile,
@@ -1466,12 +1564,13 @@ function parseWithProgramProvider(
           componentDocs.push(doc);
         }
 
-        if (!exp.exports) {
+        const componentExports = parser.getComponentExports(exp);
+        if (!componentExports) {
           return;
         }
 
         // Then document any static sub-components
-        exp.exports.forEach(symbol => {
+        componentExports.exports.forEach(symbol => {
           if (symbol.flags & ts.SymbolFlags.Prototype) {
             return;
           }
@@ -1494,7 +1593,9 @@ function parseWithProgramProvider(
 
           if (doc) {
             const prefix =
-              exp.escapedName === 'default' ? '' : `${exp.escapedName}.`;
+              componentExports.symbol.escapedName === 'default'
+                ? ''
+                : `${componentExports.symbol.escapedName}.`;
 
             componentDocs.push({
               ...doc,
