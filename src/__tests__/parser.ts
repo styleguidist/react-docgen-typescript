@@ -278,6 +278,17 @@ describe('parser', () => {
     );
   });
 
+  it('should parse static sub components exported from named object with keys', () => {
+    check('StatelessStaticComponentsNamedObjectExportAsKeys', {
+      StatelessStaticComponents: {
+        myProp: { type: 'string' }
+      },
+      SubComponent: {
+        title: { type: 'string' }
+      }
+    });
+  });
+
   it('should parse static sub components on class components', () => {
     check('ColumnWithStaticComponents', {
       Column: {

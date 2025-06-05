@@ -307,7 +307,20 @@ export class Parser {
   }
 
   private getComponentFromExpression(exp: ts.Symbol) {
-    const declaration = exp.valueDeclaration || exp.declarations![0];
+    let declaration = exp.valueDeclaration || exp.declarations![0];
+    // Lookup component if it's a property assignment
+    if (declaration && ts.isPropertyAssignment(declaration)) {
+      if (ts.isIdentifier(declaration.initializer)) {
+        const newSymbol = this.checker.getSymbolAtLocation(
+          declaration.initializer
+        );
+        if (newSymbol) {
+          exp = newSymbol;
+          declaration = exp.valueDeclaration || exp.declarations![0];
+        }
+      }
+    }
+
     const type = this.checker.getTypeOfSymbolAtLocation(exp, declaration);
     const typeSymbol = type.symbol || type.aliasSymbol;
 
@@ -1260,7 +1273,7 @@ function getTextValueOfFunctionProperty(
   source: ts.SourceFile,
   propertyName: string
 ) {
-  const [textValue] = source.statements
+  const identifierStatements: [ts.__String, string][] = source.statements
     .filter(statement => ts.isExpressionStatement(statement))
     .filter(statement => {
       const expr = (statement as ts.ExpressionStatement)
@@ -1279,11 +1292,25 @@ function getTextValueOfFunctionProperty(
       );
     })
     .map(statement => {
-      return (((statement as ts.ExpressionStatement)
-        .expression as ts.BinaryExpression).right as ts.Identifier).text;
+      const expressionStatement = (statement as ts.ExpressionStatement)
+        .expression as ts.BinaryExpression;
+      const name = ((expressionStatement.left as ts.PropertyAccessExpression)
+        .expression as ts.Identifier).escapedText;
+      const value = (expressionStatement.right as ts.Identifier).text;
+      return [name, value];
     });
 
-  return textValue || '';
+  if (identifierStatements.length > 0) {
+    const locatedStatement = identifierStatements.find(
+      statement => statement[0] === exp.escapedName
+    );
+    if (locatedStatement) {
+      return locatedStatement[1];
+    }
+    return identifierStatements[0][1] || '';
+  }
+
+  return '';
 }
 
 function computeComponentName(
@@ -1292,6 +1319,7 @@ function computeComponentName(
   customComponentTypes: ParserOptions['customComponentTypes'] = []
 ) {
   const exportName = exp.getName();
+
   const statelessDisplayName = getTextValueOfFunctionProperty(
     exp,
     source,

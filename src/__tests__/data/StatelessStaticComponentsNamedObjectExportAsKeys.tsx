@@ -21,6 +21,6 @@ const StatelessStaticComponents = (props: StatelessStaticComponentsProps) => (
 );
 
 export const Record = {
-  StatelessStaticComponents,
-  SubComponent
+  Comp1: StatelessStaticComponents,
+  Comp2: SubComponent
 };
