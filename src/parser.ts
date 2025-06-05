@@ -1135,19 +1135,18 @@ export class Parser {
     properties: ts.NodeArray<ts.PropertyAssignment | ts.BindingElement>
   ): StringIndexedObject<string | boolean | number | null> {
     return properties.reduce((acc, property) => {
-      if (ts.isSpreadAssignment(property) || !property.name) {
+      const propertyName = getPropertyName(ts.isBindingElement(property) ? (property.propertyName || property.name) : property.name);
+      if (ts.isSpreadAssignment(property) || !propertyName) {
         return acc;
       }
 
       const literalValue = this.getLiteralValueFromPropertyAssignment(property);
-      const propertyName = getPropertyName(property.name);
 
       if (
         (typeof literalValue === 'string' ||
           typeof literalValue === 'number' ||
           typeof literalValue === 'boolean' ||
-          literalValue === null) &&
-        propertyName !== null
+          literalValue === null)
       ) {
         acc[propertyName] = literalValue;
       }
