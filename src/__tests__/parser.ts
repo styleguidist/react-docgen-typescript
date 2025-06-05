@@ -240,6 +240,44 @@ describe('parser', () => {
     });
   });
 
+  it('should parse static exported components variation1', () => {
+    check('StatelessStaticComponentsExportVariation1', {
+      StatelessStaticComponents: {
+        myProp: { type: 'string' }
+      },
+      'StatelessStaticComponents.Label': {
+        title: { type: 'string' }
+      }
+    });
+  });
+
+  it('should parse static exported components variation2', () => {
+    check('StatelessStaticComponentsExportVariation2', {
+      StatelessStaticComponents: {
+        myProp: { type: 'string' }
+      },
+      'StatelessStaticComponents.Label': {
+        title: { type: 'string' }
+      }
+    });
+  });
+
+  it('should parse static sub components exported from named object', () => {
+    check(
+      'StatelessStaticComponentsNamedObjectExport',
+      {
+        StatelessStaticComponents: {
+          myProp: { type: 'string' }
+        },
+        SubComponent: {
+          title: { type: 'string' }
+        }
+      },
+      true,
+      ''
+    );
+  });
+
   it('should parse static sub components on class components', () => {
     check('ColumnWithStaticComponents', {
       Column: {
