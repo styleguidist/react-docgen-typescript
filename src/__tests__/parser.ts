@@ -781,6 +781,14 @@ describe('parser', () => {
     });
   });
 
+  it('should parse functional component declared as React.FC with default import from react', () => {
+    check('FunctionalComponentWithDefaultImportReact', {
+      Jumbotron: {
+        prop1: { type: 'string', required: true }
+      }
+    });
+  });
+
   it('should parse functional component defined as const with default value assignments in immediately destructured props', () => {
     check('FunctionalComponentWithDesctructuredProps', {
       FunctionalComponentWithDesctructuredProps: {

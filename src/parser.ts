@@ -113,7 +113,8 @@ export interface FileParser {
 export const defaultOptions: ts.CompilerOptions = {
   jsx: ts.JsxEmit.React,
   module: ts.ModuleKind.CommonJS,
-  target: ts.ScriptTarget.Latest
+  target: ts.ScriptTarget.Latest,
+  esModuleInterop: true
 };
 
 /**
