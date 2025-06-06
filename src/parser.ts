@@ -266,10 +266,9 @@ export class Parser {
     if (exp.flags & ts.SymbolFlags.Alias) {
       targetSymbol = this.checker.getAliasedSymbol(exp);
     }
-    const declaration =
-      targetSymbol.valueDeclaration || targetSymbol.declarations![0];
+    const declaration = targetSymbol.valueDeclaration;
 
-    if (ts.isClassDeclaration(declaration)) {
+    if (!declaration || ts.isClassDeclaration(declaration)) {
       return false;
     }
 
@@ -1203,7 +1202,11 @@ export class Parser {
     properties: ts.NodeArray<ts.PropertyAssignment | ts.BindingElement>
   ): StringIndexedObject<string | boolean | number | null> {
     return properties.reduce((acc, property) => {
-      const propertyName = getPropertyName(ts.isBindingElement(property) ? (property.propertyName || property.name) : property.name);
+      const propertyName = getPropertyName(
+        ts.isBindingElement(property)
+          ? property.propertyName || property.name
+          : property.name
+      );
       if (ts.isSpreadAssignment(property) || !propertyName) {
         return acc;
       }
@@ -1211,10 +1214,10 @@ export class Parser {
       const literalValue = this.getLiteralValueFromPropertyAssignment(property);
 
       if (
-        (typeof literalValue === 'string' ||
-          typeof literalValue === 'number' ||
-          typeof literalValue === 'boolean' ||
-          literalValue === null)
+        typeof literalValue === 'string' ||
+        typeof literalValue === 'number' ||
+        typeof literalValue === 'boolean' ||
+        literalValue === null
       ) {
         acc[propertyName] = literalValue;
       }
