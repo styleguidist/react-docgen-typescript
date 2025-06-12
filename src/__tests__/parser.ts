@@ -1023,6 +1023,16 @@ describe('parser', () => {
       assert.equal(parsed.displayName, 'StatelessDisplayName');
     });
 
+    it('should be taken from stateless component `displayName` property (using named export and function expression)', () => {
+      const [parsed] = parse(
+        fixturePath('StatelessDisplayNameFunctionExpression')
+      );
+      assert.equal(
+        parsed.displayName,
+        'StatelessDisplayNameFunctionExpression'
+      );
+    });
+
     it('should be taken from stateful component `displayName` property (using named export)', () => {
       const [parsed] = parse(fixturePath('StatefulDisplayName'));
       assert.equal(parsed.displayName, 'StatefulDisplayName');
