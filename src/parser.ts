@@ -1340,7 +1340,8 @@ function getTextValueOfFunctionProperty(
         (expr.left as ts.PropertyAccessExpression).name &&
         (expr.left as ts.PropertyAccessExpression).name.escapedText ===
           propertyName &&
-        flowNodeNameEscapedText === exp.escapedName
+        (!flowNodeNameEscapedText ||
+          flowNodeNameEscapedText === exp.escapedName)
       );
     })
     .filter(statement => {
