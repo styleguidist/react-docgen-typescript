@@ -308,21 +308,10 @@ export class Parser {
     }
   }
 
-  private getComponentFromExpression(exp: ts.Symbol) {
-    let declaration = exp.valueDeclaration || exp.declarations![0];
-    // Lookup component if it's a property assignment
-    if (declaration && ts.isPropertyAssignment(declaration)) {
-      if (ts.isIdentifier(declaration.initializer)) {
-        const newSymbol = this.checker.getSymbolAtLocation(
-          declaration.initializer
-        );
-        if (newSymbol) {
-          exp = newSymbol;
-          declaration = exp.valueDeclaration || exp.declarations![0];
-        }
-      }
-    }
-
+  private resolveHocArgument(
+    exp: ts.Symbol,
+    declaration: ts.Declaration
+  ): ts.Symbol {
     const type = this.checker.getTypeOfSymbolAtLocation(exp, declaration);
     const typeSymbol = type.symbol || type.aliasSymbol;
 
@@ -348,6 +337,79 @@ export class Parser {
     }
 
     return exp;
+  }
+
+  /**
+   * Resolves aliases from export symbol
+   * to the component declaration, so we can dedupe on that.
+   * @param symbol
+   */
+  public resolveExportSymbol(symbol: ts.Symbol): ts.Symbol {
+    let current = symbol;
+
+    // Follow alias symbols (e.g. `export default Foo`)
+    if (ts.SymbolFlags.Alias & current.flags) {
+      try {
+        current = this.checker.getAliasedSymbol(current);
+      } catch {
+        // leave current as-is
+      }
+    }
+
+    const declaration = current.valueDeclaration;
+
+    // Follow shorthand property assignments, e.g. members of
+    // `export default { Foo, Bar }`
+    if (declaration && ts.isShorthandPropertyAssignment(declaration)) {
+      const referenced = this.checker.getShorthandAssignmentValueSymbol(
+        declaration
+      );
+      if (referenced) {
+        current = referenced;
+      }
+    }
+
+    // Follow property assignments with an identifier initializer, e.g.
+    // members of `export default { Foo: Foo }`
+    if (
+      declaration &&
+      ts.isPropertyAssignment(declaration) &&
+      ts.isIdentifier(declaration.initializer)
+    ) {
+      const referenced = this.checker.getSymbolAtLocation(
+        declaration.initializer
+      );
+      if (referenced) {
+        current = referenced;
+      }
+    }
+
+    return this.resolveHocArgument(
+      current,
+      current.valueDeclaration || current.declarations![0]
+    );
+  }
+
+  private getComponentFromExpression(exp: ts.Symbol) {
+    if (!this.shouldIncludeExpression) {
+      return exp;
+    }
+
+    let declaration = exp.valueDeclaration || exp.declarations![0];
+    // Lookup component if it's a property assignment
+    if (declaration && ts.isPropertyAssignment(declaration)) {
+      if (ts.isIdentifier(declaration.initializer)) {
+        const newSymbol = this.checker.getSymbolAtLocation(
+          declaration.initializer
+        );
+        if (newSymbol) {
+          exp = newSymbol;
+          declaration = exp.valueDeclaration || exp.declarations![0];
+        }
+      }
+    }
+
+    return this.resolveHocArgument(exp, declaration);
   }
 
   public getComponentInfo(
@@ -1537,11 +1599,25 @@ function parseWithProgramProvider(
       const exports = checker.getExportsOfModule(moduleSymbol);
       const componentDocs: ComponentDoc[] = [];
       const exportsAndMembers: ts.Symbol[] = [];
+      const seenValueDeclarations = new Set<ts.Declaration>();
 
       // Examine each export to determine if it's on object which may contain components
       exports.forEach(exp => {
+        const resolved = parser.resolveExportSymbol(exp);
+        const valueDeclaration =
+          resolved.valueDeclaration ?? exp.valueDeclaration;
+
+        if (valueDeclaration) {
+          if (seenValueDeclarations.has(valueDeclaration)) {
+            return;
+          }
+          seenValueDeclarations.add(valueDeclaration);
+        }
+
         // Push symbol for extraction to maintain existing behavior
-        exportsAndMembers.push(exp);
+        exportsAndMembers.push(
+          parserOpts.shouldIncludeExpression ? exp : resolved
+        );
         // Determine if the export symbol is an object
         if (!parser.isPlainObjectType(exp)) {
           return;
@@ -1549,7 +1625,20 @@ function parseWithProgramProvider(
         const typeSymbol = parser.getTypeSymbol(exp);
         if (typeSymbol?.members) {
           typeSymbol.members.forEach(member => {
-            exportsAndMembers.push(member);
+            const resolved = parser.resolveExportSymbol(member);
+            const valueDeclaration =
+              resolved.valueDeclaration ?? member.valueDeclaration;
+
+            if (valueDeclaration) {
+              if (seenValueDeclarations.has(valueDeclaration)) {
+                return;
+              }
+              seenValueDeclarations.add(valueDeclaration);
+            }
+
+            exportsAndMembers.push(
+              parserOpts.shouldIncludeExpression ? member : resolved
+            );
           });
         }
       });
@@ -1608,25 +1697,6 @@ function parseWithProgramProvider(
         });
       });
 
-      // Remove any duplicates (for HOC where the names are the same)
-      const componentDocsNoDuplicates = componentDocs.reduce(
-        (prevVal, comp) => {
-          const duplicate = prevVal.find(compDoc => {
-            return compDoc!.displayName === comp!.displayName;
-          });
-          if (duplicate) return prevVal;
-          return [...prevVal, comp];
-        },
-        [] as ComponentDoc[]
-      );
-
-      const filteredComponentDocs = componentDocsNoDuplicates.filter(
-        (comp, index, comps) =>
-          comps
-            .slice(index + 1)
-            .every(innerComp => innerComp!.displayName !== comp!.displayName)
-      );
-
-      return [...docs, ...filteredComponentDocs];
+      return [...docs, ...componentDocs];
     }, []);
 }
