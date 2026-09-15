@@ -288,6 +288,17 @@ export class Parser {
     return isPlain;
   }
 
+  private getResolvedExport(exp: ts.Symbol) {
+    if (!exp.valueDeclaration && (exp.flags & ts.SymbolFlags.Alias) !== 0) {
+      const aliasedSymbol = this.checker.getAliasedSymbol(exp);
+
+      if (aliasedSymbol && aliasedSymbol.valueDeclaration) {
+        exp = aliasedSymbol;
+      }
+    }
+
+    return exp;
+  }
   /**
    * Attempts to gather a symbol's exports.
    * Some symbol's like `default` exports are aliased, so we need to get the real symbol.
@@ -327,7 +338,7 @@ export class Parser {
     const typeSymbol = type.symbol || type.aliasSymbol;
 
     if (!typeSymbol) {
-      return exp;
+      return this.getResolvedExport(exp);
     }
 
     const symbolName = typeSymbol.getName();
@@ -347,7 +358,7 @@ export class Parser {
       }
     }
 
-    return exp;
+    return this.getResolvedExport(exp);
   }
 
   public getComponentInfo(

@@ -49,13 +49,24 @@ describe('parser', () => {
     check(
       'StatelessDisplayNameFolder/Stateless.d.ts',
       {
-        Stateless: {
+        Foo: {
           foo: { description: '', type: 'string', required: false }
         }
       },
       true,
       ''
     );
+  });
+
+  it('should parse one component doc for an arrow functional component with a named and default export', () => {
+    check('NamedAndDefaultExportArrowFunction', {
+      NamedAndDefaultExportArrowFunction: {
+        id: {
+          type: 'string',
+          required: false
+        }
+      }
+    });
   });
 
   describe('file path', () => {
@@ -938,8 +949,7 @@ describe('parser', () => {
     check(
       'FunctionDeclarationAsConstAsDefaultExportWithMemo',
       {
-        // in this case the component name is taken from the file name
-        FunctionDeclarationAsConstAsDefaultExportWithMemo: {
+        Jumbotron: {
           prop1: { type: 'string', required: true }
         }
       },
@@ -965,8 +975,7 @@ describe('parser', () => {
     check(
       'FunctionalComponentAsConstAsDefaultExport',
       {
-        // in this case the component name is taken from the file name
-        FunctionalComponentAsConstAsDefaultExport: {
+        Jumbotron: {
           prop1: { type: 'string', required: true }
         }
       },
@@ -979,8 +988,7 @@ describe('parser', () => {
     check(
       'ReactSFCAsConstAsDefaultExport',
       {
-        // in this case the component name is taken from the file name
-        ReactSFCAsConstAsDefaultExport: {
+        Jumbotron: {
           prop1: { type: 'string', required: true }
         }
       },
@@ -1983,7 +1991,7 @@ describe('parser', () => {
       check(
         'Issue320',
         {
-          Issue320: {
+          Component: {
             color: {
               type: 'string',
               required: false,
