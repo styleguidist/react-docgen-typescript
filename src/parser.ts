@@ -567,6 +567,9 @@ export class Parser {
       const name = member.getName();
       const docblock = this.getFullJsDocComment(member).fullComment;
       const callSignature = this.getCallSignature(member);
+      if (!callSignature) {
+        return;
+      }
       const params = this.getParameterInfo(callSignature);
       const description = ts.displayPartsToString(
         member.getDocumentationComment(this.checker)
