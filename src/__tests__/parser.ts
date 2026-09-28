@@ -1875,6 +1875,17 @@ describe('parser', () => {
   });
 
   describe('methods', () => {
+    it('should skip public call signatures and non-callable members', () => {
+      const [parsed] = parse(fixturePath('PublicCallableMembers'));
+
+      assert.equal(parsed.displayName, 'Example');
+      assert.property(parsed.props, 'label');
+      assert.isNotEmpty(parsed.methods);
+      assert.isTrue(
+        parsed.methods.every(method => method.name === 'customMethod')
+      );
+    });
+
     it('should properly parse methods', () => {
       const [parsed] = parse(fixturePath('ColumnWithMethods'));
       const methods = parsed.methods;
